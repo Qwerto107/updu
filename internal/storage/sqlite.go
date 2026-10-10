@@ -46,6 +46,9 @@ var migration010 string
 //go:embed migrations/011_tickets.sql
 var migration011 string
 
+//go:embed migrations/012_status_page_layout.sql
+var migration012 string
+
 // DB wraps a sql.DB with updu-specific methods.
 type DB struct {
 	*sql.DB
@@ -105,6 +108,7 @@ func (db *DB) Migrate(ctx context.Context) error {
 		{9, migration009},
 		{10, migration010},
 		{11, migration011},
+		{12, migration012},
 	}
 
 	for _, m := range migrations {

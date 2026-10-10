@@ -31,6 +31,7 @@ type StatusPage struct {
 	Name              string            `json:"name"`
 	Slug              string            `json:"slug"`
 	Description       string            `json:"description,omitempty"`
+	Layout            string            `json:"layout"`
 	Groups            []StatusPageGroup `json:"groups"`
 	IsPublic          bool              `json:"is_public"`
 	PasswordProtected bool              `json:"password_protected,omitempty"`

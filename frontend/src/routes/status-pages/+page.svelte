@@ -33,6 +33,7 @@
     let formName = $state("");
     let formSlug = $state("");
     let formDescription = $state("");
+	let formLayout = $state("list");
     let formAccessMode = $state<AccessMode>("public");
     let formPassword = $state("");
     let formGroups = $state<string[]>([]);
@@ -99,6 +100,7 @@
         formName = "";
         formSlug = "";
         formDescription = "";
+		formLayout = "list";
         formAccessMode = "public";
         formPassword = "";
         formGroups = [];
@@ -112,6 +114,7 @@
         formName = p.name;
         formSlug = p.slug;
         formDescription = p.description || "";
+		formLayout = p.layout === "cards" ? "cards" : "list";
         formAccessMode = p.password_protected
             ? "protected"
             : p.is_public
@@ -172,6 +175,7 @@
                 name: formName,
                 slug: formSlug,
                 description: formDescription,
+				layout: formLayout,
                 is_public: formAccessMode !== "internal",
                 groups: compiledGroups,
                 password:
@@ -414,7 +418,7 @@
             class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in"
         />
         <Dialog.Content
-            class="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface/95 backdrop-blur-2xl p-6 shadow-[0_24px_64px_hsl(224_71%_4%/0.7)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 data-[state=open]:fade-in data-[state=open]:zoom-in-95"
+            class="fixed left-1/2 top-1/2 z-50 w-full max-w-md max-h-[90dvh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface/95 backdrop-blur-2xl p-6 shadow-[0_24px_64px_hsl(224_71%_4%/0.7)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 data-[state=open]:fade-in data-[state=open]:zoom-in-95"
         >
             <div class="flex items-center justify-between mb-5">
                 <div>
@@ -491,6 +495,17 @@
                     ></textarea>
                 </div>
                 <!-- Service & Group Selection -->
+				<fieldset class="space-y-2">
+					<legend class="text-sm font-medium text-text">{translateUI("Display layout")}</legend>
+					<div class="grid grid-cols-2 gap-3">
+						{#each [{ value: "list", label: "Simple list" }, { value: "cards", label: "Card grid" }] as option}
+							<label class="flex items-center gap-2 rounded-xl border border-border bg-surface-elevated p-3 text-sm text-text cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+								<input type="radio" name="status-layout" value={option.value} bind:group={formLayout} />
+								{translateUI(option.label)}
+							</label>
+						{/each}
+					</div>
+				</fieldset>
                 <div class="space-y-4 pt-2 border-t border-border/50">
                     <div class="space-y-2">
                         <div>

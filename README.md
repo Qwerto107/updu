@@ -20,7 +20,7 @@ on anything from a Raspberry Pi Zero W to a cloud VM.
 - **Progressive Web App (PWA)** — Offline app shell, installable on desktop and mobile, mobile navigation bar, and native App Badging (`navigator.setAppBadge`) reflecting down monitors
 - **10 notification channels** — Webhook, Discord, Slack, Email (SMTP), Gotify, Ntfy, Telegram, Pushover, Matrix, and Apprise
 - **AI Agent Integration & MCP Server** — Built-in Model Context Protocol server (`updu mcp`) for Claude, Cursor, and agentic workflows, plus `/.well-known/llms.txt`
-- **Public status pages** — Custom slugs, grouped monitors, custom CSS
+- **Public status pages** — Custom slugs, grouped monitors, list or card layouts, 24-hour status history and latency trends, custom CSS. Choose the layout under **Status Pages → Create/Edit → Display layout**; existing pages default to the list. Visible pages refresh every 30 seconds. Availability is calculated from recorded probes, with missing periods shown in gray and excluded from the percentage.
 - **Incident management** — Severity levels, status progression, per-monitor tracking
 - **Maintenance windows** — One-time or recurring windows to suppress alerts during planned work
 - **GitOps** — Declarative YAML config (`updu.conf`) with deterministic IDs

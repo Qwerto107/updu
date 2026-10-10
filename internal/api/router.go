@@ -985,6 +985,7 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 // --- Status Pages ---
 
 type statusPageUpsertRequest struct {
+	Layout        string                   `json:"layout"`
 	Name          string                   `json:"name"`
 	Slug          string                   `json:"slug"`
 	Description   string                   `json:"description"`
@@ -1026,12 +1027,20 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get monitor summaries for this status page
-	summaries, _ := s.db.GetMonitorsSummary(r.Context())
+	summaries, err := s.db.GetMonitorsSummary(r.Context())
+	if err != nil {
+		jsonError(w, "failed to load status page", http.StatusInternalServerError)
+		return
+	}
+	historyNow := time.Now()
 
 	// Filter monitors to only include those in the groups or monitor_ids assigned to this status page
 	var filtered []map[string]any
 	for _, sm := range summaries {
 		monitorGroups, _ := sm["groups"].([]string)
+		if len(monitorGroups) == 0 {
+			monitorGroups = []string{"Core"}
+		}
 		idStr, _ := sm["id"].(string)
 
 		matched := false
@@ -1060,6 +1069,14 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if matched {
+			// 只查询此页面已经授权展示的监控；查询游标已在汇总方法返回时关闭。
+			history, uptime, err := s.db.GetStatusHistory(r.Context(), idStr, historyNow)
+			if err != nil {
+				jsonError(w, "failed to load status history", http.StatusInternalServerError)
+				return
+			}
+			sm["history"] = history
+			sm["uptime_24h"] = uptime
 			filtered = append(filtered, sm)
 		}
 	}
@@ -1196,6 +1213,10 @@ func (s *Server) handleCreateStatusPage(w http.ResponseWriter, r *http.Request) 
 		jsonError(w, "password and clear_password cannot be combined", http.StatusBadRequest)
 		return
 	}
+	if req.Layout != "" && req.Layout != "list" && req.Layout != "cards" {
+		jsonError(w, "invalid status page layout", http.StatusBadRequest)
+		return
+	}
 	password := strings.TrimSpace(req.Password)
 	if req.Password != "" && password == "" {
 		jsonError(w, "password cannot be blank", http.StatusBadRequest)
@@ -1223,6 +1244,7 @@ func (s *Server) handleCreateStatusPage(w http.ResponseWriter, r *http.Request) 
 	}
 
 	sp := &models.StatusPage{
+		Layout:      req.Layout,
 		ID:          id,
 		Name:        req.Name,
 		Slug:        req.Slug,
@@ -1273,6 +1295,13 @@ func (s *Server) handleUpdateStatusPage(w http.ResponseWriter, r *http.Request) 
 	if update.Password != "" && update.ClearPassword {
 		jsonError(w, "password and clear_password cannot be combined", http.StatusBadRequest)
 		return
+	}
+	if update.Layout != "" && update.Layout != "list" && update.Layout != "cards" {
+		jsonError(w, "invalid status page layout", http.StatusBadRequest)
+		return
+	}
+	if update.Layout != "" {
+		existing.Layout = update.Layout
 	}
 	password := strings.TrimSpace(update.Password)
 	if update.Password != "" && password == "" {

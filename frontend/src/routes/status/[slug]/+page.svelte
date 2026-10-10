@@ -6,13 +6,40 @@
         AlertTriangle,
         XCircle,
         Activity,
-        Globe,
         Lock,
         Wrench,
         Info,
-        ShieldAlert,
     } from "lucide-svelte";
     import Button from "$lib/components/ui/button.svelte";
+    import StatusMonitor from "$lib/components/StatusMonitor.svelte";
+    import { onMount } from "svelte";
+
+    let refreshing = $state(false);
+    let refreshFailed = $state(false);
+    // 避免后台标签页持续轮询；销毁组件时清理定时器，慢请求不会重叠。
+    onMount(() => {
+        const controller = new AbortController();
+        const timer = setInterval(async () => {
+            if (document.hidden || refreshing) return;
+            refreshing = true;
+            try {
+                const response = await fetch(`/api/v1/status-pages/${encodeURIComponent(data.slug)}`, {
+                    cache: 'no-store', signal: controller.signal,
+                });
+                // 权限变化交给路由重新校验，临时网络故障则保留页面并在下轮重试。
+                if (response.status === 403 || response.status === 404) {
+                    await invalidateAll();
+                } else {
+                    if (!response.ok) throw new Error('refresh failed');
+                    data = { ...(await response.json()), slug: data.slug };
+                }
+                refreshFailed = false;
+            }
+            catch { refreshFailed = true; }
+            finally { refreshing = false; }
+        }, 30000);
+        return () => { clearInterval(timer); controller.abort(); };
+    });
 
     let { data } = $props<{ data: any }>();
     let password = $state("");
@@ -37,7 +64,7 @@
             if (!sp?.groups) return false;
             return sp.groups.some((g: any) => {
                 if (g.name && monitorGroups(m).includes(g.name)) return true;
-                if (!g.name && g.monitor_ids?.includes(m.id)) return true;
+                if (g.monitor_ids?.includes(m.id)) return true;
                 return false;
             });
         }),
@@ -52,7 +79,7 @@
             const bucket = sp?.groups?.find(
                 (g: any) =>
                     (g.name && monitorGroups(monitor).includes(g.name)) ||
-                    (!g.name && g.monitor_ids?.includes(monitor.id)),
+                    g.monitor_ids?.includes(monitor.id),
             );
             if (!bucket) {
                 continue;
@@ -172,7 +199,7 @@
         </div>
     </div>
 {:else}
-    <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-10">
+    <div class="mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8" class:max-w-6xl={sp.layout === 'cards'} class:max-w-4xl={sp.layout !== 'cards'}>
         <div class="text-center space-y-3 pt-6 pb-4 border-b border-border/50">
             <h1 class="text-3xl font-extrabold tracking-tight text-text">
                 {sp.name}
@@ -182,6 +209,11 @@
                     {sp.description}
                 </p>
             {/if}
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-text-muted">
+            <span>{translateUI("Services")}: {relevantMonitors.length} · {translateUI("Operational")}: {relevantMonitors.filter((m: any) => m.status === 'up').length}</span>
+            <span role="status">{refreshFailed ? translateUI("Refresh failed; retrying shortly") : translateUI("Refreshes every 30 seconds")}</span>
         </div>
 
         {#if relevantMonitors.length === 0}
@@ -195,7 +227,7 @@
             </div>
         {:else if humanState === "fixing"}
             <div
-                class="p-6 rounded-2xl bg-warning/10 border border-warning/30 flex items-start gap-4 text-warning shadow-[0_0_24px_hsl(38_92%_50%/0.15)]"
+                class="p-6 rounded-2xl bg-warning/10 border border-warning/30 flex items-start gap-4 text-warning light:text-amber-800 shadow-[0_0_24px_hsl(38_92%_50%/0.15)]"
             >
                 <AlertTriangle class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
@@ -212,7 +244,7 @@
             </div>
         {:else if humanState === "maintenance"}
             <div
-                class="p-6 rounded-2xl bg-primary/10 border border-primary/30 flex items-start gap-4 text-primary shadow-[0_0_24px_hsl(217_91%_60%/0.15)]"
+                class="p-6 rounded-2xl bg-primary/10 border border-primary/30 flex items-start gap-4 text-primary light:text-blue-700 shadow-[0_0_24px_hsl(217_91%_60%/0.15)]"
             >
                 <Wrench class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
@@ -224,7 +256,7 @@
             </div>
         {:else if humanState === "unacknowledged"}
             <div
-                class="p-6 rounded-2xl bg-danger/10 border border-danger/30 flex items-start gap-4 text-danger shadow-[0_0_24px_hsl(0_84%_60%/0.15)]"
+                class="p-6 rounded-2xl bg-danger/10 border border-danger/30 flex items-start gap-4 text-danger light:text-red-700 shadow-[0_0_24px_hsl(0_84%_60%/0.15)]"
             >
                 <XCircle class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
@@ -237,9 +269,14 @@
                     </p>
                 </div>
             </div>
+        {:else if !isAllUp}
+            <div class="p-6 rounded-2xl bg-surface-elevated border border-border text-text flex items-center gap-3">
+                <Info class="size-6 text-text-muted" />
+                <h2 class="text-lg font-semibold">{translateUI("Some services are paused or awaiting checks")}</h2>
+            </div>
         {:else}
             <div
-                class="p-6 rounded-2xl bg-success/10 border border-success/20 flex items-start gap-4 text-success shadow-[0_0_24px_hsl(142_71%_45%/0.1)]"
+                class="p-6 rounded-2xl bg-success/10 border border-success/20 flex items-start gap-4 text-success light:text-emerald-700 shadow-[0_0_24px_hsl(142_71%_45%/0.1)]"
             >
                 <CheckCircle2 class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
@@ -254,6 +291,11 @@
             </div>
         {/if}
 
+        <div class="flex flex-wrap gap-4 text-xs text-text-muted" aria-label={translateUI("History legend")}>
+            {#each [{label: 'Operational', color: 'bg-emerald-500'}, {label: 'Outage', color: 'bg-red-500'}, {label: 'Degraded', color: 'bg-amber-500'}, {label: 'No data', color: 'bg-slate-600 light:bg-slate-300'}] as item}
+                <span class="inline-flex items-center gap-1.5"><span class={`size-2 rounded-sm ${item.color}`}></span>{translateUI(item.label)}</span>
+            {/each}
+        </div>
         <div class="space-y-8">
             {#if sp.groups}
                 {#each sp.groups as group}
@@ -274,80 +316,9 @@
                                 </h3>
                             {/if}
 
-                            <div class="flex flex-col gap-3">
-                                {#each groupMonitors as m}
-                                    <div
-                                        class="p-4 rounded-xl bg-surface border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-surface-elevated/50"
-                                    >
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="size-8 rounded-lg bg-surface-elevated/80 flex items-center justify-center shrink-0 border border-border"
-                                            >
-                                                {#if m.type === "http" || m.type === "json" || m.type === "ssl"}
-                                                    <Globe
-                                                        class="size-3.5 text-text-muted"
-                                                    />
-                                                {:else}
-                                                    <Activity
-                                                        class="size-3.5 text-text-muted"
-                                                    />
-                                                {/if}
-                                            </div>
-                                            <div>
-                                                <p
-                                                    class="text-sm font-semibold text-text"
-                                                >
-                                                    {m.name}
-                                                </p>
-                                                {#if m.uptime_24h != null}
-                                                    <p
-                                                        class="text-[11px] text-text-subtle mt-0.5"
-                                                    >
-                                                        {m.uptime_24h.toFixed(4)}{translateUI("% uptime over 24h")}
-                                                    </p>
-                                                {/if}
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            {#if m.status === "up"}
-                                                <span
-                                                    class="text-[11px] font-bold uppercase tracking-wider text-success flex items-center gap-1.5"
-                                                >
-                                                    <div
-                                                        class="size-1.5 bg-success rounded-full shadow-[0_0_6px_currentColor]"
-                                                    ></div>
-                                                    {translateUI("Operational")}
-                                                </span>
-                                            {:else if m.status === "down"}
-                                                <span
-                                                    class="text-[11px] font-bold uppercase tracking-wider text-danger flex items-center gap-1.5"
-                                                >
-                                                    <div
-                                                        class="size-1.5 bg-danger rounded-full shadow-[0_0_6px_currentColor]"
-                                                    ></div>
-                                                    {translateUI("Outage")}
-                                                </span>
-                                            {:else if m.status === "degraded"}
-                                                <span
-                                                    class="text-[11px] font-bold uppercase tracking-wider text-warning flex items-center gap-1.5"
-                                                >
-                                                    <div
-                                                        class="size-1.5 bg-warning rounded-full shadow-[0_0_6px_currentColor]"
-                                                    ></div>
-                                                    {translateUI("Degraded")}
-                                                </span>
-                                            {:else}
-                                                <span
-                                                    class="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5"
-                                                >
-                                                    <div
-                                                        class="size-1.5 bg-text-subtle rounded-full"
-                                                    ></div>
-                                                    {translateUI("Unknown")}
-                                                </span>
-                                            {/if}
-                                        </div>
-                                    </div>
+                            <div class={sp.layout === "cards" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"} data-testid="status-layout" data-layout={sp.layout === "cards" ? "cards" : "list"}>
+                                {#each groupMonitors as m (m.id)}
+                                    <StatusMonitor monitor={m} cards={sp.layout === "cards"} />
                                 {/each}
                             </div>
                         </div>
