@@ -1,6 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+/* 需要保留状态色时，浅色主题使用更深的文字色以保证对比度。 */
+@custom-variant light (&:where(html.light, html.light *));
+
 @theme {
   /* Colors */
   --color-primary: hsl(217 91% 60%);

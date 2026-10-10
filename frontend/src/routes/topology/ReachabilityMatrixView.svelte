@@ -57,15 +57,15 @@
 	function getStatusBadgeClass(status?: string): string {
 		switch (status) {
 			case "up":
-				return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+				return "bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border-emerald-500/20";
 			case "degraded":
-				return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+				return "bg-amber-500/10 text-amber-400 light:text-amber-700 border-amber-500/20";
 			case "down":
-				return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+				return "bg-rose-500/10 text-rose-400 light:text-rose-700 border-rose-500/20";
 			case "isolated":
-				return "bg-slate-800/60 text-slate-300 border-slate-700/60";
+				return "bg-background text-text border-border";
 			default:
-				return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+				return "bg-text-muted/10 text-text-muted border-border";
 		}
 	}
 
@@ -110,26 +110,26 @@
 
 <div class="space-y-4">
 	<!-- Control Bar -->
-	<div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 border border-slate-800 p-3 rounded-xl text-xs">
+	<div class="flex flex-wrap items-center justify-between gap-3 bg-surface-elevated border border-border p-3 rounded-xl text-xs">
 		<div class="flex items-center gap-2 flex-1 max-w-sm">
-			<Search class="w-4 h-4 text-slate-400 shrink-0" />
+			<Search class="w-4 h-4 text-text-muted shrink-0" />
 			<input
 				type="text"
 				bind:value={searchQuery}
 				placeholder={translateUI("Filter services by name, zone, or HA group...")}
-				class="bg-transparent border-none text-slate-200 placeholder-slate-500 focus:outline-none w-full text-xs"
+				class="bg-transparent border-none text-text placeholder-text-muted focus:outline-none w-full text-xs"
 			/>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
-			<div class="inline-flex rounded-lg bg-slate-950 p-0.5 border border-slate-800">
+			<div class="inline-flex rounded-lg bg-surface p-0.5 border border-border">
 				<button
 					type="button"
 					onclick={() => (filterMode = "all")}
 					class={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
 						filterMode === "all"
-							? "bg-slate-800 text-white font-bold shadow-sm"
-							: "text-slate-400 hover:text-slate-200"
+							? "bg-background text-text font-bold shadow-sm"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
 					{translateUI("All Services")}
@@ -139,11 +139,11 @@
 					onclick={() => (filterMode = "asymmetric")}
 					class={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1 ${
 						filterMode === "asymmetric"
-							? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30"
-							: "text-slate-400 hover:text-slate-200"
+							? "bg-amber-500/20 text-amber-300 light:text-amber-700 font-bold border border-amber-500/30"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
-					<ShieldAlert class="w-3 h-3 text-amber-400" />
+					<ShieldAlert class="w-3 h-3 text-amber-400 light:text-amber-700" />
 					{translateUI("Asymmetric Reachability")}
 				</button>
 				<button
@@ -151,8 +151,8 @@
 					onclick={() => (filterMode = "degraded")}
 					class={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
 						filterMode === "degraded"
-							? "bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30"
-							: "text-slate-400 hover:text-slate-200"
+							? "bg-rose-500/20 text-rose-300 light:text-rose-700 font-bold border border-rose-500/30"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
 					{translateUI("Degraded Only")}
@@ -162,23 +162,23 @@
 	</div>
 
 	<!-- Dense Reachability Matrix Table -->
-	<div class="rounded-2xl border border-slate-800 bg-slate-950/80 shadow-xl overflow-hidden">
+	<div class="rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] overflow-hidden">
 		<div class="overflow-x-auto">
 			<table class="w-full text-left border-collapse text-xs">
 				<thead>
-					<tr class="border-b border-slate-800 bg-slate-900/90 text-slate-400 uppercase tracking-wider text-[10px] font-mono">
+					<tr class="border-b border-border bg-surface-elevated text-text-muted uppercase tracking-wider text-[10px] font-mono">
 						<th class="py-3.5 px-4 font-bold min-w-[220px]">{translateUI("Monitored Service")}</th>
 						<th class="py-3.5 px-4 font-bold min-w-[110px]">{translateUI("Zone")}</th>
 						<th class="py-3.5 px-4 font-bold min-w-[120px]">{translateUI("Overall")}</th>
 						{#each scopes as sc (sc.id)}
 							<th class="py-3.5 px-4 font-bold min-w-[180px]">
 								<div class="flex items-center gap-1.5">
-									<span class="text-white font-bold">{sc.name}</span>
-									<span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-normal">
+									<span class="text-text font-bold">{sc.name}</span>
+									<span class="text-[9px] px-1.5 py-0.2 rounded bg-background text-text-muted font-normal">
 										{sc.id}
 									</span>
 								</div>
-								<div class="text-[9px] text-slate-500 font-normal normal-case truncate max-w-[160px] mt-0.5">
+								<div class="text-[9px] text-text-muted font-normal normal-case truncate max-w-[160px] mt-0.5">
 									{sc.description || ""}
 								</div>
 							</th>
@@ -187,10 +187,10 @@
 					</tr>
 				</thead>
 
-				<tbody class="divide-y divide-slate-800/60">
+				<tbody class="divide-y divide-border">
 					{#if filteredServices.length === 0}
 						<tr>
-							<td colspan={scopes.length + 4} class="py-12 text-center text-slate-500">
+							<td colspan={scopes.length + 4} class="py-12 text-center text-text-muted">
 								{translateUI("No services match your active search or filters.")}
 							</td>
 						</tr>
@@ -198,8 +198,8 @@
 						{#each filteredServices as svc (svc.id)}
 							{@const isAsymm = isAsymmetric(svc)}
 							<tr
-								class={`hover:bg-slate-900/60 transition-colors group ${
-									isAsymm ? "bg-amber-950/10" : ""
+								class={`hover:bg-surface-elevated transition-colors group ${
+									isAsymm ? "bg-amber-500/10" : ""
 								}`}
 							>
 								<!-- Service Name & Type -->
@@ -208,25 +208,25 @@
 										<button
 											type="button"
 											onclick={() => onSelectService(svc)}
-											class="font-bold text-white text-sm text-left hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+											class="font-bold text-text text-sm text-left hover:text-emerald-400 light:hover:text-emerald-700 transition-colors flex items-center gap-1.5"
 										>
 											<span class="w-2 h-2 rounded-full shrink-0" style={`background-color: ${getStatusColor(svc.status)}`}></span>
 											<span>{svc.name}</span>
 										</button>
 									</div>
 
-									<div class="mt-0.5 flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
-										<span class="uppercase text-slate-500">{svc.type}</span>
+									<div class="mt-0.5 flex items-center gap-1.5 text-[10px] text-text-muted font-mono">
+										<span class="uppercase text-text-muted">{svc.type}</span>
 										{#if svc.ha_group}
 											<span>•</span>
-											<span class="inline-flex items-center gap-0.5 text-indigo-400">
+											<span class="inline-flex items-center gap-0.5 text-indigo-400 light:text-indigo-700">
 												<GitBranch class="w-2.5 h-2.5" />
 												{svc.ha_group}
 											</span>
 										{/if}
 										{#if isAsymm}
 											<span>•</span>
-											<span class="text-amber-400 font-semibold flex items-center gap-0.5">
+											<span class="text-amber-400 light:text-amber-700 font-semibold flex items-center gap-0.5">
 												<ShieldAlert class="w-2.5 h-2.5" />
 												{translateUI("Asymmetric")}
 											</span>
@@ -235,8 +235,8 @@
 								</td>
 
 								<!-- Zone -->
-								<td class="py-3 px-4 font-mono text-slate-300 text-xs">
-									<span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px]">
+								<td class="py-3 px-4 font-mono text-text text-xs">
+									<span class="px-2 py-0.5 rounded bg-surface-elevated border border-border text-[11px]">
 										{svc.zone_id || "default"}
 									</span>
 								</td>
@@ -247,7 +247,7 @@
 										{svc.status?.toUpperCase() || "PENDING"}
 									</span>
 									{#if svc.primary_latency_ms != null}
-										<div class="text-[10px] font-mono text-slate-400 mt-1">
+										<div class="text-[10px] font-mono text-text-muted mt-1">
 											{svc.primary_latency_ms}ms
 										</div>
 									{/if}
@@ -263,18 +263,18 @@
 												<button
 													type="button"
 													onclick={() => onSelectService(svc, sc.id)}
-													class="w-full text-left p-2 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer bg-slate-900/40 border-slate-800/80 hover:border-slate-600 text-slate-400 group/iso"
+													class="w-full text-left p-2 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer bg-surface-elevated border-border hover:border-border text-text-muted group/iso"
 												>
 													<div class="flex items-center justify-between gap-1">
-														<div class="flex items-center gap-1.5 font-bold text-[11px] text-slate-300">
-															<Shield class="w-3 h-3 text-slate-400 shrink-0" />
+														<div class="flex items-center gap-1.5 font-bold text-[11px] text-text">
+															<Shield class="w-3 h-3 text-text-muted shrink-0" />
 															<span class="truncate max-w-[90px]">{ep.name}</span>
 														</div>
-														<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">
+														<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-background text-text-muted border border-border">
 															{translateUI("Isolated")}
 														</span>
 													</div>
-													<div class="mt-1 text-[9px] text-slate-500 font-mono truncate">
+													<div class="mt-1 text-[9px] text-text-muted font-mono truncate">
 														{translateUI("Not reachable by design")}
 													</div>
 												</button>
@@ -284,32 +284,32 @@
 													onclick={() => onSelectService(svc, sc.id)}
 													class={`w-full text-left p-2 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${
 														ep.status === "up"
-															? "bg-emerald-950/20 border-emerald-800/40 hover:border-emerald-500/60"
+															? "bg-emerald-500/10 border-emerald-500/25 hover:border-emerald-500/60"
 															: ep.status === "degraded"
-															? "bg-amber-950/30 border-amber-800/50 hover:border-amber-500/70"
+															? "bg-amber-500/10 border-amber-500/25 hover:border-amber-500/70"
 															: ep.status === "down"
-															? "bg-rose-950/30 border-rose-800/50 hover:border-rose-500/70"
-															: "bg-slate-900/60 border-slate-800 hover:border-slate-700"
+															? "bg-rose-500/10 border-rose-500/25 hover:border-rose-500/70"
+															: "bg-surface-elevated border-border hover:border-border"
 													}`}
 												>
 													<div class="flex items-center justify-between gap-1">
-														<div class="flex items-center gap-1.5 font-bold text-[11px] text-white">
+														<div class="flex items-center gap-1.5 font-bold text-[11px] text-text">
 															<span class="w-1.5 h-1.5 rounded-full" style={`background-color: ${getStatusColor(ep.status)}`}></span>
 															<span class="truncate max-w-[90px]">{ep.name}</span>
 														</div>
 														{#if ep.last_latency_ms != null}
-															<span class="text-[10px] font-mono font-semibold text-emerald-400">
+															<span class="text-[10px] font-mono font-semibold text-emerald-400 light:text-emerald-700">
 																{ep.last_latency_ms}ms
 															</span>
 														{/if}
 													</div>
 
 													{#if failingHop}
-														<div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-950 border border-rose-800/80 text-[9px] font-mono text-rose-400 font-bold">
+														<div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-500/10 border border-rose-500/25 text-[9px] font-mono text-rose-400 light:text-rose-700 font-bold">
 															<span>{translateUI("HOP:")} {failingHop}</span>
 														</div>
 													{:else if ep.last_status_code}
-														<div class="mt-1 text-[10px] font-mono text-slate-400">
+														<div class="mt-1 text-[10px] font-mono text-text-muted">
 															HTTP {ep.last_status_code}
 														</div>
 													{/if}
@@ -320,7 +320,7 @@
 												<button
 													type="button"
 													onclick={() => onAddEndpoint(svc, sc.id)}
-													class="flex-1 text-center py-2 px-2 rounded-xl border border-dashed border-slate-800 hover:border-slate-600 text-slate-500 hover:text-slate-300 text-[10px] flex items-center justify-center gap-1 transition-all truncate"
+													class="flex-1 text-center py-2 px-2 rounded-xl border border-dashed border-border hover:border-border text-text-muted hover:text-text text-[10px] flex items-center justify-center gap-1 transition-all truncate"
 													title={`Add probe endpoint for ${sc.id}`}
 												>
 													<Plus class="w-3 h-3 shrink-0" />
@@ -330,7 +330,7 @@
 													<button
 														type="button"
 														onclick={() => onMarkIsolated(svc, sc.id)}
-														class="py-2 px-2 rounded-xl border border-dashed border-slate-800 hover:border-amber-500/50 hover:bg-amber-500/10 text-slate-500 hover:text-amber-400 text-[10px] flex items-center justify-center gap-1 transition-all shrink-0"
+														class="py-2 px-2 rounded-xl border border-dashed border-border hover:border-amber-500/50 hover:bg-amber-500/10 text-text-muted hover:text-amber-400 light:hover:text-amber-700 text-[10px] flex items-center justify-center gap-1 transition-all shrink-0"
 														title={`Mark ${sc.id} as Isolated / Not Reachable`}
 														aria-label={`Mark ${sc.id} as Isolated`}
 													>
@@ -350,21 +350,21 @@
 											type="button"
 											onclick={() => onRunProbe(svc.id)}
 											disabled={probingId === svc.id}
-											class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-all disabled:opacity-50"
+											class="p-1.5 rounded-lg text-text-muted hover:text-emerald-400 light:hover:text-emerald-700 hover:bg-background transition-all disabled:opacity-50"
 											title={translateUI("Run Probe")}
 											aria-label={translateUI("Run Probe")}
 										>
-											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400" : ""}`} />
+											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400 light:text-emerald-700" : ""}`} />
 										</button>
 
 										<button
 											type="button"
 											onclick={() => onSelectService(svc)}
-											class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+											class="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-background transition-all"
 											title={translateUI("Inspect Hop Trace")}
 											aria-label={translateUI("Inspect Hop Trace")}
 										>
-											<ArrowUpRight class="w-3.5 h-3.5 text-emerald-400" />
+											<ArrowUpRight class="w-3.5 h-3.5 text-emerald-400 light:text-emerald-700" />
 										</button>
 									</div>
 								</td>

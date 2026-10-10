@@ -17,13 +17,13 @@ test.describe('language preferences', () => {
         await page.context().clearCookies();
         await page.goto('/login');
         await expect(page.getByRole('heading', { name: 'Sign in to updu' })).toBeVisible();
-        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('zh-CN');
+        await page.getByRole('button', { name: '简体中文', exact: true }).click();
         await expect(page.getByRole('heading', { name: '登录 updu' })).toBeVisible();
         await expect(page.getByLabel('用户名', { exact: true })).toBeVisible();
         await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
         await page.reload();
         await expect(page.getByRole('heading', { name: '登录 updu' })).toBeVisible();
-        await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en');
+        await page.getByRole('button', { name: 'English', exact: true }).click();
         await expect(page.getByRole('heading', { name: 'Sign in to updu' })).toBeVisible();
     });
 
@@ -40,7 +40,7 @@ test.describe('language preferences', () => {
         expect((await saved.json()).default_language).toBe('zh-CN');
         await page.reload();
         await expect(page.getByLabel('默认语言', { exact: true })).toHaveValue('zh-CN');
-        await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en');
+        await page.getByRole('button', { name: 'English', exact: true }).click();
         await page.reload();
         await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
 
@@ -56,7 +56,7 @@ test.describe('language preferences', () => {
             await expect(login.getByRole('heading', { name: '登录 updu' })).toBeVisible();
             await expect(login.locator('html')).toHaveAttribute('lang', 'zh-CN');
         } finally { await visitor.close(); }
-        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('');
+        await page.getByRole('button', { name: 'Use instance default', exact: true }).click();
         await expect(page.getByRole('heading', { name: '设置', exact: true })).toBeVisible();
     });
 
@@ -80,7 +80,7 @@ test.describe('language preferences', () => {
         page.on('pageerror', error => errors.push(error.message));
         await page.context().addCookies((await request.storageState()).cookies);
         await page.goto('/');
-        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('zh-CN');
+        await page.getByRole('button', { name: '简体中文', exact: true }).click();
         // 检查各路由的实际浏览器渲染，发现翻译接入导致的运行时错误。
         for (const route of ['/', '/services', '/topology', '/certificates', '/stats',
             '/incidents', '/maintenance', '/status-pages', '/settings/general',
@@ -89,14 +89,14 @@ test.describe('language preferences', () => {
             await page.goto(route);
             await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
             await expect(page.locator('#main-content'), route).toBeVisible();
-            await expect(page.getByRole('combobox', { name: '语言', exact: true })).toBeVisible();
+            await expect(page.getByRole('group', { name: '语言', exact: true })).toBeVisible();
         }
         expect(errors).toEqual([]);
-        // 中文选择项更长，320px 手机宽度下仍须能切换语言和退出。
+        // 分段开关在 320px 手机宽度下仍须完整显示，并保留退出入口。
         await page.setViewportSize({ width: 320, height: 800 });
         for (const route of ['/', '/stats']) {
             await page.goto(route);
-            await expect(page.getByRole('combobox', { name: '语言', exact: true })).toBeInViewport();
+            await expect(page.getByRole('group', { name: '语言', exact: true })).toBeInViewport();
             await expect(page.getByRole('button', { name: '退出登录', exact: true })).toBeInViewport();
             await expect.poll(() => page.evaluate(() =>
                 document.documentElement.scrollWidth - document.documentElement.clientWidth,

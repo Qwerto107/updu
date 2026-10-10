@@ -37,7 +37,7 @@
         nextSettings.default_language = normalizeLocale(nextSettings.default_language);
 
         if (!nextSettings.theme) {
-            nextSettings.theme = 'dark';
+            nextSettings.theme = 'light';
         }
 
         if (!nextSettings.enable_custom_css) {
@@ -86,7 +86,7 @@
     function selectedThemeLabel(): string {
         return (
             themeOptions.find((option) => option.value === settingValue('theme'))
-                ?.label ?? 'Dark'
+                ?.label ?? 'Light'
         );
     }
 

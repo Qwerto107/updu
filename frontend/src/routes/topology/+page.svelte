@@ -1,4 +1,5 @@
 <script lang="ts">
+    // 中性颜色使用主题变量，状态文字单独适配浅色，弹窗也遵循相同规则。
     import { t as translateUI } from '$lib/i18n/index.svelte';
 	import { onMount, onDestroy } from "svelte";
 	import {
@@ -384,25 +385,25 @@
 	<!-- Top Header Bar -->
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 		<div>
-			<h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-				<Network class="w-7 h-7 text-emerald-400" />
+			<h1 class="text-2xl font-bold tracking-tight text-text flex items-center gap-2.5">
+				<Network class="w-7 h-7 text-emerald-400 light:text-emerald-700" />
 				{translateUI("Network Topology & Diagnostics")}
 			</h1>
-			<p class="text-sm text-slate-400 mt-1">
+			<p class="text-sm text-text-muted mt-1">
 				{translateUI("Zone perimeters, cross-fabric reachability matrices, and hop-by-hop diagnostic autopsies.")}
 			</p>
 		</div>
 
 		<div class="flex items-center gap-2 flex-wrap">
 			<!-- View Mode Toggle: Zones | Matrix | Hop Inspector -->
-			<div class="inline-flex rounded-lg bg-slate-900/80 p-1 border border-slate-800">
+			<div class="inline-flex rounded-lg bg-surface-elevated p-1 border border-border">
 				<button
 					type="button"
 					onclick={() => (viewMode = "zones")}
 					class={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
 						viewMode === "zones"
 							? "bg-emerald-500 text-slate-950 font-semibold shadow"
-							: "text-slate-400 hover:text-white"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
 					<Layers class="w-3.5 h-3.5" />
@@ -414,7 +415,7 @@
 					class={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
 						viewMode === "matrix"
 							? "bg-emerald-500 text-slate-950 font-semibold shadow"
-							: "text-slate-400 hover:text-white"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
 					<Grid3X3 class="w-3.5 h-3.5" />
@@ -431,7 +432,7 @@
 					class={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
 						viewMode === "inspector"
 							? "bg-emerald-500 text-slate-950 font-semibold shadow"
-							: "text-slate-400 hover:text-white"
+							: "text-text-muted hover:text-text"
 					}`}
 				>
 					<Activity class="w-3.5 h-3.5" />
@@ -440,7 +441,7 @@
 			</div>
 
 			<Button variant="secondary" onclick={loadTopology} disabled={loading} class="gap-1.5 text-xs">
-				<RefreshCw class={`w-3.5 h-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
+				<RefreshCw class={`w-3.5 h-3.5 ${loading ? "animate-spin text-emerald-400 light:text-emerald-700" : ""}`} />
 				{translateUI("Refresh")}
 			</Button>
 
@@ -453,9 +454,9 @@
 					newZoneDescription = "";
 					showAddZoneModal = true;
 				}}
-				class="gap-1.5 text-xs border-slate-700 hover:bg-slate-800 text-slate-200"
+				class="gap-1.5 text-xs border-border hover:bg-background text-text"
 			>
-				<Layers class="w-3.5 h-3.5 text-blue-400" />
+				<Layers class="w-3.5 h-3.5 text-blue-400 light:text-blue-700" />
 				{translateUI("Add Zone")}
 			</Button>
 
@@ -471,46 +472,46 @@
 	</div>
 
 	{#if loading && !topology}
-		<div class="flex flex-col items-center justify-center min-h-[400px] border border-slate-800 rounded-xl bg-slate-900/40">
-			<Spinner class="w-8 h-8 text-emerald-400" />
-			<p class="text-sm text-slate-400 mt-3">{translateUI("Synthesizing network topology graph...")}</p>
+		<div class="flex flex-col items-center justify-center min-h-[400px] border border-border rounded-xl bg-surface-elevated">
+			<Spinner class="w-8 h-8 text-emerald-400 light:text-emerald-700" />
+			<p class="text-sm text-text-muted mt-3">{translateUI("Synthesizing network topology graph...")}</p>
 		</div>
 	{:else if error}
-		<div class="p-6 rounded-xl border border-rose-900/50 bg-rose-950/20 text-rose-300">
+		<div class="p-6 rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-300 light:text-rose-700">
 			<p class="font-medium">{translateUI("Failed to load topology")}</p>
-			<p class="text-sm text-rose-400 mt-1">{translateUI(error ?? '')}</p>
+			<p class="text-sm text-rose-400 light:text-rose-700 mt-1">{translateUI(error ?? '')}</p>
 			<Button variant="outline" class="mt-4 text-xs" onclick={loadTopology}>{translateUI("Try Again")}</Button>
 		</div>
 	{:else if topology}
 		<!-- Stats Banner -->
 		<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-			<div class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 flex items-center justify-between">
+			<div class="p-3.5 rounded-xl border border-border bg-surface-elevated flex items-center justify-between">
 				<div>
-					<span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{translateUI("Prober Nodes")}</span>
-					<div class="text-xl font-bold text-white mt-0.5">{topology.nodes?.length || 0}</div>
+					<span class="text-xs text-text-muted uppercase tracking-wider font-semibold">{translateUI("Prober Nodes")}</span>
+					<div class="text-xl font-bold text-text mt-0.5">{topology.nodes?.length || 0}</div>
 				</div>
-				<Radio class="w-6 h-6 text-emerald-400/50" />
+				<Radio class="w-6 h-6 text-emerald-400/50 light:text-emerald-700" />
 			</div>
-			<div class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 flex items-center justify-between">
+			<div class="p-3.5 rounded-xl border border-border bg-surface-elevated flex items-center justify-between">
 				<div>
-					<span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{translateUI("Zones")}</span>
-					<div class="text-xl font-bold text-white mt-0.5">{topology.zones?.length || 0}</div>
+					<span class="text-xs text-text-muted uppercase tracking-wider font-semibold">{translateUI("Zones")}</span>
+					<div class="text-xl font-bold text-text mt-0.5">{topology.zones?.length || 0}</div>
 				</div>
-				<Layers class="w-6 h-6 text-blue-400/50" />
+				<Layers class="w-6 h-6 text-blue-400/50 light:text-blue-700" />
 			</div>
-			<div class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 flex items-center justify-between">
+			<div class="p-3.5 rounded-xl border border-border bg-surface-elevated flex items-center justify-between">
 				<div>
-					<span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{translateUI("Services")}</span>
-					<div class="text-xl font-bold text-white mt-0.5">{topology.services?.length || 0}</div>
+					<span class="text-xs text-text-muted uppercase tracking-wider font-semibold">{translateUI("Services")}</span>
+					<div class="text-xl font-bold text-text mt-0.5">{topology.services?.length || 0}</div>
 				</div>
-				<Server class="w-6 h-6 text-indigo-400/50" />
+				<Server class="w-6 h-6 text-indigo-400/50 light:text-indigo-700" />
 			</div>
-			<div class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 flex items-center justify-between">
+			<div class="p-3.5 rounded-xl border border-border bg-surface-elevated flex items-center justify-between">
 				<div>
-					<span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">{translateUI("Ingress Endpoints")}</span>
-					<div class="text-xl font-bold text-white mt-0.5">{topology.edges?.length || 0}</div>
+					<span class="text-xs text-text-muted uppercase tracking-wider font-semibold">{translateUI("Ingress Endpoints")}</span>
+					<div class="text-xl font-bold text-text mt-0.5">{topology.edges?.length || 0}</div>
 				</div>
-				<Activity class="w-6 h-6 text-emerald-400/50" />
+				<Activity class="w-6 h-6 text-emerald-400/50 light:text-emerald-700" />
 			</div>
 		</div>
 
@@ -566,47 +567,47 @@
 	>
 		<form onsubmit={handleCreateZone} class="space-y-4">
 			{#if formError}
-				<div class="p-3 rounded-lg bg-rose-950/40 border border-rose-800 text-xs text-rose-300">
+				<div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 light:text-rose-700">
 					{translateUI(formError ?? '')}
 				</div>
 			{/if}
 
 			<div class="space-y-1.5">
-				<label for="zone-id" class="text-xs font-semibold text-slate-300">{translateUI("Zone ID (slug) *")}</label>
+				<label for="zone-id" class="text-xs font-semibold text-text">{translateUI("Zone ID (slug) *")}</label>
 				<input
 					id="zone-id"
 					type="text"
 					bind:value={newZoneId}
 					placeholder={translateUI("e.g. cloud-vps, home-rack, branch-office")}
 					required
-					class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-blue-500 focus:outline-none"
+					class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-blue-500 focus:outline-none"
 				/>
 			</div>
 
 			<div class="space-y-1.5">
-				<label for="zone-name" class="text-xs font-semibold text-slate-300">{translateUI("Zone Display Name *")}</label>
+				<label for="zone-name" class="text-xs font-semibold text-text">{translateUI("Zone Display Name *")}</label>
 				<input
 					id="zone-name"
 					type="text"
 					bind:value={newZoneName}
 					placeholder={translateUI("e.g. Cloud VPS (Frankfurt), Home Rack")}
 					required
-					class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+					class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-blue-500 focus:outline-none"
 				/>
 			</div>
 
 			<div class="space-y-1.5">
-				<label for="zone-desc" class="text-xs font-semibold text-slate-300">{translateUI("Description (Optional)")}</label>
+				<label for="zone-desc" class="text-xs font-semibold text-text">{translateUI("Description (Optional)")}</label>
 				<input
 					id="zone-desc"
 					type="text"
 					bind:value={newZoneDescription}
 					placeholder={translateUI("e.g. Offsite failover node and public reverse proxy")}
-					class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+					class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-blue-500 focus:outline-none"
 				/>
 			</div>
 
-			<div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+			<div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
 				<Button type="button" variant="secondary" onclick={() => (showAddZoneModal = false)}>
 					{translateUI("Cancel")}
 				</Button>
@@ -630,30 +631,30 @@
 	>
 		<form onsubmit={handleCreateService} class="space-y-4">
 			{#if formError}
-				<div class="p-3 rounded-lg bg-rose-950/40 border border-rose-800 text-xs text-rose-300">
+				<div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 light:text-rose-700">
 					{translateUI(formError ?? '')}
 				</div>
 			{/if}
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<div class="space-y-1.5">
-					<label for="svc-name" class="text-xs font-semibold text-slate-300">{translateUI("Service Name *")}</label>
+					<label for="svc-name" class="text-xs font-semibold text-text">{translateUI("Service Name *")}</label>
 					<input
 						id="svc-name"
 						type="text"
 						bind:value={newServiceName}
 						placeholder={translateUI("e.g. Vaultwarden, Plex, Home Assistant")}
 						required
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<label for="svc-zone" class="text-xs font-semibold text-slate-300">{translateUI("Infrastructure Zone")}</label>
+					<label for="svc-zone" class="text-xs font-semibold text-text">{translateUI("Infrastructure Zone")}</label>
 					<select
 						id="svc-zone"
 						bind:value={newServiceZoneId}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					>
 						{#each topology?.zones || [{ id: "default", name: "Default Zone" }] as z}
 							<option value={z.id}>{z.name} ({z.id})</option>
@@ -664,11 +665,11 @@
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<div class="space-y-1.5">
-					<label for="svc-type" class="text-xs font-semibold text-slate-300">{translateUI("Service Type")}</label>
+					<label for="svc-type" class="text-xs font-semibold text-text">{translateUI("Service Type")}</label>
 					<select
 						id="svc-type"
 						bind:value={newServiceType}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					>
 						<option value="web">{translateUI("Web (HTTP/HTTPS)")}</option>
 						<option value="ping">{translateUI("Ping (ICMP Echo)")}</option>
@@ -679,24 +680,24 @@
 				</div>
 
 				<div class="space-y-1.5">
-					<label for="svc-hagroup" class="text-xs font-semibold text-slate-300">{translateUI("HA Cluster Group (Optional)")}</label>
+					<label for="svc-hagroup" class="text-xs font-semibold text-text">{translateUI("HA Cluster Group (Optional)")}</label>
 					<input
 						id="svc-hagroup"
 						type="text"
 						bind:value={newServiceHAGroup}
 						placeholder={translateUI("e.g. vaultwarden-ha, adguard-cluster")}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<div class="space-y-1.5">
-					<label for="svc-scope" class="text-xs font-semibold text-slate-300">{translateUI("Primary Endpoint Scope")}</label>
+					<label for="svc-scope" class="text-xs font-semibold text-text">{translateUI("Primary Endpoint Scope")}</label>
 					<select
 						id="svc-scope"
 						bind:value={newServiceScopeId}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					>
 						<option value="public">{translateUI("Public WAN (Cloudflare / Ingress)")}</option>
 						<option value="tailnet">{translateUI("Tailnet (Private VPN Overlay)")}</option>
@@ -705,7 +706,7 @@
 				</div>
 
 				<div class="space-y-1.5">
-					<label for="svc-target" class="text-xs font-semibold text-slate-300">
+					<label for="svc-target" class="text-xs font-semibold text-text">
 						{newServiceType === "web" ? translateUI("Target URL *") : "Target Host / IP *"}
 					</label>
 					<input
@@ -714,36 +715,36 @@
 						bind:value={newServiceTarget}
 						placeholder={newServiceType === "web" ? "https://vault.example.com" : "192.168.1.10"}
 						required
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-2 gap-4">
 				<div class="space-y-1.5">
-					<label for="svc-interval" class="text-xs font-semibold text-slate-300">{translateUI("Probe Interval (sec)")}</label>
+					<label for="svc-interval" class="text-xs font-semibold text-text">{translateUI("Probe Interval (sec)")}</label>
 					<input
 						id="svc-interval"
 						type="number"
 						min="10"
 						bind:value={newServiceInterval}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<label for="svc-timeout" class="text-xs font-semibold text-slate-300">{translateUI("Timeout (sec)")}</label>
+					<label for="svc-timeout" class="text-xs font-semibold text-text">{translateUI("Timeout (sec)")}</label>
 					<input
 						id="svc-timeout"
 						type="number"
 						min="1"
 						bind:value={newServiceTimeout}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 			</div>
 
-			<div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+			<div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
 				<Button type="button" variant="secondary" onclick={() => (showAddServiceModal = false)}>
 					{translateUI("Cancel")}
 				</Button>
@@ -767,30 +768,30 @@
 	>
 		<form onsubmit={handleCreateEndpoint} class="space-y-4">
 			{#if formError}
-				<div class="p-3 rounded-lg bg-rose-950/40 border border-rose-800 text-xs text-rose-300">
+				<div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 light:text-rose-700">
 					{translateUI(formError ?? '')}
 				</div>
 			{/if}
 
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<div class="space-y-1.5">
-					<label for="ep-name" class="text-xs font-semibold text-slate-300">{translateUI("Endpoint Label *")}</label>
+					<label for="ep-name" class="text-xs font-semibold text-text">{translateUI("Endpoint Label *")}</label>
 					<input
 						id="ep-name"
 						type="text"
 						bind:value={newEndpointName}
 						placeholder={translateUI("e.g. Tailscale Direct, LAN IP")}
 						required
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<label for="ep-scope" class="text-xs font-semibold text-slate-300">{translateUI("Vantage Scope *")}</label>
+					<label for="ep-scope" class="text-xs font-semibold text-text">{translateUI("Vantage Scope *")}</label>
 					<select
 						id="ep-scope"
 						bind:value={newEndpointScopeId}
-						class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+						class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 					>
 						<option value="lan">{translateUI("LAN (Direct Local Network)")}</option>
 						<option value="tailnet">{translateUI("Tailnet (Tailscale Mesh)")}</option>
@@ -800,20 +801,20 @@
 			</div>
 
 			<!-- Scope Isolation Toggle -->
-			<div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+			<div class="p-3 rounded-xl bg-surface border border-border space-y-2">
 				<div class="flex items-center gap-2">
 					<input
 						id="ep-isolated"
 						type="checkbox"
 						bind:checked={newEndpointIsIsolated}
-						class="rounded border-slate-800 bg-slate-900 text-amber-500 focus:ring-amber-500"
+						class="rounded border-border bg-surface-elevated text-amber-500 focus:ring-amber-500"
 					/>
-					<label for="ep-isolated" class="text-xs font-semibold text-slate-200 cursor-pointer flex items-center gap-1.5">
-						<Shield class="w-3.5 h-3.5 text-amber-400" />
+					<label for="ep-isolated" class="text-xs font-semibold text-text cursor-pointer flex items-center gap-1.5">
+						<Shield class="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
 						{translateUI("Mark as Isolated / Not Reachable in this scope")}
 					</label>
 				</div>
-				<p class="text-[11px] text-slate-400 pl-6 leading-relaxed">
+				<p class="text-[11px] text-text-muted pl-6 leading-relaxed">
 					{translateUI("Designates that this service is intentionally segmented and unreachable from this scope (e.g. internal service not exposed to Public WAN). Active probes are disabled for this route and diagnostics treat it as healthy by design.")}
 				</p>
 			</div>
@@ -821,11 +822,11 @@
 			{#if !newEndpointIsIsolated}
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div class="space-y-1.5">
-						<label for="ep-type" class="text-xs font-semibold text-slate-300">{translateUI("Target Type")}</label>
+						<label for="ep-type" class="text-xs font-semibold text-text">{translateUI("Target Type")}</label>
 						<select
 							id="ep-type"
 							bind:value={newEndpointTargetType}
-							class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+							class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:border-emerald-500 focus:outline-none"
 						>
 							<option value="http">HTTP / HTTPS</option>
 							<option value="ping">{translateUI("Ping (ICMP)")}</option>
@@ -836,7 +837,7 @@
 					</div>
 
 					<div class="space-y-1.5">
-						<label for="ep-target" class="text-xs font-semibold text-slate-300">
+						<label for="ep-target" class="text-xs font-semibold text-text">
 							{newEndpointTargetType === "http" ? translateUI("Target URL *") : "Target Host / IP *"}
 						</label>
 						<input
@@ -845,31 +846,31 @@
 							bind:value={newEndpointTarget}
 							placeholder={newEndpointTargetType === "http" ? "http://192.168.1.50:8080" : "100.64.0.1"}
 							required={!newEndpointIsIsolated}
-							class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+							class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 						/>
 					</div>
 				</div>
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-1.5">
-						<label for="ep-interval" class="text-xs font-semibold text-slate-300">{translateUI("Interval (sec)")}</label>
+						<label for="ep-interval" class="text-xs font-semibold text-text">{translateUI("Interval (sec)")}</label>
 						<input
 							id="ep-interval"
 							type="number"
 							min="10"
 							bind:value={newEndpointInterval}
-							class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+							class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 						/>
 					</div>
 
 					<div class="space-y-1.5">
-						<label for="ep-timeout" class="text-xs font-semibold text-slate-300">{translateUI("Timeout (sec)")}</label>
+						<label for="ep-timeout" class="text-xs font-semibold text-text">{translateUI("Timeout (sec)")}</label>
 						<input
 							id="ep-timeout"
 							type="number"
 							min="1"
 							bind:value={newEndpointTimeout}
-							class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono text-white focus:border-emerald-500 focus:outline-none"
+							class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono text-text focus:border-emerald-500 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -879,15 +880,15 @@
 						id="ep-primary"
 						type="checkbox"
 						bind:checked={newEndpointIsPrimary}
-						class="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500"
+						class="rounded border-border bg-surface text-emerald-500 focus:ring-emerald-500"
 					/>
-					<label for="ep-primary" class="text-xs text-slate-300 cursor-pointer">
+					<label for="ep-primary" class="text-xs text-text cursor-pointer">
 						{translateUI("Set as primary routing endpoint for this service")}
 					</label>
 				</div>
 			{/if}
 
-			<div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+			<div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
 				<Button type="button" variant="secondary" onclick={() => (showAddEndpointModal = false)}>
 					{translateUI("Cancel")}
 				</Button>

@@ -56,26 +56,26 @@
 	function getStatusBadgeClass(status?: string): string {
 		switch (status) {
 			case "up":
-				return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+				return "bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border-emerald-500/20";
 			case "degraded":
-				return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+				return "bg-amber-500/10 text-amber-400 light:text-amber-700 border-amber-500/20";
 			case "down":
-				return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+				return "bg-rose-500/10 text-rose-400 light:text-rose-700 border-rose-500/20";
 			default:
-				return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+				return "bg-text-muted/10 text-text-muted border-border";
 		}
 	}
 
 	function getScopeColor(scopeId: string): string {
 		switch (scopeId) {
 			case "lan":
-				return "text-emerald-400 bg-emerald-950/40 border-emerald-800/60";
+				return "text-emerald-400 light:text-emerald-700 bg-emerald-500/10 border-emerald-500/25";
 			case "tailnet":
-				return "text-indigo-400 bg-indigo-950/40 border-indigo-800/60";
+				return "text-indigo-400 light:text-indigo-700 bg-indigo-500/10 border-indigo-500/25";
 			case "public":
-				return "text-sky-400 bg-sky-950/40 border-sky-800/60";
+				return "text-sky-400 light:text-sky-700 bg-sky-500/10 border-sky-500/25";
 			default:
-				return "text-slate-300 bg-slate-900 border-slate-800";
+				return "text-text bg-surface-elevated border-border";
 		}
 	}
 
@@ -89,28 +89,28 @@
 
 <div class="space-y-6">
 	<!-- Sub-bar Filter & Search -->
-	<div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 border border-slate-800 p-3 rounded-xl text-xs">
+	<div class="flex flex-wrap items-center justify-between gap-3 bg-surface-elevated border border-border p-3 rounded-xl text-xs">
 		<div class="flex items-center gap-2 flex-1 max-w-sm">
-			<Search class="w-4 h-4 text-slate-400 shrink-0" />
+			<Search class="w-4 h-4 text-text-muted shrink-0" />
 			<input
 				type="text"
 				bind:value={searchQuery}
 				placeholder={translateUI("Filter services by name, type, or HA group...")}
-				class="bg-transparent border-none text-slate-200 placeholder-slate-500 focus:outline-none w-full text-xs"
+				class="bg-transparent border-none text-text placeholder-text-muted focus:outline-none w-full text-xs"
 			/>
 		</div>
 
 		<div class="flex items-center gap-2">
-			<span class="text-slate-400 font-medium">{translateUI("Status:")}</span>
-			<div class="inline-flex rounded-lg bg-slate-950 p-0.5 border border-slate-800">
+			<span class="text-text-muted font-medium">{translateUI("Status:")}</span>
+			<div class="inline-flex rounded-lg bg-surface p-0.5 border border-border">
 				{#each ["all", "up", "degraded", "down"] as st}
 					<button
 						type="button"
 						onclick={() => (statusFilter = st)}
 						class={`px-2.5 py-1 rounded-md text-[11px] font-medium uppercase tracking-wider transition-all ${
 							statusFilter === st
-								? "bg-slate-800 text-white font-bold shadow-sm"
-								: "text-slate-400 hover:text-slate-200"
+								? "bg-background text-text font-bold shadow-sm"
+								: "text-text-muted hover:text-text"
 						}`}
 					>
 						{st}
@@ -144,21 +144,21 @@
 			{@const degradedCount = allZoneServices.filter((s) => s.status === "degraded").length}
 			{@const downCount = allZoneServices.filter((s) => s.status === "down").length}
 
-			<div class="rounded-2xl border border-slate-800 bg-slate-950/70 shadow-lg overflow-hidden flex flex-col transition-all hover:border-slate-700/80">
+			<div class="rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] overflow-hidden flex flex-col transition-all hover:border-border">
 				<!-- Zone Boundary Header -->
-				<div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-900/80 flex flex-wrap items-center justify-between gap-3">
+				<div class="p-4 sm:p-5 border-b border-border bg-surface-elevated flex flex-wrap items-center justify-between gap-3">
 					<div class="flex items-center gap-3">
-						<div class="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+						<div class="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 light:text-blue-700">
 							<Layers class="w-5 h-5" />
 						</div>
 						<div>
 							<div class="flex items-center gap-2">
-								<h2 class="font-bold text-base text-white tracking-tight">{zone.name}</h2>
-								<span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+								<h2 class="font-bold text-base text-text tracking-tight">{zone.name}</h2>
+								<span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-background text-text border border-border">
 									{zone.id}
 								</span>
 							</div>
-							<p class="text-xs text-slate-400 mt-0.5">
+							<p class="text-xs text-text-muted mt-0.5">
 								{zone.description || translateUI("Failure domain & physical infrastructure perimeter")}
 							</p>
 						</div>
@@ -166,15 +166,15 @@
 
 					<div class="flex items-center gap-2">
 						<!-- Health summary pill -->
-						<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
-							<span class="text-emerald-400 font-bold">{upCount} {translateUI("Up")}</span>
+						<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface border border-border text-[11px] font-mono">
+							<span class="text-emerald-400 light:text-emerald-700 font-bold">{upCount} {translateUI("Up")}</span>
 							{#if degradedCount > 0}
-								<span class="text-slate-600">•</span>
-								<span class="text-amber-400 font-bold">{degradedCount} {translateUI("Degraded")}</span>
+								<span class="text-text-muted">•</span>
+								<span class="text-amber-400 light:text-amber-700 font-bold">{degradedCount} {translateUI("Degraded")}</span>
 							{/if}
 							{#if downCount > 0}
-								<span class="text-slate-600">•</span>
-								<span class="text-rose-400 font-bold">{downCount} {translateUI("Down")}</span>
+								<span class="text-text-muted">•</span>
+								<span class="text-rose-400 light:text-rose-700 font-bold">{downCount} {translateUI("Down")}</span>
 							{/if}
 						</div>
 
@@ -182,7 +182,7 @@
 							variant="ghost"
 							size="sm"
 							onclick={() => onAddService(zone.id)}
-							class="text-xs gap-1 text-slate-300 hover:text-white hover:bg-slate-800"
+							class="text-xs gap-1 text-text hover:text-text hover:bg-background"
 						>
 							<Plus class="w-3.5 h-3.5" />
 							{translateUI("Add")}
@@ -191,20 +191,20 @@
 				</div>
 
 				<!-- Zone Infrastructure / Nodes Strip -->
-				<div class="px-5 py-2.5 bg-slate-900/40 border-b border-slate-800/80 flex flex-wrap items-center gap-3 text-xs">
-					<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-						<Radio class="w-3.5 h-3.5 text-emerald-400" />
+				<div class="px-5 py-2.5 bg-surface-elevated border-b border-border flex flex-wrap items-center gap-3 text-xs">
+					<span class="text-[11px] font-semibold uppercase tracking-wider text-text-muted flex items-center gap-1">
+						<Radio class="w-3.5 h-3.5 text-emerald-400 light:text-emerald-700" />
 						{translateUI("Prober Nodes:")}
 					</span>
 					{#if zoneNodes.length === 0}
-						<span class="text-[11px] text-slate-500 italic">{translateUI("No nodes assigned to this zone directly")}</span>
+						<span class="text-[11px] text-text-muted italic">{translateUI("No nodes assigned to this zone directly")}</span>
 					{:else}
 						{#each zoneNodes as node}
-							<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[11px]">
+							<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface-elevated border border-border text-text text-[11px]">
 								<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
 								<span class="font-medium">{node.name}</span>
 								{#if node.is_local}
-									<span class="text-[9px] font-mono uppercase px-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+									<span class="text-[9px] font-mono uppercase px-1 rounded bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border border-emerald-500/25">
 										{translateUI("Origin")}
 									</span>
 								{/if}
@@ -216,7 +216,7 @@
 				<!-- Zone Services Grid / List -->
 				<div class="p-4 sm:p-5 space-y-3 flex-1">
 					{#if filteredZoneServices.length === 0}
-						<div class="text-center py-10 text-slate-500 text-xs">
+						<div class="text-center py-10 text-text-muted text-xs">
 							{#if allZoneServices.length === 0}
 								{translateUI("No services in this zone yet. Click \"Add\" above to register one.")}
 							{:else}
@@ -233,24 +233,24 @@
 								onkeydown={(e) => {
 									if (e.key === "Enter" || e.key === " ") onSelectService(svc);
 								}}
-								class="p-4 rounded-xl border border-slate-800/90 bg-slate-900/70 hover:bg-slate-900 hover:border-slate-700 transition-all cursor-pointer shadow-sm group"
+								class="p-4 rounded-xl border border-border bg-surface-elevated hover:bg-surface-elevated hover:border-border transition-all cursor-pointer shadow-sm group"
 							>
 								<!-- Service Header -->
 								<div class="flex items-start justify-between gap-3">
 									<div>
 										<div class="flex items-center gap-2 flex-wrap">
 											<span class="w-2.5 h-2.5 rounded-full shrink-0" style={`background-color: ${getStatusColor(svc.status)}`}></span>
-											<span class="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
+											<span class="font-bold text-sm text-text group-hover:text-emerald-300 light:group-hover:text-emerald-700 transition-colors">
 												{svc.name}
 											</span>
-											<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800 uppercase">
+											<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface text-text-muted border border-border uppercase">
 												{svc.type}
 											</span>
 
 											<!-- HA Cluster Badge -->
 											{#if svc.ha_group}
-												<div class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60">
-													<GitBranch class="w-3 h-3 text-indigo-400" />
+												<div class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 light:text-indigo-700 border border-indigo-500/25">
+													<GitBranch class="w-3 h-3 text-indigo-400 light:text-indigo-700" />
 													<span>{translateUI("HA:")} {svc.ha_group}</span>
 												</div>
 											{/if}
@@ -258,10 +258,10 @@
 
 										<!-- HA Peers Indicator -->
 										{#if haPeers.length > 0}
-											<div class="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-												<span class="text-slate-500">{translateUI("HA Peers:")}</span>
+											<div class="mt-1 flex items-center gap-1.5 text-[11px] text-text-muted">
+												<span class="text-text-muted">{translateUI("HA Peers:")}</span>
 												{#each haPeers as peer}
-													<span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-slate-950 border border-slate-800 text-[10px] font-mono">
+													<span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-surface border border-border text-[10px] font-mono">
 														<span class="w-1.5 h-1.5 rounded-full" style={`background-color: ${getStatusColor(peer.status)}`}></span>
 														{peer.zone_id} ({peer.status})
 													</span>
@@ -282,11 +282,11 @@
 												onRunProbe(svc.id);
 											}}
 											disabled={probingId === svc.id}
-											class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-all disabled:opacity-50"
+											class="p-1.5 rounded-lg text-text-muted hover:text-emerald-400 light:hover:text-emerald-700 hover:bg-background transition-all disabled:opacity-50"
 											title={translateUI("Run Probe Now")}
 											aria-label={translateUI("Run Probe Now")}
 										>
-											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400" : ""}`} />
+											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400 light:text-emerald-700" : ""}`} />
 										</button>
 									</div>
 								</div>
@@ -294,8 +294,8 @@
 								<!-- Diagnostic Alert if Degraded/Down -->
 								{#if svc.status === "degraded" || svc.status === "down"}
 									<div class="mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
-										<ShieldAlert class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-										<div class="text-[11px] text-amber-300 leading-tight">
+										<ShieldAlert class="w-4 h-4 text-amber-400 light:text-amber-700 shrink-0 mt-0.5" />
+										<div class="text-[11px] text-amber-300 light:text-amber-700 leading-tight">
 											<span class="font-semibold">{translateUI("Diagnosis:")}</span> {svc.diagnosis || translateUI("Probe failure detected")}
 										</div>
 									</div>
@@ -304,13 +304,13 @@
 								<!-- Ingress Scope Reachability Pills -->
 								<div class="mt-3 flex flex-wrap items-center gap-2">
 									{#if !svc.endpoints || svc.endpoints.length === 0}
-										<span class="text-[11px] text-slate-500 italic">{translateUI("No scope ingress endpoints configured")}</span>
+										<span class="text-[11px] text-text-muted italic">{translateUI("No scope ingress endpoints configured")}</span>
 									{:else}
 										{#each svc.endpoints as ep}
 											<div class={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border ${getScopeColor(ep.scope_id)}`}>
 												<span class="w-1.5 h-1.5 rounded-full" style={`background-color: ${getStatusColor(ep.status)}`}></span>
 												<span class="uppercase font-bold text-[10px] font-mono">{ep.scope_id}</span>
-												<span class="text-slate-300 font-normal truncate max-w-[120px]">{ep.name}</span>
+												<span class="text-text font-normal truncate max-w-[120px]">{ep.name}</span>
 												{#if ep.last_latency_ms != null}
 													<span class="font-mono text-[10px] font-semibold opacity-90">{ep.last_latency_ms}ms</span>
 												{/if}
@@ -324,7 +324,7 @@
 											e.stopPropagation();
 											onAddEndpoint(svc);
 										}}
-										class="text-[11px] text-slate-400 hover:text-white px-2 py-1 rounded border border-dashed border-slate-700 hover:border-slate-500 flex items-center gap-1"
+										class="text-[11px] text-text-muted hover:text-text px-2 py-1 rounded border border-dashed border-border hover:border-border flex items-center gap-1"
 									>
 										<Plus class="w-3 h-3" />
 										{translateUI("Endpoint")}
@@ -332,11 +332,11 @@
 								</div>
 
 								<!-- Footer: Hop Inspector Deep-Link CTA -->
-								<div class="mt-3 pt-2.5 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-									<span class="text-slate-500 font-mono">
+								<div class="mt-3 pt-2.5 border-t border-border flex items-center justify-between text-[11px] text-text-muted">
+									<span class="text-text-muted font-mono">
 										{translateUI("Primary Ingress:")} {svc.endpoints?.find((e) => e.is_primary)?.name || "Default"}
 									</span>
-									<span class="text-emerald-400 group-hover:underline flex items-center gap-0.5 font-medium">
+									<span class="text-emerald-400 light:text-emerald-700 group-hover:underline flex items-center gap-0.5 font-medium">
 										{translateUI("Troubleshoot & Hop Trace")}
 										<ArrowUpRight class="w-3 h-3" />
 									</span>
