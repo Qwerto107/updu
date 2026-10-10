@@ -5,7 +5,7 @@
 
 <select
     aria-label={t('Language')}
-    class="input-base text-xs w-auto max-w-40 py-1.5"
+    class="input-base text-xs w-24 sm:w-auto sm:max-w-40 min-w-0 py-1.5"
     value={languageStore.preference}
     onchange={(event) => languageStore.select(event.currentTarget.value)}
 >

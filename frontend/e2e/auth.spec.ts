@@ -15,9 +15,10 @@ test('login, session persistence, and logout work', async ({ page }) => {
     await expect(page.getByText(expectedUsername, { exact: true })).toBeVisible();
 
     await page.goto('/monitors');
-    await expect(page).toHaveURL(/\/monitors$/);
+    // 旧监控路径会重定向到服务列表，继续验证兼容入口和登录态。
+    await expect(page).toHaveURL(/\/services$/);
     await expect(
-        page.getByRole('heading', { name: 'Monitors', level: 1 }),
+        page.getByRole('heading', { name: 'Services', level: 1 }),
     ).toBeVisible();
 
     await page.reload();

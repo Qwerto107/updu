@@ -1,13 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { locales, normalizeLocale, translate } from '../src/lib/i18n/locales';
-import { adminUsername, adminPassword } from './helpers/env';
 
 test.describe('language preferences', () => {
     test.beforeEach(async ({ request }) => {
-        // 使用隔离测试实例，不修改用户当前运行实例的账号或语言设置。
-        expect((await request.post('/api/v1/auth/login', {
-            data: { username: adminUsername, password: adminPassword },
-        })).ok()).toBeTruthy();
+        // 复用 setup 项目保存的会话，避免整套 E2E 重复登录触发限流。
         expect((await request.post('/api/v1/settings', {
             data: { default_language: 'en' },
         })).ok()).toBeTruthy();
@@ -49,7 +45,11 @@ test.describe('language preferences', () => {
         await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
 
         // 新上下文没有本地偏好或登录态，必须采用服务器保存的中文默认值。
-        const visitor = await browser.newContext({ baseURL: page.url().split('/settings')[0] });
+        const visitor = await browser.newContext({
+            baseURL: page.url().split('/settings')[0],
+            // 显式清除项目默认登录态，确保这里验证的确实是新访客。
+            storageState: { cookies: [], origins: [] },
+        });
         try {
             const login = await visitor.newPage();
             await login.goto('/login');
@@ -92,5 +92,15 @@ test.describe('language preferences', () => {
             await expect(page.getByRole('combobox', { name: '语言', exact: true })).toBeVisible();
         }
         expect(errors).toEqual([]);
+        // 中文选择项更长，320px 手机宽度下仍须能切换语言和退出。
+        await page.setViewportSize({ width: 320, height: 800 });
+        for (const route of ['/', '/stats']) {
+            await page.goto(route);
+            await expect(page.getByRole('combobox', { name: '语言', exact: true })).toBeInViewport();
+            await expect(page.getByRole('button', { name: '退出登录', exact: true })).toBeInViewport();
+            await expect.poll(() => page.evaluate(() =>
+                document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            )).toBeLessThanOrEqual(1);
+        }
     });
 });

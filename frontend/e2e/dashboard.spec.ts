@@ -118,6 +118,8 @@ test.describe('dashboard situational awareness', () => {
         await expect(healthRegion).toContainText('Service outage');
         await expect(healthRegion).toContainText('Down');
         await expect(healthRegion).toContainText('1/1');
+        // 默认是紧凑行视图；诊断卡片才展示带标签的状态和心跳历史。
+        await page.getByRole('button', { name: 'Diagnostic Cards', exact: true }).click();
         const downMonitorCard = page.getByRole('link', {
             name: /Dashboard Down Monitor Status: Down/i,
         });
@@ -139,12 +141,13 @@ test.describe('dashboard situational awareness', () => {
 
         await expect(
             page.getByRole('region', {
-                name: /system health: no active monitors/i,
+                name: /system health: no active services/i,
             }),
         ).toBeVisible();
         await expect(page.getByRole('region', { name: /system health/i })).not.toContainText(
             'Service outage',
         );
+        await page.getByRole('button', { name: 'Diagnostic Cards', exact: true }).click();
         await expect(
             page.getByRole('link', {
                 name: /Dashboard Paused Monitor Status: Paused/i,

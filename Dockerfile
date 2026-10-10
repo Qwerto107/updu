@@ -9,7 +9,8 @@ COPY frontend/ .
 RUN pnpm run build
 
 # ---- Go build stage ----
-FROM golang:1.26.1-bookworm AS backend
+# 与 go.mod 保持一致，使用已修复标准库漏洞的补丁版本。
+FROM golang:1.26.9-bookworm AS backend
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
