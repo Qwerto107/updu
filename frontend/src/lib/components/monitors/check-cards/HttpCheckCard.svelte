@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { ShieldCheck } from "lucide-svelte";
     import {
         formatPublicKeySummary,
@@ -112,32 +113,32 @@
 
 <CheckCardShell
     typeLabel={url?.startsWith("https://") ? "HTTPS" : "HTTP"}
-    description="updu sends an HTTP request and validates the response and TLS certificate."
+    description={translateUI("updu sends an HTTP request and validates the response and TLS certificate.")}
     hasDetails
 >
     {#snippet basics()}
         <FieldTile
-            label="Last Status"
+            label={translateUI("Last Status")}
             value={lastStatusCode ?? undefined}
         />
-        <FieldTile label="Expected" value={`HTTP ${expectedStatus}`} />
-        <FieldTile label="Method" value={method.toUpperCase()} />
+        <FieldTile label={translateUI("Expected")} value={`HTTP ${expectedStatus}`} />
+        <FieldTile label={translateUI("Method")} value={method.toUpperCase()} />
         {#if hasTLS}
             <FieldTile
-                label="Cert Expires"
+                label={translateUI("Cert Expires")}
                 value={formatDate(certNotAfter)}
                 tone={certTone}
                 testId="monitor-basic-certificate-expires"
             />
             <FieldTile
-                label="Days Left"
+                label={translateUI("Days Left")}
                 value={certDaysRemaining ?? undefined}
                 tone={certTone}
                 testId="monitor-basic-days-left"
             />
         {/if}
         <FieldTile
-            label="Cadence"
+            label={translateUI("Cadence")}
             value={cadence ? `Every ${cadence}s` : undefined}
         />
     {/snippet}
@@ -147,7 +148,7 @@
             <HttpHero {method} {url} />
 
             <div class="grid gap-3 sm:grid-cols-2">
-                <FieldTile label="Expectation" value={expectation} />
+                <FieldTile label={translateUI("Expectation")} value={expectation} />
                 {#if curlSnippet}
                     <FieldTile
                         label="curl"
@@ -170,25 +171,25 @@
                         <p
                             class="text-[10px] font-semibold uppercase tracking-[0.16em]"
                         >
-                            TLS Certificate
+                            {translateUI("TLS Certificate")}
                         </p>
                     </div>
                     <div class="grid gap-2 text-xs sm:grid-cols-2">
                         {#if certVerification}
                             <p class="text-text">
-                                <span class="text-text-subtle">Verification:</span>
+                                <span class="text-text-subtle">{translateUI("Verification:")}</span>
                                 {certVerification}
                             </p>
                         {/if}
                         {#if certSubject}
                             <p class="font-mono break-all text-text">
-                                <span class="text-text-subtle">Subject:</span>
+                                <span class="text-text-subtle">{translateUI("Subject:")}</span>
                                 {certSubject}
                             </p>
                         {/if}
                         {#if certIssuer}
                             <p class="font-mono break-all text-text">
-                                <span class="text-text-subtle">Issuer:</span>
+                                <span class="text-text-subtle">{translateUI("Issuer:")}</span>
                                 {certIssuer}
                             </p>
                         {/if}
@@ -199,7 +200,7 @@
     {/snippet}
 
     {#snippet details()}
-        <DetailSection title="Request">
+        <DetailSection title={translateUI("Request")}>
             <FieldTile
                 label="URL"
                 value={url}
@@ -208,18 +209,18 @@
                 copyable={Boolean(url)}
                 copyLabel="Copy URL"
             />
-            <FieldTile label="Method" value={method.toUpperCase()} />
-            <FieldTile label="Expected Status" value={expectedStatus} />
+            <FieldTile label={translateUI("Method")} value={method.toUpperCase()} />
+            <FieldTile label={translateUI("Expected Status")} value={expectedStatus} />
             <FieldTile
-                label="Expected Body"
+                label={translateUI("Expected Body")}
                 value={expectedBody}
                 multiline
             />
             {#if hasTLS}
-                <FieldTile label="TLS Warn Threshold" value={`${warnDays} days`} />
+                <FieldTile label={translateUI("TLS Warn Threshold")} value={`${warnDays} days`} />
             {/if}
             <FieldTile
-                label="Skip TLS Verification"
+                label={translateUI("Skip TLS Verification")}
                 value={skipTLSVerify === undefined
                     ? undefined
                     : skipTLSVerify
@@ -229,7 +230,7 @@
         </DetailSection>
 
         {#if headerEntries.length > 0}
-            <DetailSection title="Headers">
+            <DetailSection title={translateUI("Headers")}>
                 <FieldTile
                     label={`Headers (${headerEntries.length})`}
                     value={headerText}
@@ -242,9 +243,9 @@
         {/if}
 
         {#if body}
-            <DetailSection title="Request Body">
+            <DetailSection title={translateUI("Request Body")}>
                 <FieldTile
-                    label="Body"
+                    label={translateUI("Body")}
                     value={body}
                     monospace
                     multiline
@@ -255,59 +256,59 @@
         {/if}
 
         {#if certNotAfter || certNotBefore || certSubject || certIssuer}
-            <DetailSection title="TLS Certificate">
-                <FieldTile label="Valid From" value={formatTimestamp(certNotBefore)} />
-                <FieldTile label="Valid Until" value={formatTimestamp(certNotAfter)} />
+            <DetailSection title={translateUI("TLS Certificate")}>
+                <FieldTile label={translateUI("Valid From")} value={formatTimestamp(certNotBefore)} />
+                <FieldTile label={translateUI("Valid Until")} value={formatTimestamp(certNotAfter)} />
                 <FieldTile
-                    label="Days Left"
+                    label={translateUI("Days Left")}
                     value={certDaysRemaining ?? undefined}
                 />
-                <FieldTile label="Verification" value={certVerification} />
+                <FieldTile label={translateUI("Verification")} value={certVerification} />
                 <FieldTile
-                    label="Subject"
+                    label={translateUI("Subject")}
                     value={certSubject}
                     monospace
                     copyable={Boolean(certSubject)}
                 />
                 <FieldTile
-                    label="Issuer"
+                    label={translateUI("Issuer")}
                     value={certIssuer}
                     monospace
                     copyable={Boolean(certIssuer)}
                 />
                 <FieldTile
-                    label="Serial Number"
+                    label={translateUI("Serial Number")}
                     value={certSerialNumber}
                     monospace
                     copyable={Boolean(certSerialNumber)}
                 />
                 <FieldTile
-                    label="SHA-256 Fingerprint"
+                    label={translateUI("SHA-256 Fingerprint")}
                     value={certFingerprint}
                     monospace
                     multiline
                     copyable={Boolean(certFingerprint)}
                 />
-                <FieldTile label="Signature Algorithm" value={certSignatureAlgorithm} />
-                <FieldTile label="Public Key" value={certPublicKey} />
+                <FieldTile label={translateUI("Signature Algorithm")} value={certSignatureAlgorithm} />
+                <FieldTile label={translateUI("Public Key")} value={certPublicKey} />
                 <FieldTile
-                    label="DNS Names"
+                    label={translateUI("DNS Names")}
                     value={formatList(certDNSNames)}
                     monospace
                     multiline
                 />
                 <FieldTile
-                    label="IP Addresses"
+                    label={translateUI("IP Addresses")}
                     value={formatList(certIPAddresses)}
                     monospace
                     multiline
                 />
                 <FieldTile
-                    label="Chain Length"
+                    label={translateUI("Chain Length")}
                     value={formatChainLength(certChainLength)}
                 />
                 <FieldTile
-                    label="Certificate Chain"
+                    label={translateUI("Certificate Chain")}
                     value={formatList(certChainSummary)}
                     monospace
                     multiline

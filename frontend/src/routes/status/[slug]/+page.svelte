@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { invalidateAll } from "$app/navigation";
     import {
         CheckCircle2,
@@ -125,7 +126,7 @@
 </script>
 
 <svelte:head>
-    <title>{sp?.name ? `${sp.name} Status` : locked ? "Protected Status Page" : "Status Page"}</title>
+    <title>{sp?.name ? `${sp.name} Status` : locked ? translateUI("Protected Status Page") : translateUI("Status Page")}</title>
 </svelte:head>
 
 {#if locked}
@@ -136,9 +137,9 @@
                     <Lock class="size-6" />
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-text">Protected Status Page</h1>
+                    <h1 class="text-2xl font-bold tracking-tight text-text">{translateUI("Protected Status Page")}</h1>
                     <p class="text-sm text-text-muted mt-2">
-                        Enter the page password to view current service status.
+                        {translateUI("Enter the page password to view current service status.")}
                     </p>
                 </div>
             </div>
@@ -146,7 +147,7 @@
             <form class="space-y-4" onsubmit={unlockPage}>
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="status-page-password">
-                        Password
+                        {translateUI("Password")}
                     </label>
                     <input
                         id="status-page-password"
@@ -154,7 +155,7 @@
                         bind:value={password}
                         class="input-base"
                         autocomplete="current-password"
-                        placeholder="Enter password"
+                        placeholder={translateUI("Enter password")}
                     />
                 </div>
 
@@ -165,7 +166,7 @@
                 {/if}
 
                 <Button class="w-full" loading={unlocking} type="submit">
-                    {unlocking ? "Unlocking..." : "Unlock Status Page"}
+                    {unlocking ? "Unlocking..." : translateUI("Unlock Status Page")}
                 </Button>
             </form>
         </div>
@@ -189,7 +190,7 @@
             >
                 <Activity class="size-6 text-text-muted" />
                 <h2 class="text-lg font-medium text-text-muted">
-                    No services configured
+                    {translateUI("No services configured")}
                 </h2>
             </div>
         {:else if humanState === "fixing"}
@@ -198,9 +199,9 @@
             >
                 <AlertTriangle class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">Active Incident: {incidents[0]?.title || "Service Disturbance"}</h2>
+                    <h2 class="text-xl font-bold">{translateUI("Active Incident:")} {incidents[0]?.title || translateUI("Service Disturbance")}</h2>
                     <p class="text-sm opacity-90">
-                        We are aware of this issue and actively investigating / working on a fix (Status: {incidents[0]?.status || "investigating"}).
+                        {translateUI("We are aware of this issue and actively investigating / working on a fix (Status:")} {incidents[0]?.status || "investigating"}).
                     </p>
                     {#if incidents[0]?.description}
                         <p class="text-xs text-text-muted mt-1">
@@ -215,9 +216,9 @@
             >
                 <Wrench class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">Scheduled Maintenance: {maintenance[0]?.title || "System Maintenance"}</h2>
+                    <h2 class="text-xl font-bold">{translateUI("Scheduled Maintenance:")} {maintenance[0]?.title || translateUI("System Maintenance")}</h2>
                     <p class="text-sm opacity-90">
-                        Scheduled maintenance is currently in progress. Affected services will resume nominal operation upon completion.
+                        {translateUI("Scheduled maintenance is currently in progress. Affected services will resume nominal operation upon completion.")}
                     </p>
                 </div>
             </div>
@@ -227,12 +228,12 @@
             >
                 <XCircle class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">Automated Alert: Service Outage Detected</h2>
+                    <h2 class="text-xl font-bold">{translateUI("Automated Alert: Service Outage Detected")}</h2>
                     <p class="text-sm opacity-90">
-                        Canary probes report reachability failures across one or more failure domains.
+                        {translateUI("Canary probes report reachability failures across one or more failure domains.")}
                     </p>
                     <p class="text-xs text-text-muted mt-1">
-                        Status: Unacknowledged by on-call administrator. Automated alerts have been dispatched.
+                        {translateUI("Status: Unacknowledged by on-call administrator. Automated alerts have been dispatched.")}
                     </p>
                 </div>
             </div>
@@ -242,12 +243,12 @@
             >
                 <CheckCircle2 class="size-8 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">All Systems Operational</h2>
+                    <h2 class="text-xl font-bold">{translateUI("All Systems Operational")}</h2>
                     <p class="text-sm opacity-90">
-                        All monitored services are reachable from all server vantage points.
+                        {translateUI("All monitored services are reachable from all server vantage points.")}
                     </p>
                     <p class="text-xs text-text-subtle mt-0.5">
-                        If a service is unreachable for you, verify your local network connection, Tailscale overlay daemon, or DNS.
+                        {translateUI("If a service is unreachable for you, verify your local network connection, Tailscale overlay daemon, or DNS.")}
                     </p>
                 </div>
             </div>
@@ -302,8 +303,7 @@
                                                     <p
                                                         class="text-[11px] text-text-subtle mt-0.5"
                                                     >
-                                                        {m.uptime_24h.toFixed(4)}%
-                                                        uptime over 24h
+                                                        {m.uptime_24h.toFixed(4)}{translateUI("% uptime over 24h")}
                                                     </p>
                                                 {/if}
                                             </div>
@@ -316,7 +316,7 @@
                                                     <div
                                                         class="size-1.5 bg-success rounded-full shadow-[0_0_6px_currentColor]"
                                                     ></div>
-                                                    Operational
+                                                    {translateUI("Operational")}
                                                 </span>
                                             {:else if m.status === "down"}
                                                 <span
@@ -325,7 +325,7 @@
                                                     <div
                                                         class="size-1.5 bg-danger rounded-full shadow-[0_0_6px_currentColor]"
                                                     ></div>
-                                                    Outage
+                                                    {translateUI("Outage")}
                                                 </span>
                                             {:else if m.status === "degraded"}
                                                 <span
@@ -334,7 +334,7 @@
                                                     <div
                                                         class="size-1.5 bg-warning rounded-full shadow-[0_0_6px_currentColor]"
                                                     ></div>
-                                                    Degraded
+                                                    {translateUI("Degraded")}
                                                 </span>
                                             {:else}
                                                 <span
@@ -343,7 +343,7 @@
                                                     <div
                                                         class="size-1.5 bg-text-subtle rounded-full"
                                                     ></div>
-                                                    Unknown
+                                                    {translateUI("Unknown")}
                                                 </span>
                                             {/if}
                                         </div>

@@ -147,6 +147,11 @@ func (s *Server) handleImportConfig(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Sanitize custom CSS if present
+	// 备份导入遵守与设置接口相同的语言校验，防止保存未支持的语言。
+	if language, exists := backup.Settings["default_language"]; exists && !isSupportedLanguage(language) {
+		jsonError(w, "unsupported default language", http.StatusBadRequest)
+		return
+	}
 	if css, ok := backup.Settings["custom_css"]; ok {
 		backup.Settings["custom_css"] = sanitizeCSS(css)
 	}

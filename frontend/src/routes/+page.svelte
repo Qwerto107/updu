@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import {
 		Activity,
 		ServerCrash,
@@ -187,7 +188,7 @@
 			return {
 				key: "empty",
 				label: "No active services",
-				sub: `${pausedCount} service${pausedCount === 1 ? "" : "s"} paused.`,
+				sub: translateUI('Paused services: {count}.', { count: pausedCount }),
 				tone: "neutral",
 				icon: ShieldAlert,
 			};
@@ -197,7 +198,7 @@
 			return {
 				key: "outage",
 				label: "Service outage",
-				sub: `${downCount} service${downCount === 1 ? "" : "s"} down.`,
+				sub: translateUI('Service outages: {count}.', { count: downCount }),
 				tone: "danger",
 				icon: ShieldX,
 			};
@@ -207,7 +208,7 @@
 			return {
 				key: "degraded",
 				label: "Degraded performance",
-				sub: `${attentionMonitors.length} service${attentionMonitors.length === 1 ? "" : "s"} need triage.`,
+				sub: translateUI('Services needing triage: {count}.', { count: attentionMonitors.length }),
 				tone: "warning",
 				icon: ShieldAlert,
 			};
@@ -217,7 +218,7 @@
 			return {
 				key: "empty",
 				label: "Checks pending",
-				sub: `${upCount} healthy, ${pendingCount} waiting for first result.`,
+				sub: translateUI('{healthy} healthy, {pending} waiting for first result.', { healthy: upCount, pending: pendingCount }),
 				tone: "neutral",
 				icon: ShieldAlert,
 			};
@@ -226,7 +227,7 @@
 		return {
 			key: "operational",
 			label: "All systems operational",
-			sub: `${upCount} of ${activeMonitorCount} active service${activeMonitorCount === 1 ? "" : "s"} healthy.`,
+			sub: translateUI('Healthy services: {healthy} / {total}.', { healthy: upCount, total: activeMonitorCount }),
 			tone: "success",
 			icon: ShieldCheck,
 		};
@@ -385,7 +386,7 @@
 </script>
 
 <svelte:head>
-	<title>{showPortal ? "Service Portal – updu" : "Dashboard – updu"}</title>
+	<title>{showPortal ? translateUI("Service Portal – updu") : "Dashboard – updu"}</title>
 </svelte:head>
 
 {#if showPortal}
@@ -393,10 +394,10 @@
 		<div class="flex items-center justify-between p-3.5 mb-6 rounded-xl bg-primary/10 border border-primary/20 text-xs text-text">
 			<div class="flex items-center gap-2">
 				<Sparkles class="size-4 text-primary shrink-0" />
-				<span><strong>Admin Preview Mode:</strong> You are viewing the unified single-page portal as non-admin users see it.</span>
+				<span><strong>{translateUI("Admin Preview Mode:")}</strong> {translateUI("You are viewing the unified single-page portal as non-admin users see it.")}</span>
 			</div>
 			<Button size="sm" variant="secondary" onclick={() => (adminPortalPreview = false)} class="text-xs">
-				Exit Preview
+				{translateUI("Exit Preview")}
 			</Button>
 		</div>
 	{/if}
@@ -406,17 +407,16 @@
 	<!-- Page header -->
 	<div class="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
 		<div>
-			<h1 class="text-2xl font-bold tracking-tight text-text">Dashboard</h1>
+			<h1 class="text-2xl font-bold tracking-tight text-text">{translateUI("Dashboard")}</h1>
 			<p class="mt-1 type-caption text-text-muted">
-			Real-time infrastructure overview
+			{translateUI("Real-time infrastructure overview")}
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
 			{#if !loading && monitors.length > 0}
 				<p class="type-caption text-text-muted hidden sm:block">
-					{upCount} healthy, {downCount} active {downCount === 1
-						? "incident"
-						: "incidents"}, {pausedCount} paused
+					{translateUI('Healthy: {healthy}, active incidents: {incidents}, paused: {paused}',
+						{ healthy: upCount, incidents: downCount, paused: pausedCount })}
 				</p>
 			{/if}
 			<Button
@@ -426,7 +426,7 @@
 				class="flex items-center gap-1.5 text-xs"
 			>
 				<Sparkles class="size-3.5 text-primary" />
-				<span>Preview User Portal</span>
+				<span>{translateUI("Preview User Portal")}</span>
 			</Button>
 		</div>
 	</div>
@@ -448,32 +448,32 @@
 					<VerdictIcon class="size-6" aria-hidden="true" />
 				</div>
 				<div class="min-w-0">
-					<p class="type-kicker text-text-subtle">System health</p>
+					<p class="type-kicker text-text-subtle">{translateUI("System health")}</p>
 					<h2 class="text-xl font-bold tracking-tight text-text">
-						{dashboardVerdict.label}
+						{translateUI(dashboardVerdict.label ?? '')}
 					</h2>
-					<p class="type-caption text-text-muted">{dashboardVerdict.sub}</p>
+					<p class="type-caption text-text-muted">{translateUI(dashboardVerdict.sub)}</p>
 				</div>
 			</div>
 
 			<dl
 				class="grid w-full grid-cols-2 gap-3 text-left sm:w-auto sm:grid-cols-3 sm:gap-8 sm:text-right"
-				aria-label="Key dashboard metrics"
+				aria-label={translateUI("Key dashboard metrics")}
 			>
 				<div>
-					<dt class="type-kicker text-text-subtle">Down</dt>
+					<dt class="type-kicker text-text-subtle">{translateUI("Down")}</dt>
 					<dd class="type-numeric text-2xl font-bold tabular-nums text-text">
 						{downCount}/{monitors.length}
 					</dd>
 				</div>
 				<div>
-					<dt class="type-kicker text-text-subtle">Needs attention</dt>
+					<dt class="type-kicker text-text-subtle">{translateUI("Needs attention")}</dt>
 					<dd class="type-numeric text-2xl font-bold tabular-nums {attentionMonitors.length > 0 ? 'text-warning' : 'text-text'}">
 						{attentionMonitors.length}
 					</dd>
 				</div>
 				<div class="col-span-2 sm:col-span-1">
-					<dt class="type-kicker text-text-subtle">Avg latency</dt>
+					<dt class="type-kicker text-text-subtle">{translateUI("Avg latency")}</dt>
 					<dd class="type-numeric text-2xl font-bold tabular-nums {latencyTextClass(avgLatencyNum)}">
 						{avgLatencyNum == null ? "—" : `${avgLatencyNum}ms`}
 					</dd>
@@ -494,15 +494,15 @@
 					</div>
 					<div>
 						<h2 id="attention-heading" class="type-section-title text-text">
-							Needs attention
+							{translateUI("Needs attention")}
 						</h2>
 						<p class="mt-0.5 type-caption text-text-muted">
-							{attentionMonitors.length} service{attentionMonitors.length === 1 ? "" : "s"} require triage.
+							{translateUI('Services needing triage: {count}.', { count: attentionMonitors.length })}
 						</p>
 					</div>
 				</div>
 				<Button href="/services" variant="outline" size="sm">
-					Open services <ArrowUpRight class="size-3.5" />
+					{translateUI("Open services")} <ArrowUpRight class="size-3.5" />
 				</Button>
 			</div>
 			<div class="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -516,17 +516,17 @@
 						<span class="min-w-0">
 							<span class="block truncate font-medium text-text">{monitor.name}</span>
 							<span class="type-numeric text-xs text-text-muted">
-								{monitor.last_latency_ms != null ? `${monitor.last_latency_ms}ms` : "No latency sample"}
+								{monitor.last_latency_ms != null ? `${monitor.last_latency_ms}ms` : translateUI("No latency sample")}
 							</span>
 						</span>
 						<div class="flex shrink-0 items-center gap-1.5">
 							{#if flapping}
 								<span
 									class="type-kicker inline-flex items-center gap-1 rounded-full border border-warning/25 bg-warning/10 px-2 py-0.5 text-warning"
-									aria-label="Flapping: three or more status changes in ten minutes"
+									aria-label={translateUI("Flapping: three or more status changes in ten minutes")}
 								>
 									<Waves class="size-3" aria-hidden="true" />
-									Flapping
+									{translateUI("Flapping")}
 								</span>
 							{/if}
 							<Badge status={monitor.status} calm={flapping} />
@@ -539,7 +539,7 @@
 
 	<!-- Survivor Triage Autopsy (for disconnected peers) -->
 	{#if !loading && triage.length > 0}
-		<section class="space-y-3" aria-label="Peer Survivor Triage Autopsy">
+		<section class="space-y-3" aria-label={translateUI("Peer Survivor Triage Autopsy")}>
 			{#each triage as tr (tr.peer_id)}
 				<div class="rounded-xl border border-rose-500/30 bg-rose-500/5 p-5">
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rose-500/20 pb-3">
@@ -551,37 +551,37 @@
 									<span class="font-mono text-xs rounded bg-rose-500/20 text-rose-400 px-1.5 py-0.5">{tr.peer_id}</span>
 								</div>
 								<p class="text-xs text-rose-400/80 mt-0.5">
-									Heartbeat Lost • Discovered at {new Date(tr.discovered_at).toLocaleTimeString()}
+									{translateUI("Heartbeat Lost • Discovered at")} {new Date(tr.discovered_at).toLocaleTimeString()}
 								</p>
 							</div>
 						</div>
 						<div class="rounded-full bg-rose-500/20 px-3 py-1 text-xs font-semibold text-rose-400 self-start sm:self-auto">
-							Diagnosis: {tr.probable_cause}
+							{translateUI("Diagnosis:")} {tr.probable_cause}
 						</div>
 					</div>
 
 					<!-- Multi-path diagnostic probe results -->
 					<div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
 						<div class="rounded-lg border border-border/50 bg-background/50 p-3">
-							<span class="text-text-muted block font-medium">Tailnet Route:</span>
+							<span class="text-text-muted block font-medium">{translateUI("Tailnet Route:")}</span>
 							<span class="font-mono mt-1 block {tr.tailnet_reachable ? 'text-emerald-500 font-semibold' : 'text-rose-400 font-semibold'}">
-								{tr.tailnet_ip || 'Not detected'} ({tr.tailnet_reachable ? 'Reachable' : 'Unreachable'})
+								{tr.tailnet_ip || translateUI("Not detected")} ({tr.tailnet_reachable ? 'Reachable' : 'Unreachable'})
 							</span>
 						</div>
 						<div class="rounded-lg border border-border/50 bg-background/50 p-3">
-							<span class="text-text-muted block font-medium">Public WAN Route:</span>
+							<span class="text-text-muted block font-medium">{translateUI("Public WAN Route:")}</span>
 							<span class="font-mono mt-1 block {tr.public_wan_reachable ? 'text-emerald-500 font-semibold' : 'text-rose-400 font-semibold'}">
-								{tr.public_ip || 'Not detected'} ({tr.public_wan_reachable ? 'Reachable' : 'Unreachable'})
+								{tr.public_ip || translateUI("Not detected")} ({tr.public_wan_reachable ? 'Reachable' : 'Unreachable'})
 							</span>
 						</div>
 						<div class="rounded-lg border border-border/50 bg-background/50 p-3">
-							<span class="text-text-muted block font-medium">Last Known RAM:</span>
+							<span class="text-text-muted block font-medium">{translateUI("Last Known RAM:")}</span>
 							<span class="font-mono mt-1 block {tr.last_telemetry && tr.last_telemetry.mem_pct > 90 ? 'text-rose-400 font-bold' : 'text-text'}">
 								{tr.last_telemetry ? `${tr.last_telemetry.mem_pct.toFixed(1)}%` : '—'}
 							</span>
 						</div>
 						<div class="rounded-lg border border-border/50 bg-background/50 p-3">
-							<span class="text-text-muted block font-medium">Last Known CPU:</span>
+							<span class="text-text-muted block font-medium">{translateUI("Last Known CPU:")}</span>
 							<span class="font-mono mt-1 block {tr.last_telemetry && tr.last_telemetry.cpu_pct > 90 ? 'text-rose-400 font-bold' : 'text-text'}">
 								{tr.last_telemetry ? `${tr.last_telemetry.cpu_pct.toFixed(1)}%` : '—'}
 							</span>
@@ -590,7 +590,7 @@
 
 					{#if tr.notes}
 						<div class="mt-3 rounded-lg bg-background/60 p-3 text-xs text-text-muted border border-border/40">
-							<span class="font-semibold text-text">Autopsy Analysis: </span>{tr.notes}
+							<span class="font-semibold text-text">{translateUI("Autopsy Analysis:")} </span>{tr.notes}
 						</div>
 					{/if}
 
@@ -599,12 +599,12 @@
 						<div class="mt-3">
 							<details class="text-xs text-text-muted group">
 								<summary class="cursor-pointer font-medium hover:text-text transition-colors py-1">
-									▶ Diagnostic Hop Trace ({tr.traceroute_hops.length} hops)
+									{translateUI("▶ Diagnostic Hop Trace (")}{tr.traceroute_hops.length} {translateUI("hops)")}
 								</summary>
 								<div class="mt-2 rounded-lg bg-background/40 border border-border/40 p-2.5 font-mono space-y-1">
 									{#each tr.traceroute_hops as hop}
 										<div class="flex items-center justify-between text-[11px]">
-											<span>Hop {hop.hop}: {hop.address}</span>
+											<span>{translateUI("Hop")} {hop.hop}: {hop.address}</span>
 											<span>{hop.rtt_ms.toFixed(2)}ms {hop.loss_pct > 0 ? `(${hop.loss_pct}% loss)` : ''}</span>
 										</div>
 									{/each}
@@ -658,7 +658,7 @@
 								aria-label="Flapping: {statusLabel(displayStatus)}"
 							>
 								<Waves class="size-3" aria-hidden="true" />
-								Flapping
+								{translateUI("Flapping")}
 							</span>
 						{:else}
 							<span
@@ -666,7 +666,7 @@
 								aria-label="Status: {statusLabel(displayStatus)}"
 							>
 								<StatusIcon class="size-3" aria-hidden="true" />
-								{statusLabel(displayStatus)}
+								{translateUI(statusLabel(displayStatus) ?? '')}
 							</span>
 						{/if}
 					</div>
@@ -676,7 +676,7 @@
 							<span
 								class="type-numeric type-micro font-bold {uptimeTextClass(monitor.uptime_24h)}"
 							>
-								{monitor.uptime_24h.toFixed(2)}% Uptime
+								{monitor.uptime_24h.toFixed(2)}{translateUI("% Uptime")}
 							</span>
 						{/if}
 						{#if monitor.last_latency_ms != null}
@@ -729,7 +729,7 @@
 					{#if timeRange}
 						<div class="mt-1 flex justify-between">
 							<span class="type-numeric type-micro text-text-subtle/60">{timeRange}</span>
-							<span class="type-numeric type-micro text-text-subtle/60">now</span>
+							<span class="type-numeric type-micro text-text-subtle/60">{translateUI("now")}</span>
 						</div>
 					{/if}
 				</div>
@@ -774,7 +774,7 @@
 						</span>
 						{#if flapping}
 							<span class="type-micro px-1.5 py-0.2 rounded border border-warning/30 bg-warning/10 text-warning">
-								flapping
+								{translateUI("flapping")}
 							</span>
 						{/if}
 					</div>
@@ -819,7 +819,7 @@
 		{#if loading}
 			<div class="mb-3 flex items-center justify-between gap-3">
 				<div class="flex items-center gap-2">
-					<h2 class="type-section-title text-text">Monitors</h2>
+					<h2 class="type-section-title text-text">{translateUI("Monitors")}</h2>
 				</div>
 			</div>
 			<div class="dashboard-grid">
@@ -835,23 +835,23 @@
 		{:else if allLocalMonitors.length === 0 && peerGroups.length === 0}
 			<div class="mb-3 flex items-center justify-between gap-3">
 				<div class="flex items-center gap-2">
-					<h2 class="type-section-title text-text">All Services</h2>
+					<h2 class="type-section-title text-text">{translateUI("All Services")}</h2>
 				</div>
 			</div>
 			<div class="card">
 				<EmptyState
 					icon={Activity}
-					title="No services yet"
-					description="Start tracking your homelab infrastructure by creating your first service."
+					title={translateUI("No services yet")}
+					description={translateUI("Start tracking your homelab infrastructure by creating your first service.")}
 				>
-					<Button href="/services" class="mt-2">Go to Services</Button>
+					<Button href="/services" class="mt-2">{translateUI("Go to Services")}</Button>
 				</EmptyState>
 			</div>
 		{:else}
 			{#if allLocalMonitors.length > 0}
 				<!-- Group Filter Tabs & View Toggle -->
 				<div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
-					<div class="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filter by group">
+					<div class="flex flex-wrap items-center gap-1.5" role="tablist" aria-label={translateUI("Filter by group")}>
 						<button
 							type="button"
 							role="tab"
@@ -859,7 +859,7 @@
 							onclick={() => (selectedGroup = "all")}
 							class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all {selectedGroup === 'all' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-surface border border-border/70 text-text-muted hover:text-text hover:bg-surface-elevated'}"
 						>
-							All
+							{translateUI("All")}
 							<span class="rounded-full px-1.5 py-0.2 text-[10px] {selectedGroup === 'all' ? 'bg-primary-foreground/20' : 'bg-border/60 text-text-subtle'}">
 								{allLocalMonitors.length}
 							</span>
@@ -887,26 +887,26 @@
 								type="button"
 								onclick={() => setViewMode("compact")}
 								class="flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors {viewMode === 'compact' ? 'bg-surface-elevated text-text shadow-sm font-semibold' : 'text-text-muted hover:text-text'}"
-								title="Clean Health Rows"
-								aria-label="Clean Health Rows"
+								title={translateUI("Clean Health Rows")}
+								aria-label={translateUI("Clean Health Rows")}
 							>
 								<List class="size-3.5" />
-								<span class="hidden sm:inline">Rows</span>
+								<span class="hidden sm:inline">{translateUI("Rows")}</span>
 							</button>
 							<button
 								type="button"
 								onclick={() => setViewMode("cards")}
 								class="flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors {viewMode === 'cards' ? 'bg-surface-elevated text-text shadow-sm font-semibold' : 'text-text-muted hover:text-text'}"
-								title="Diagnostic Cards"
-								aria-label="Diagnostic Cards"
+								title={translateUI("Diagnostic Cards")}
+								aria-label={translateUI("Diagnostic Cards")}
 							>
 								<LayoutGrid class="size-3.5" />
-								<span class="hidden sm:inline">Cards</span>
+								<span class="hidden sm:inline">{translateUI("Cards")}</span>
 							</button>
 						</div>
 
 						<Button href="/services" variant="ghost" size="sm">
-							View all <ArrowUpRight class="size-3.5" />
+							{translateUI("View all")} <ArrowUpRight class="size-3.5" />
 						</Button>
 					</div>
 				</div>
@@ -939,7 +939,7 @@
 						</div>
 						<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-500">
 							<span class="size-1.5 rounded-full bg-emerald-500"></span>
-							Federated Peer
+							{translateUI("Federated Peer")}
 						</span>
 					</div>
 					{#if viewMode === "compact"}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { fetchAPI } from "$lib/api/client";
     import {
@@ -304,7 +305,7 @@
 </script>
 
 <svelte:head>
-    <title>Maintenance – updu</title>
+    <title>{translateUI("Maintenance – updu")}</title>
 </svelte:head>
 
 <div class="space-y-5 max-w-4xl">
@@ -313,15 +314,15 @@
     >
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Maintenance
+                {translateUI("Maintenance")}
             </h1>
             <p class="text-sm text-text-muted mt-1">
-                Schedule downtime windows for planned work
+                {translateUI("Schedule downtime windows for planned work")}
             </p>
         </div>
         <Button onclick={openCreate}>
             <Plus class="size-4" />
-            New Window
+            {translateUI("New Window")}
         </Button>
     </div>
 
@@ -332,7 +333,7 @@
         />
         <input
             type="text"
-            placeholder="Search maintenance..."
+            placeholder={translateUI("Search maintenance...")}
             bind:value={searchQuery}
             class="input-base pl-9 h-9 text-xs"
         />
@@ -341,7 +342,7 @@
     <!-- List card -->
     <div class="card overflow-hidden" style="padding: 0;">
         {#if loading}
-            <div class="divide-y divide-border" aria-busy="true" aria-label="Loading maintenance windows">
+            <div class="divide-y divide-border" aria-busy="true" aria-label={translateUI("Loading maintenance windows")}>
                 {#each { length: 4 } as _}
                     <div class="p-5 flex gap-4">
                         <Skeleton
@@ -368,7 +369,7 @@
             >
                 {#if !searchQuery}
                     <Button onclick={openCreate} variant="outline" size="sm"
-                        >Schedule maintenance</Button
+                        >{translateUI("Schedule maintenance")}</Button
                     >
                 {/if}
             </EmptyState>
@@ -385,7 +386,7 @@
                                 class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-wider {s.classes}"
                             >
                                 <s.icon class="size-3" />
-                                {s.label}
+                                {translateUI(s.label ?? '')}
                             </span>
                         </div>
 
@@ -416,7 +417,7 @@
                             <button
                                 onclick={() => openEdit(mw)}
                                 class="size-7 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-subtle hover:text-text transition-colors"
-                                title="Edit"
+                                title={translateUI("Edit")}
                                 aria-label={`Edit maintenance window ${mw.title}`}
                             >
                                 <Pencil class="size-3.5" />
@@ -424,7 +425,7 @@
                             <button
                                 onclick={() => deleteWindow(mw.id)}
                                 class="size-7 flex items-center justify-center rounded-lg hover:bg-danger/10 text-text-subtle hover:text-danger transition-colors"
-                                title="Delete"
+                                title={translateUI("Delete")}
                                 aria-label={`Delete maintenance window ${mw.title}`}
                             >
                                 <Trash2 class="size-3.5" />
@@ -450,13 +451,13 @@
                 <div>
                     <Dialog.Title class="text-base font-semibold text-text">
                         {editTarget
-                            ? "Edit Maintenance Window"
-                            : "New Maintenance Window"}
+                            ? translateUI("Edit Maintenance Window")
+                            : translateUI("New Maintenance Window")}
                     </Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
                         {editTarget
-                            ? "Update the schedule for this window."
-                            : "Schedule a downtime window for planned work."}
+                            ? translateUI("Update the schedule for this window.")
+                            : translateUI("Schedule a downtime window for planned work.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close
@@ -470,7 +471,7 @@
                 <div
                     class="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm"
                 >
-                    {formError}
+                    {translateUI(formError ?? '')}
                 </div>
             {/if}
 
@@ -479,13 +480,13 @@
                     <label
                         class="text-sm font-medium text-text-muted"
                         for="mw-title"
-                        >Title <span class="text-danger">*</span></label
+                        >{translateUI("Title")} <span class="text-danger">*</span></label
                     >
                     <input
                         id="mw-title"
                         type="text"
                         bind:value={formTitle}
-                        placeholder="Server upgrade"
+                        placeholder={translateUI("Server upgrade")}
                         class="input-base"
                     />
                 </div>
@@ -494,7 +495,7 @@
                         <label
                             class="text-sm font-medium text-text-muted"
                             for="mw-start"
-                            >Starts at <span class="text-danger">*</span></label
+                            >{translateUI("Starts at")} <span class="text-danger">*</span></label
                         >
                         <input
                             id="mw-start"
@@ -507,7 +508,7 @@
                         <label
                             class="text-sm font-medium text-text-muted"
                             for="mw-end"
-                            >Ends at <span class="text-danger">*</span></label
+                            >{translateUI("Ends at")} <span class="text-danger">*</span></label
                         >
                         <input
                             id="mw-end"
@@ -520,23 +521,23 @@
                 <div class="space-y-1.5">
                     <label
                         class="text-sm font-medium text-text-muted"
-                        for="mw-recurring">Recurring</label
+                        for="mw-recurring">{translateUI("Recurring")}</label
                     >
                     <select
                         id="mw-recurring"
                         bind:value={formRecurring}
                         class="input-base text-sm"
                     >
-                        <option value="">None (one-time)</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
+                        <option value="">{translateUI("None (one-time)")}</option>
+                        <option value="daily">{translateUI("Daily")}</option>
+                        <option value="weekly">{translateUI("Weekly")}</option>
+                        <option value="monthly">{translateUI("Monthly")}</option>
                     </select>
                 </div>
                 {#if monitors.length > 0}
                     <div class="space-y-1.5">
                         <p class="text-sm font-medium text-text-muted">
-                            Affected Services
+                            {translateUI("Affected Services")}
                         </p>
                         <div
                             class="max-h-28 overflow-y-auto rounded-lg border border-border bg-background/50 px-3 py-2 space-y-1"
@@ -578,13 +579,13 @@
 
             <div class="flex gap-2 justify-end mt-6">
                 <Button variant="outline" onclick={() => (dialogOpen = false)}
-                    >Cancel</Button
+                    >{translateUI("Cancel")}</Button
                 >
                 <Button loading={formSaving} onclick={saveWindow}>
                     {formSaving
-                        ? "Saving..."
+                        ? translateUI("Saving...")
                         : editTarget
-                          ? "Save Changes"
+                          ? translateUI("Save Changes")
                           : "Schedule"}
                 </Button>
             </div>

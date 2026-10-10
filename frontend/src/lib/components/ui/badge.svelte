@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { cn } from "$lib/utils";
     import { statusIcon, statusLabel } from "$lib/monitor-tones";
 
@@ -63,7 +64,7 @@
     };
 
     const Glyph = $derived(status ? statusIcon(status) : null);
-    const ariaLabel = $derived(status ? statusLabel(status) : undefined);
+    const ariaLabel = $derived(status ? translateUI(statusLabel(status)) : undefined);
 
     const cfg = $derived.by(() => {
         if (!status) return null;
@@ -105,7 +106,7 @@
         {#if children}
             {@render children()}
         {:else}
-            {status}
+            {translateUI(status ?? '')}
         {/if}
     </span>
 {:else}

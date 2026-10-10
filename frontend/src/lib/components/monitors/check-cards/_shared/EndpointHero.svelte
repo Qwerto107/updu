@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { Network } from "lucide-svelte";
     import CopyButton from "./CopyButton.svelte";
 
@@ -42,7 +43,7 @@
         </code>
     {:else}
         <p class="text-sm text-text-muted italic">
-            No target configured.
+            {translateUI("No target configured.")}
         </p>
     {/if}
     {#if subline}

@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { Activity, Lock, LogIn, UserPlus } from "lucide-svelte";
     import Button from "$lib/components/ui/button.svelte";
     import { fetchAPI } from "$lib/api/client";
     import { authStore } from "$lib/stores/auth.svelte";
+    import LanguageSelect from '$lib/components/ui/language-select.svelte';
 
     let username = $state("");
     let password = $state("");
@@ -78,12 +80,13 @@
 </script>
 
 <svelte:head>
-    <title>{setupRequired ? "Setup" : "Sign In"} – updu</title>
+    <title>{setupRequired ? "Setup" : translateUI("Sign In")} – updu</title>
 </svelte:head>
 
 <div
     class="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden"
 >
+    <div class="absolute top-4 right-4 z-20"><LanguageSelect /></div>
     <!-- Decorative background -->
     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
@@ -109,17 +112,17 @@
         </div>
         {#if setupRequired}
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Welcome to updu
+                {translateUI("Welcome to updu")}
             </h1>
             <p class="text-sm text-text-muted mt-1">
-                Create your admin account to get started
+                {translateUI("Create your admin account to get started")}
             </p>
         {:else}
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Sign in to updu
+                {translateUI("Sign in to updu")}
             </h1>
             <p class="text-sm text-text-muted mt-1">
-                Uptime Dashboard Unlimited
+                {translateUI("Uptime Dashboard Unlimited")}
             </p>
         {/if}
     </div>
@@ -148,7 +151,7 @@
                                     y2="12"
                                 /><line x1="12" y1="16" x2="12.01" y2="16" />
                             </svg>
-                            {errorMsg}
+                            {translateUI(errorMsg ?? '')}
                         </div>
                     {/if}
 
@@ -156,9 +159,8 @@
                         <div
                             class="p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm"
                         >
-                            Choose a username and password for your admin
-                            account. Username must be at least 3 characters;
-                            {passwordPolicyHint}.
+                            {translateUI("Choose a username and password for your admin account. Username must be at least 3 characters;")}
+                            {translateUI(passwordPolicyHint ?? '')}.
                         </div>
                     {/if}
 
@@ -167,7 +169,7 @@
                             <label
                                 for="username"
                                 class="text-sm font-medium text-text-muted"
-                                >Username</label
+                                >{translateUI("Username")}</label
                             >
                             <div class="relative">
                                 <div
@@ -202,7 +204,7 @@
                             <label
                                 for="password"
                                 class="text-sm font-medium text-text-muted"
-                                >Password</label
+                                >{translateUI("Password")}</label
                             >
                             <div class="relative">
                                 <div
@@ -230,11 +232,11 @@
                             {#if setupRequired}
                                 <UserPlus class="size-4" />
                                 {loading
-                                    ? "Creating account..."
-                                    : "Create Admin Account"}
+                                    ? translateUI("Creating account...")
+                                    : translateUI("Create Admin Account")}
                             {:else}
                                 <LogIn class="size-4" />
-                                {loading ? "Signing in..." : "Sign in"}
+                                {loading ? translateUI("Signing in...") : translateUI("Sign in")}
                             {/if}
                         </Button>
                     {/if}
@@ -244,8 +246,8 @@
                     <div class="mt-6 p-4 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm flex gap-3">
                         <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                         <div>
-                            <strong>Forward Auth is enabled.</strong>
-                            <p class="text-xs opacity-80 mt-0.5">Access this instance through your trusted proxy to sign in automatically.</p>
+                            <strong>{translateUI("Forward Auth is enabled.")}</strong>
+                            <p class="text-xs opacity-80 mt-0.5">{translateUI("Access this instance through your trusted proxy to sign in automatically.")}</p>
                         </div>
                     </div>
                 {/if}
@@ -253,8 +255,8 @@
 
             <p class="text-center text-xs text-text-subtle mt-6">
                 {setupRequired
-                    ? "Your first account will have admin privileges"
-                    : "Uptime Dashboard Unlimited"}
+                    ? translateUI("Your first account will have admin privileges")
+                    : translateUI("Uptime Dashboard Unlimited")}
             </p>
         </div>
 </div>

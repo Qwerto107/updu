@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Toggle switch built on bits-ui Switch primitive.
     import { Switch } from "bits-ui";
     import { cn } from "$lib/utils";
@@ -43,7 +44,7 @@
     {#if label || description}
         <div class="min-w-0 flex-1">
             {#if label}
-                <p class="text-sm font-medium text-text">{label}</p>
+                <p class="text-sm font-medium text-text">{translateUI(label ?? '')}</p>
             {/if}
             {#if description}
                 <p class="mt-0.5 text-xs text-text-muted">{description}</p>

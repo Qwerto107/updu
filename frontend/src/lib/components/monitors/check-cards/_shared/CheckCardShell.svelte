@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import type { Snippet } from "svelte";
     import { ChevronDown, ChevronUp } from "lucide-svelte";
 
@@ -30,10 +31,10 @@
                 <p
                     class="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-subtle"
                 >
-                    What This Monitor Checks
+                    {translateUI("What This Monitor Checks")}
                 </p>
                 <h2 class="text-lg font-semibold text-text">
-                    {typeLabel}
+                    {translateUI(typeLabel ?? '')}
                 </h2>
                 <p class="text-sm text-text-muted">
                     {description}
@@ -50,10 +51,10 @@
                 >
                     {#if showDetails}
                         <ChevronUp class="size-3.5" />
-                        Hide Detailed Config
+                        {translateUI("Hide Detailed Config")}
                     {:else}
                         <ChevronDown class="size-3.5" />
-                        Show Detailed Config
+                        {translateUI("Show Detailed Config")}
                     {/if}
                 </button>
             {/if}
@@ -64,7 +65,7 @@
                 <p
                     class="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-subtle"
                 >
-                    Current Basics
+                    {translateUI("Current Basics")}
                 </p>
                 <div
                     data-testid="monitor-current-basics"

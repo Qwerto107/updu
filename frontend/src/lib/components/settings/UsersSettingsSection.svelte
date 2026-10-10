@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from 'svelte';
     import { Dialog } from 'bits-ui';
     import { Eye, Plus, Shield, Trash2, Users, X } from 'lucide-svelte';
@@ -186,20 +187,20 @@
                     <Users class="size-4 text-primary" />
                 </div>
                 <div>
-                    <h2 class="text-base font-semibold text-text">Users & Roles</h2>
+                    <h2 class="text-base font-semibold text-text">{translateUI("Users & Roles")}</h2>
                     <p class="text-[11px] text-text-subtle mt-0.5 max-w-2xl">
-                        Manage local operators and keep access changes explicit. Admins can configure the instance while viewers stay read-only.
+                        {translateUI("Manage local operators and keep access changes explicit. Admins can configure the instance while viewers stay read-only.")}
                     </p>
                     {#if !usersLoading}
                         <div class="settings-meta-row">
                             <span class="settings-pill settings-pill-primary">
-                                {users.length} total
+                                {users.length} {translateUI("total")}
                             </span>
                             <span class="settings-pill settings-pill-muted">
-                                {adminCount()} admins
+                                {adminCount()} {translateUI("admins")}
                             </span>
                             <span class="settings-pill settings-pill-muted">
-                                {viewerCount()} viewers
+                                {viewerCount()} {translateUI("viewers")}
                             </span>
                         </div>
                     {/if}
@@ -208,12 +209,12 @@
 
             <Button class="settings-header-action" onclick={openInviteUser}>
                 <Plus class="size-4" />
-                Invite User
+                {translateUI("Invite User")}
             </Button>
         </div>
 
         {#if usersLoading}
-            <div class="space-y-3" aria-busy="true" aria-label="Loading users">
+            <div class="space-y-3" aria-busy="true" aria-label={translateUI("Loading users")}>
                 {#each Array.from({ length: 3 }) as _, index (index)}
                     <div class="settings-skeleton-item flex gap-4">
                         <Skeleton height="h-9" width="w-9" rounded="rounded-full" />
@@ -227,8 +228,8 @@
         {:else if users.length === 0}
             <EmptyState
                 icon={Users}
-                title="No users found"
-                description="User accounts will appear here once they are created."
+                title={translateUI("No users found")}
+                description={translateUI("User accounts will appear here once they are created.")}
             />
         {:else}
             <div class="space-y-3">
@@ -248,22 +249,22 @@
                                     <h2 class="font-semibold text-text text-sm">{user.username}</h2>
                                     {#if user.id === authStore.user?.id}
                                         <span class="inline-flex items-center rounded-full border border-border/60 bg-surface/40 px-2 py-0.5 text-[10px] font-medium text-text-muted">
-                                            You
+                                            {translateUI("You")}
                                         </span>
                                     {/if}
                                     {#if user.auth_provider && user.auth_provider !== 'local'}
                                         <span class="inline-flex items-center rounded-full border border-info/30 bg-info/10 px-2 py-0.5 text-[10px] font-bold text-info uppercase tracking-wider">
-                                            {user.auth_provider === 'oidc' ? 'SSO' : 'Forward Auth'}
+                                            {user.auth_provider === 'oidc' ? 'SSO' : translateUI("Forward Auth")}
                                         </span>
                                     {/if}
                                 </div>
                                 <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-text-subtle">
                                     {#if user.role === 'admin'}
                                         <Shield class="size-3 text-primary" />
-                                        <span class="text-primary font-medium">Admin</span>
+                                        <span class="text-primary font-medium">{translateUI("Admin")}</span>
                                     {:else}
                                         <Eye class="size-3" />
-                                        <span>Viewer</span>
+                                        <span>{translateUI("Viewer")}</span>
                                     {/if}
                                 </div>
                             </div>
@@ -281,7 +282,7 @@
                                         )}
                                     loading={userActionID === user.id && Boolean(pendingRoleChange)}
                                 >
-                                    {user.role === 'admin' ? 'Make Viewer' : 'Make Admin'}
+                                    {user.role === 'admin' ? translateUI("Make Viewer") : translateUI("Make Admin")}
                                 </Button>
                                 <Button
                                     size="sm"
@@ -291,7 +292,7 @@
                                     loading={userActionID === user.id && Boolean(deleteTarget)}
                                 >
                                     <Trash2 class="size-3.5" />
-                                    Delete
+                                    {translateUI("Delete")}
                                 </Button>
                             </div>
                         {/if}
@@ -303,8 +304,8 @@
 
     <ConfirmActionDialog
         bind:open={roleDialogOpen}
-        title="Change User Role"
-        description="This updates the permissions for the selected account immediately."
+        title={translateUI("Change User Role")}
+        description={translateUI("This updates the permissions for the selected account immediately.")}
         confirmLabel="Apply Role Change"
         confirmVariant="default"
         loading={Boolean(pendingRoleChange && userActionID === pendingRoleChange.user.id)}
@@ -314,13 +315,13 @@
             <div class="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
                     <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                        User
+                        {translateUI("User")}
                     </p>
                     <p class="mt-1 text-text">{pendingRoleChange.user.username}</p>
                 </div>
                 <div>
                     <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                        New Role
+                        {translateUI("New Role")}
                     </p>
                     <p class="mt-1 text-text capitalize">{pendingRoleChange.role}</p>
                 </div>
@@ -330,8 +331,8 @@
 
     <ConfirmActionDialog
         bind:open={deleteDialogOpen}
-        title="Delete User"
-        description="This permanently removes the account from the local user list."
+        title={translateUI("Delete User")}
+        description={translateUI("This permanently removes the account from the local user list.")}
         confirmLabel="Delete User"
         loading={Boolean(deleteTarget && userActionID === deleteTarget.id)}
         onConfirm={removeUser}
@@ -339,11 +340,11 @@
         {#if deleteTarget}
             <div class="space-y-1 text-sm">
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Account
+                    {translateUI("Account")}
                 </p>
                 <p class="text-text">{deleteTarget.username}</p>
                 <p class="text-xs text-text-muted">
-                    Remove access before deleting if this account is still shared with automation or operators.
+                    {translateUI("Remove access before deleting if this account is still shared with automation or operators.")}
                 </p>
             </div>
         {/if}
@@ -360,9 +361,9 @@
         >
             <div class="flex items-center justify-between mb-5">
                 <div>
-                    <Dialog.Title class="text-base font-semibold text-text">Invite User</Dialog.Title>
+                    <Dialog.Title class="text-base font-semibold text-text">{translateUI("Invite User")}</Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
-                        Create a new local user account.
+                        {translateUI("Create a new local user account.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close class="size-7 inline-flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors">
@@ -379,7 +380,7 @@
             <div class="space-y-4">
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="invite-username">
-                        Username <span class="text-danger">*</span>
+                        {translateUI("Username")} <span class="text-danger">*</span>
                     </label>
                     <input
                         id="invite-username"
@@ -391,22 +392,22 @@
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="invite-password">
-                        Password <span class="text-danger">*</span>
+                        {translateUI("Password")} <span class="text-danger">*</span>
                     </label>
                     <input
                         id="invite-password"
                         type="password"
                         bind:value={newPassword}
-                        placeholder="Must satisfy the server policy"
+                        placeholder={translateUI("Must satisfy the server policy")}
                         class="input-base"
                     />
                 </div>
             </div>
 
             <div class="flex gap-2 justify-end mt-6">
-                <Button variant="outline" onclick={() => (dialogOpen = false)}>Cancel</Button>
+                <Button variant="outline" onclick={() => (dialogOpen = false)}>{translateUI("Cancel")}</Button>
                 <Button loading={userSaving} onclick={inviteUser}>
-                    {userSaving ? 'Creating...' : 'Create User'}
+                    {userSaving ? translateUI("Creating...") : translateUI("Create User")}
                 </Button>
             </div>
         </Dialog.Content>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { format } from "date-fns";
     import { cn } from "$lib/utils";
     import { statusLabel, statusPattern } from "$lib/monitor-tones";
@@ -141,7 +142,7 @@
                 aria-hidden="true"
             >
                 <span class="type-kicker text-text-subtle">
-                    Collecting data...
+                    {translateUI("Collecting data...")}
                 </span>
             </div>
         {/if}
@@ -170,7 +171,7 @@
     </div>
     <div class="type-micro flex items-center justify-between text-text-subtle">
         <span>{leftLabel}</span>
-        <span class="type-numeric">{total} buckets</span>
+        <span class="type-numeric">{total} {translateUI("buckets")}</span>
         <span>{rightLabel}</span>
     </div>
     <div class="sr-only" aria-live="polite" aria-atomic="true">{liveText}</div>

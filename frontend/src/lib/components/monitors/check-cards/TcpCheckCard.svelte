@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import {
         parseMonitorConfig,
         readNumber,
@@ -22,14 +23,14 @@
 
 <CheckCardShell
     typeLabel="TCP"
-    description="updu opens a TCP connection to the host and port to confirm the service is reachable."
+    description={translateUI("updu opens a TCP connection to the host and port to confirm the service is reachable.")}
     hasDetails
 >
     {#snippet basics()}
-        <FieldTile label="Host" value={host} monospace />
-        <FieldTile label="Port" value={port} />
+        <FieldTile label={translateUI("Host")} value={host} monospace />
+        <FieldTile label={translateUI("Port")} value={port} />
         <FieldTile
-            label="Cadence"
+            label={translateUI("Cadence")}
             value={cadence ? `Every ${cadence}s` : undefined}
         />
     {/snippet}
@@ -39,16 +40,16 @@
     {/snippet}
 
     {#snippet details()}
-        <DetailSection title="Configuration">
+        <DetailSection title={translateUI("Configuration")}>
             <FieldTile
-                label="Host"
+                label={translateUI("Host")}
                 value={host}
                 monospace
                 copyable={Boolean(host)}
             />
-            <FieldTile label="Port" value={port} />
+            <FieldTile label={translateUI("Port")} value={port} />
             <FieldTile
-                label="Endpoint"
+                label={translateUI("Endpoint")}
                 value={endpoint}
                 monospace
                 copyable={Boolean(endpoint)}

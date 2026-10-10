@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import type { NetworkTopology, Service, ServiceEndpoint } from "$lib/api/services";
 	import {
 		Layers,
@@ -94,13 +95,13 @@
 			<input
 				type="text"
 				bind:value={searchQuery}
-				placeholder="Filter services by name, type, or HA group..."
+				placeholder={translateUI("Filter services by name, type, or HA group...")}
 				class="bg-transparent border-none text-slate-200 placeholder-slate-500 focus:outline-none w-full text-xs"
 			/>
 		</div>
 
 		<div class="flex items-center gap-2">
-			<span class="text-slate-400 font-medium">Status:</span>
+			<span class="text-slate-400 font-medium">{translateUI("Status:")}</span>
 			<div class="inline-flex rounded-lg bg-slate-950 p-0.5 border border-slate-800">
 				{#each ["all", "up", "degraded", "down"] as st}
 					<button
@@ -158,7 +159,7 @@
 								</span>
 							</div>
 							<p class="text-xs text-slate-400 mt-0.5">
-								{zone.description || "Failure domain & physical infrastructure perimeter"}
+								{zone.description || translateUI("Failure domain & physical infrastructure perimeter")}
 							</p>
 						</div>
 					</div>
@@ -166,14 +167,14 @@
 					<div class="flex items-center gap-2">
 						<!-- Health summary pill -->
 						<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono">
-							<span class="text-emerald-400 font-bold">{upCount} Up</span>
+							<span class="text-emerald-400 font-bold">{upCount} {translateUI("Up")}</span>
 							{#if degradedCount > 0}
 								<span class="text-slate-600">•</span>
-								<span class="text-amber-400 font-bold">{degradedCount} Degraded</span>
+								<span class="text-amber-400 font-bold">{degradedCount} {translateUI("Degraded")}</span>
 							{/if}
 							{#if downCount > 0}
 								<span class="text-slate-600">•</span>
-								<span class="text-rose-400 font-bold">{downCount} Down</span>
+								<span class="text-rose-400 font-bold">{downCount} {translateUI("Down")}</span>
 							{/if}
 						</div>
 
@@ -184,7 +185,7 @@
 							class="text-xs gap-1 text-slate-300 hover:text-white hover:bg-slate-800"
 						>
 							<Plus class="w-3.5 h-3.5" />
-							Add
+							{translateUI("Add")}
 						</Button>
 					</div>
 				</div>
@@ -193,10 +194,10 @@
 				<div class="px-5 py-2.5 bg-slate-900/40 border-b border-slate-800/80 flex flex-wrap items-center gap-3 text-xs">
 					<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
 						<Radio class="w-3.5 h-3.5 text-emerald-400" />
-						Prober Nodes:
+						{translateUI("Prober Nodes:")}
 					</span>
 					{#if zoneNodes.length === 0}
-						<span class="text-[11px] text-slate-500 italic">No nodes assigned to this zone directly</span>
+						<span class="text-[11px] text-slate-500 italic">{translateUI("No nodes assigned to this zone directly")}</span>
 					{:else}
 						{#each zoneNodes as node}
 							<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300 text-[11px]">
@@ -204,7 +205,7 @@
 								<span class="font-medium">{node.name}</span>
 								{#if node.is_local}
 									<span class="text-[9px] font-mono uppercase px-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60">
-										Origin
+										{translateUI("Origin")}
 									</span>
 								{/if}
 							</div>
@@ -217,9 +218,9 @@
 					{#if filteredZoneServices.length === 0}
 						<div class="text-center py-10 text-slate-500 text-xs">
 							{#if allZoneServices.length === 0}
-								No services in this zone yet. Click "Add" above to register one.
+								{translateUI("No services in this zone yet. Click \"Add\" above to register one.")}
 							{:else}
-								No services match the active search/status filters.
+								{translateUI("No services match the active search/status filters.")}
 							{/if}
 						</div>
 					{:else}
@@ -250,7 +251,7 @@
 											{#if svc.ha_group}
 												<div class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60">
 													<GitBranch class="w-3 h-3 text-indigo-400" />
-													<span>HA: {svc.ha_group}</span>
+													<span>{translateUI("HA:")} {svc.ha_group}</span>
 												</div>
 											{/if}
 										</div>
@@ -258,7 +259,7 @@
 										<!-- HA Peers Indicator -->
 										{#if haPeers.length > 0}
 											<div class="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-												<span class="text-slate-500">HA Peers:</span>
+												<span class="text-slate-500">{translateUI("HA Peers:")}</span>
 												{#each haPeers as peer}
 													<span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-slate-950 border border-slate-800 text-[10px] font-mono">
 														<span class="w-1.5 h-1.5 rounded-full" style={`background-color: ${getStatusColor(peer.status)}`}></span>
@@ -282,8 +283,8 @@
 											}}
 											disabled={probingId === svc.id}
 											class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-all disabled:opacity-50"
-											title="Run Probe Now"
-											aria-label="Run Probe Now"
+											title={translateUI("Run Probe Now")}
+											aria-label={translateUI("Run Probe Now")}
 										>
 											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400" : ""}`} />
 										</button>
@@ -295,7 +296,7 @@
 									<div class="mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
 										<ShieldAlert class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
 										<div class="text-[11px] text-amber-300 leading-tight">
-											<span class="font-semibold">Diagnosis:</span> {svc.diagnosis || "Probe failure detected"}
+											<span class="font-semibold">{translateUI("Diagnosis:")}</span> {svc.diagnosis || translateUI("Probe failure detected")}
 										</div>
 									</div>
 								{/if}
@@ -303,7 +304,7 @@
 								<!-- Ingress Scope Reachability Pills -->
 								<div class="mt-3 flex flex-wrap items-center gap-2">
 									{#if !svc.endpoints || svc.endpoints.length === 0}
-										<span class="text-[11px] text-slate-500 italic">No scope ingress endpoints configured</span>
+										<span class="text-[11px] text-slate-500 italic">{translateUI("No scope ingress endpoints configured")}</span>
 									{:else}
 										{#each svc.endpoints as ep}
 											<div class={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border ${getScopeColor(ep.scope_id)}`}>
@@ -326,17 +327,17 @@
 										class="text-[11px] text-slate-400 hover:text-white px-2 py-1 rounded border border-dashed border-slate-700 hover:border-slate-500 flex items-center gap-1"
 									>
 										<Plus class="w-3 h-3" />
-										Endpoint
+										{translateUI("Endpoint")}
 									</button>
 								</div>
 
 								<!-- Footer: Hop Inspector Deep-Link CTA -->
 								<div class="mt-3 pt-2.5 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
 									<span class="text-slate-500 font-mono">
-										Primary Ingress: {svc.endpoints?.find((e) => e.is_primary)?.name || "Default"}
+										{translateUI("Primary Ingress:")} {svc.endpoints?.find((e) => e.is_primary)?.name || "Default"}
 									</span>
 									<span class="text-emerald-400 group-hover:underline flex items-center gap-0.5 font-medium">
-										Troubleshoot & Hop Trace
+										{translateUI("Troubleshoot & Hop Trace")}
 										<ArrowUpRight class="w-3 h-3" />
 									</span>
 								</div>

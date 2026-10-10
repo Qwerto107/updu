@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { resolve } from "$app/paths";
     import {
         Plus,
@@ -215,7 +216,7 @@
 </script>
 
 <svelte:head>
-    <title>Services – updu</title>
+    <title>{translateUI("Services – updu")}</title>
 </svelte:head>
 
 <div class="space-y-5 max-w-7xl">
@@ -225,15 +226,15 @@
     >
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Services
+                {translateUI("Services")}
             </h1>
             <p class="mt-1 type-caption text-text-muted">
-                Manage monitored infrastructure services and endpoints
+                {translateUI("Manage monitored infrastructure services and endpoints")}
             </p>
         </div>
         <Button onclick={() => (createDialogOpen = true)}>
             <Plus class="size-4" />
-            New Service
+            {translateUI("New Service")}
         </Button>
     </div>
 
@@ -250,17 +251,17 @@
                     />
                     <input
                         type="search"
-                        placeholder="Search services..."
+                        placeholder={translateUI("Search services...")}
                         bind:value={searchQuery}
                         data-testid="search-services"
-                        aria-label="Search services"
+                        aria-label={translateUI("Search services")}
                         class="input-base h-9 pl-9 text-xs"
                     />
                 </div>
                 <div
                     class="flex items-center gap-1 rounded-lg border border-border bg-surface-elevated/40 p-0.5"
                     role="tablist"
-                    aria-label="Filter by status"
+                    aria-label={translateUI("Filter by status")}
                 >
                     {#each filterChips as chip (chip.value)}
                         {@const active = statusFilter === chip.value}
@@ -278,7 +279,7 @@
                                     : "text-text-muted hover:text-text",
                             )}
                         >
-                            <span>{chip.label}</span>
+                            <span>{translateUI(chip.label ?? '')}</span>
                             <span
                                 class={cn(
                                     "type-numeric rounded px-1 font-semibold",
@@ -295,13 +296,13 @@
             </div>
             {#if !monitorsStore.loading}
                 <span class="type-caption shrink-0 text-text-subtle">
-                    {filtered.length} service{filtered.length === 1 ? "" : "s"}
+                    {filtered.length} {translateUI("service")}{filtered.length === 1 ? "" : "s"}
                 </span>
             {/if}
         </div>
 
         {#if monitorsStore.loading}
-            <div class="divide-y border-border" aria-busy="true" aria-label="Loading services">
+            <div class="divide-y border-border" aria-busy="true" aria-label={translateUI("Loading services")}>
                 {#each { length: 5 } as _, i (i)}
                     <div class="flex items-center gap-4 px-4 py-3.5">
                         <Skeleton height="h-3" width="w-16" />
@@ -354,7 +355,7 @@
                                     class="flex items-center gap-1 transition-colors hover:text-text"
                                     onclick={() => toggleSort("status")}
                                 >
-                                    Status <SortIconStatus class="size-3" />
+                                    {translateUI("Status")} <SortIconStatus class="size-3" />
                                 </button>
                             </th>
                             <th
@@ -367,11 +368,11 @@
                                     class="flex items-center gap-1 transition-colors hover:text-text"
                                     onclick={() => toggleSort("name")}
                                 >
-                                    Name <SortIconName class="size-3" />
+                                    {translateUI("Name")} <SortIconName class="size-3" />
                                 </button>
                             </th>
-                            <th scope="col" class="px-4 py-3 font-medium">Type</th>
-                            <th scope="col" class="px-4 py-3 font-medium">Groups</th>
+                            <th scope="col" class="px-4 py-3 font-medium">{translateUI("Type")}</th>
+                            <th scope="col" class="px-4 py-3 font-medium">{translateUI("Groups")}</th>
                             <th
                                 scope="col"
                                 class="px-4 py-3 font-medium"
@@ -382,14 +383,14 @@
                                     class="flex items-center gap-1 transition-colors hover:text-text"
                                     onclick={() => toggleSort("latency")}
                                 >
-                                    Latency <SortIconLatency class="size-3" />
+                                    {translateUI("Latency")} <SortIconLatency class="size-3" />
                                 </button>
                             </th>
                             <th
                                 scope="col"
                                 class="px-4 py-3 text-right font-medium"
                             >
-                                Actions
+                                {translateUI("Actions")}
                             </th>
                         </tr>
                     </thead>
@@ -416,10 +417,10 @@
                                         {#if flapping}
                                             <span
                                                 class="type-kicker inline-flex items-center gap-1 rounded-full border border-warning/25 bg-warning/10 px-2 py-0.5 text-warning"
-                                                aria-label="Flapping: three or more status changes in ten minutes"
+                                                aria-label={translateUI("Flapping: three or more status changes in ten minutes")}
                                             >
                                                 <Waves class="size-3" aria-hidden="true" />
-                                                Flapping
+                                                {translateUI("Flapping")}
                                             </span>
                                         {/if}
                                     </div>
@@ -458,7 +459,7 @@
                                         />
                                         <span class="type-numeric text-xs">
                                             {#if !monitor.enabled}
-                                                <span class="text-text-subtle">Paused</span>
+                                                <span class="text-text-subtle">{translateUI("Paused")}</span>
                                             {:else if monitor.last_latency_ms != null}
                                                 <span
                                                     class={latencyTextClass(
@@ -468,7 +469,7 @@
                                                     {monitor.last_latency_ms}ms
                                                 </span>
                                             {:else}
-                                                <span class="text-text-subtle">No data</span>
+                                                <span class="text-text-subtle">{translateUI("No data")}</span>
                                             {/if}
                                         </span>
                                     </div>
@@ -509,7 +510,7 @@
                                                          href={resolve("/services/[id]", { id: monitor.id })}
                                                          class="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-text-muted outline-none transition-colors hover:bg-surface-elevated hover:text-text"
                                                      >
-                                                         <Activity class="size-3.5" /> View Details
+                                                         <Activity class="size-3.5" /> {translateUI("View Details")}
                                                      </a>
                                                      {#if monitor.peer_address}
                                                          <a
@@ -518,11 +519,11 @@
                                                              rel="noopener noreferrer"
                                                              class="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-text-muted outline-none transition-colors hover:bg-surface-elevated hover:text-text"
                                                          >
-                                                             <ExternalLink class="size-3.5" /> Open on {monitor.peer_name || 'Peer'}
+                                                             <ExternalLink class="size-3.5" /> {translateUI("Open on")} {monitor.peer_name || 'Peer'}
                                                          </a>
                                                      {/if}
                                                      <div class="px-3 py-1.5 text-[11px] text-text-subtle/80">
-                                                         Managed on {monitor.peer_name || 'peer node'}
+                                                         {translateUI("Managed on")} {monitor.peer_name || translateUI("peer node")}
                                                      </div>
                                                  {:else}
                                                      <DropdownMenu.Item
@@ -533,7 +534,7 @@
                                                              );
                                                          }}
                                                      >
-                                                         <Pencil class="size-3.5" /> Edit
+                                                         <Pencil class="size-3.5" /> {translateUI("Edit")}
                                                      </DropdownMenu.Item>
                                                      <DropdownMenu.Item
                                                          class="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-text-muted outline-none transition-colors hover:bg-surface-elevated hover:text-text"
@@ -544,9 +545,9 @@
                                                              )}
                                                      >
                                                          {#if monitor.enabled}
-                                                             <Pause class="size-3.5" /> Pause
+                                                             <Pause class="size-3.5" /> {translateUI("Pause")}
                                                          {:else}
-                                                             <Play class="size-3.5" /> Resume
+                                                             <Play class="size-3.5" /> {translateUI("Resume")}
                                                          {/if}
                                                      </DropdownMenu.Item>
                                                      <DropdownMenu.Separator
@@ -557,7 +558,7 @@
                                                          onclick={() =>
                                                              deleteMonitor(monitor.id)}
                                                      >
-                                                         <Trash2 class="size-3.5" /> Delete
+                                                         <Trash2 class="size-3.5" /> {translateUI("Delete")}
                                                      </DropdownMenu.Item>
                                                  {/if}
                                              </DropdownMenu.Content>

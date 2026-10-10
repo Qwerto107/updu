@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { format, formatDistanceToNow } from "date-fns";
     import { fetchAPI } from "$lib/api/client";
@@ -102,18 +103,18 @@
                 <History class="size-4 text-primary" />
             </div>
             <div>
-                <h3 class="text-sm font-semibold text-text">Audit Log</h3>
+                <h3 class="text-sm font-semibold text-text">{translateUI("Audit Log")}</h3>
                 <p class="text-[11px] text-text-subtle mt-0.5 max-w-2xl">
-                    Browse configuration changes, who made them, and which resources were touched.
+                    {translateUI("Browse configuration changes, who made them, and which resources were touched.")}
                 </p>
                 {#if !loading}
                     <div class="settings-meta-row">
                         <span class="settings-pill settings-pill-primary">
-                            {auditLogs.length} loaded
+                            {auditLogs.length} {translateUI("loaded")}
                         </span>
                         {#if hasActiveFilters()}
                             <span class="settings-pill settings-pill-muted">
-                                filtered view
+                                {translateUI("filtered view")}
                             </span>
                         {/if}
                     </div>
@@ -123,15 +124,15 @@
 
         <Button size="sm" variant="outline" class="settings-header-action" onclick={loadAuditLogs}>
             <RefreshCcw class="size-4" />
-            Refresh
+            {translateUI("Refresh")}
         </Button>
     </div>
 
     <div class="settings-panel-muted">
         <div>
-            <p class="text-xs font-semibold text-text">Filter Audit Events</p>
+            <p class="text-xs font-semibold text-text">{translateUI("Filter Audit Events")}</p>
             <p class="text-[11px] text-text-subtle mt-1">
-                Filters are applied server-side to keep the audit response small and focused.
+                {translateUI("Filters are applied server-side to keep the audit response small and focused.")}
             </p>
         </div>
 
@@ -144,7 +145,7 @@
         >
             <div class="space-y-1.5">
                 <label for="audit-action-filter" class="text-xs font-medium text-text-muted">
-                    Action
+                    {translateUI("Action")}
                 </label>
                 <input
                     id="audit-action-filter"
@@ -155,7 +156,7 @@
             </div>
             <div class="space-y-1.5">
                 <label for="audit-resource-filter" class="text-xs font-medium text-text-muted">
-                    Resource Type
+                    {translateUI("Resource Type")}
                 </label>
                 <input
                     id="audit-resource-filter"
@@ -166,7 +167,7 @@
             </div>
             <div class="space-y-1.5">
                 <label for="audit-limit-filter" class="text-xs font-medium text-text-muted">
-                    Limit
+                    {translateUI("Limit")}
                 </label>
                 <select id="audit-limit-filter" bind:value={limit} class="input-base">
                     <option value="10">10</option>
@@ -177,7 +178,7 @@
             </div>
             <div class="flex items-end">
                 <Button type="submit" size="sm" variant="outline" class="w-full md:w-auto">
-                    Apply Filters
+                    {translateUI("Apply Filters")}
                 </Button>
             </div>
             <div class="flex items-end">
@@ -189,7 +190,7 @@
                     onclick={resetFilters}
                     disabled={!hasActiveFilters()}
                 >
-                    Clear
+                    {translateUI("Clear")}
                 </Button>
             </div>
         </form>
@@ -197,13 +198,13 @@
 
     {#if error}
         <div class="settings-banner settings-banner-danger">
-            {error}
+            {translateUI(error ?? '')}
         </div>
     {/if}
 
     <div class="space-y-3" data-testid="audit-log-list">
         {#if loading}
-            <div class="space-y-3" aria-busy="true" aria-label="Loading audit logs">
+            <div class="space-y-3" aria-busy="true" aria-label={translateUI("Loading audit logs")}>
                 {#each Array.from({ length: 4 }) as _, index (index)}
                     <div class="rounded-2xl border border-border/60 p-4 space-y-3">
                         <Skeleton height="h-4" width="w-1/4" />
@@ -215,7 +216,7 @@
         {:else if auditLogs.length === 0}
             <EmptyState
                 icon={History}
-                title="No audit entries matched"
+                title={translateUI("No audit entries matched")}
                 description={hasActiveFilters()
                     ? "Try broader filters or clear the current filter set."
                     : "Perform an admin action to populate the log, then refresh this panel."}
@@ -237,21 +238,21 @@
                             class="text-xs text-text-subtle shrink-0"
                             title={formatAbsoluteTime(entry.created_at)}
                         >
-                            {formatRelativeTime(entry.created_at)}
+                            {translateUI(formatRelativeTime(entry.created_at) ?? '')}
                         </time>
                     </div>
 
                     <div class="grid gap-2 text-xs text-text-muted md:grid-cols-3">
                         <div>
-                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Actor</span>
+                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Actor")}</span>
                             <span class="text-text">{entry.actor_name}</span>
                         </div>
                         <div>
-                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Resource</span>
+                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Resource")}</span>
                             <span class="text-text">{entry.resource_type}</span>
                         </div>
                         <div>
-                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Resource ID</span>
+                            <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Resource ID")}</span>
                             <span class="font-mono text-text break-all">{entry.resource_id}</span>
                         </div>
                     </div>

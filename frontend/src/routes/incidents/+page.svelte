@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { fetchAPI } from "$lib/api/client";
     import {
@@ -369,7 +370,7 @@
 </script>
 
 <svelte:head>
-    <title>Incidents – updu</title>
+    <title>{translateUI("Incidents – updu")}</title>
 </svelte:head>
 
 {#snippet incidentBadge(status: string)}
@@ -397,15 +398,15 @@
     >
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Incidents
+                {translateUI("Incidents")}
             </h1>
             <p class="type-caption text-text-muted mt-1">
-                Track and resolve service disruptions
+                {translateUI("Track and resolve service disruptions")}
             </p>
         </div>
         <Button onclick={openCreate}>
             <Plus class="size-4" />
-            Report Incident
+            {translateUI("Report Incident")}
         </Button>
     </div>
 
@@ -417,9 +418,9 @@
             />
             <input
                 type="text"
-                placeholder="Search incidents..."
+                placeholder={translateUI("Search incidents...")}
                 bind:value={searchQuery}
-                aria-label="Search incidents"
+                aria-label={translateUI("Search incidents")}
                 class="input-base pl-9 h-9 text-xs"
             />
         </div>
@@ -427,14 +428,14 @@
             class="type-caption inline-flex items-center gap-2 rounded-lg border border-border bg-surface/40 px-3 py-2 font-medium text-text-muted"
         >
             <input type="checkbox" bind:checked={showUngrouped} class="rounded border-border" />
-            Show ungrouped
+            {translateUI("Show ungrouped")}
         </label>
     </div>
 
     <!-- List card -->
     <div class="card overflow-hidden" style="padding: 0;">
         {#if loading}
-            <div class="divide-y divide-border" aria-busy="true" aria-label="Loading incidents">
+            <div class="divide-y divide-border" aria-busy="true" aria-label={translateUI("Loading incidents")}>
                 {#each { length: 4 } as _, index (index)}
                     <div class="p-5 flex gap-4">
                         <Skeleton
@@ -462,17 +463,17 @@
                     <h3 class="type-section-title text-text">
                         {searchQuery
                             ? `No incidents matching "${searchQuery}"`
-                            : "No incidents"}
+                            : translateUI("No incidents")}
                     </h3>
                     <p class="type-caption text-text-muted max-w-xs">
                         {searchQuery
-                            ? "Try a different search term."
-                            : "All systems are operational 🎉"}
+                            ? translateUI("Try a different search term.")
+                            : translateUI("All systems are operational 🎉")}
                     </p>
                 </div>
                 {#if !searchQuery}
                     <Button onclick={openCreate} variant="outline" size="sm"
-                        >Report incident</Button
+                        >{translateUI("Report incident")}</Button
                     >
                 {/if}
             </div>
@@ -513,7 +514,7 @@
                                             {isGrouped ? `${group.incidents.length} correlated incidents` : primary.title}
                                         </h3>
                                         <span class="type-kicker rounded-full border border-border bg-surface px-2 py-0.5 text-text-subtle">
-                                            {group.monitorIds.length || "No"} service{group.monitorIds.length === 1 ? "" : "s"} · {group.durationLabel}
+                                            {group.monitorIds.length || "No"} {translateUI("service")}{group.monitorIds.length === 1 ? "" : "s"} · {group.durationLabel}
                                         </span>
                                     </div>
                                     <p class="type-caption mt-1 text-text-muted line-clamp-2">
@@ -523,7 +524,7 @@
                                     </p>
                                     {#if group.groupNames.length > 0}
                                         <p class="type-micro mt-1 text-text-subtle">
-                                            Shared group: {group.groupNames.join(", ")}
+                                            {translateUI("Shared group:")} {group.groupNames.join(", ")}
                                         </p>
                                     {/if}
                                     <div
@@ -551,7 +552,7 @@
                                         <button
                                             onclick={() => openEdit(primary)}
                                             class="px-3 py-1.5 text-xs rounded-lg border border-border text-text-muted hover:text-text hover:border-border/80 transition-colors hover:bg-surface-elevated"
-                                            >Update</button
+                                            >{translateUI("Update")}</button
                                         >
                                         <button
                                             onclick={() => deleteIncident(primary.id)}
@@ -582,7 +583,7 @@
                                             <button
                                                 onclick={() => openEdit(inc)}
                                                 class="px-3 py-1.5 text-xs rounded-lg border border-border text-text-muted hover:text-text hover:border-border/80 transition-colors hover:bg-surface-elevated"
-                                                >Update</button
+                                                >{translateUI("Update")}</button
                                             >
                                             <button
                                                 onclick={() => deleteIncident(inc.id)}
@@ -620,12 +621,12 @@
             <div class="flex items-center justify-between mb-5">
                 <div>
                     <Dialog.Title class="text-base font-semibold text-text">
-                        {editTarget ? "Update Incident" : "Report Incident"}
+                        {editTarget ? translateUI("Update Incident") : translateUI("Report Incident")}
                     </Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
                         {editTarget
-                            ? "Update the status and details."
-                            : "Document a new service disruption."}
+                            ? translateUI("Update the status and details.")
+                            : translateUI("Document a new service disruption.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close
@@ -639,7 +640,7 @@
                 <div
                     class="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm"
                 >
-                    {formError}
+                    {translateUI(formError ?? '')}
                 </div>
             {/if}
 
@@ -648,64 +649,64 @@
                     <label
                         class="text-sm font-medium text-text-muted"
                         for="inc-title"
-                        >Title <span class="text-danger">*</span></label
+                        >{translateUI("Title")} <span class="text-danger">*</span></label
                     >
                     <input
                         id="inc-title"
                         type="text"
                         bind:value={formTitle}
-                        placeholder="Brief description of the incident"
+                        placeholder={translateUI("Brief description of the incident")}
                         class="input-base"
                     />
                 </div>
                 <div class="space-y-1.5">
                     <label
                         class="text-sm font-medium text-text-muted"
-                        for="inc-status">Status</label
+                        for="inc-status">{translateUI("Status")}</label
                     >
                     <select
                         id="inc-status"
                         bind:value={formStatus}
                         class="input-base bg-background/50"
                     >
-                        <option value="investigating">Investigating</option>
-                        <option value="identified">Identified</option>
-                        <option value="monitoring">Monitoring</option>
-                        <option value="resolved">Resolved</option>
+                        <option value="investigating">{translateUI("Investigating")}</option>
+                        <option value="identified">{translateUI("Identified")}</option>
+                        <option value="monitoring">{translateUI("Monitoring")}</option>
+                        <option value="resolved">{translateUI("Resolved")}</option>
                     </select>
                 </div>
                 <div class="space-y-1.5">
                     <label
                         class="text-sm font-medium text-text-muted"
-                        for="inc-severity">Severity</label
+                        for="inc-severity">{translateUI("Severity")}</label
                     >
                     <select
                         id="inc-severity"
                         bind:value={formSeverity}
                         class="input-base bg-background/50"
                     >
-                        <option value="minor">Minor</option>
-                        <option value="major">Major</option>
-                        <option value="critical">Critical</option>
+                        <option value="minor">{translateUI("Minor")}</option>
+                        <option value="major">{translateUI("Major")}</option>
+                        <option value="critical">{translateUI("Critical")}</option>
                     </select>
                 </div>
                 <div class="space-y-1.5">
                     <label
                         class="text-sm font-medium text-text-muted"
-                        for="inc-desc">Description</label
+                        for="inc-desc">{translateUI("Description")}</label
                     >
                     <textarea
                         id="inc-desc"
                         bind:value={formDescription}
                         rows={4}
-                        placeholder="Additional details, impact, affected systems..."
+                        placeholder={translateUI("Additional details, impact, affected systems...")}
                         class="input-base h-auto py-2.5 resize-none"
                     ></textarea>
                 </div>
                 {#if monitors.length > 0}
                     <div class="space-y-1.5">
                         <p class="text-sm font-medium text-text-muted">
-                            Affected Services
+                            {translateUI("Affected Services")}
                         </p>
                         <div
                             class="max-h-28 overflow-y-auto rounded-lg border border-border bg-background/50 px-3 py-2 space-y-1"
@@ -747,13 +748,13 @@
 
             <div class="flex gap-2 justify-end mt-6">
                 <Button variant="outline" onclick={() => (dialogOpen = false)}
-                    >Cancel</Button
+                    >{translateUI("Cancel")}</Button
                 >
                 <Button loading={formSaving} onclick={saveIncident}>
                     {formSaving
-                        ? "Saving..."
+                        ? translateUI("Saving...")
                         : editTarget
-                          ? "Update"
+                          ? translateUI("Update")
                           : "Report"}
                 </Button>
             </div>

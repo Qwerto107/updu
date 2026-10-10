@@ -1,0 +1,96 @@
+import { expect, test } from '@playwright/test';
+import { locales, normalizeLocale, translate } from '../src/lib/i18n/locales';
+import { adminUsername, adminPassword } from './helpers/env';
+
+test.describe('language preferences', () => {
+    test.beforeEach(async ({ request }) => {
+        // 使用隔离测试实例，不修改用户当前运行实例的账号或语言设置。
+        expect((await request.post('/api/v1/auth/login', {
+            data: { username: adminUsername, password: adminPassword },
+        })).ok()).toBeTruthy();
+        expect((await request.post('/api/v1/settings', {
+            data: { default_language: 'en' },
+        })).ok()).toBeTruthy();
+    });
+
+    test.afterEach(async ({ request }) => {
+        await request.post('/api/v1/settings', { data: { default_language: 'en' } });
+    });
+
+    test('login language changes immediately and survives reload', async ({ page }) => {
+        await page.context().clearCookies();
+        await page.goto('/login');
+        await expect(page.getByRole('heading', { name: 'Sign in to updu' })).toBeVisible();
+        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('zh-CN');
+        await expect(page.getByRole('heading', { name: '登录 updu' })).toBeVisible();
+        await expect(page.getByLabel('用户名', { exact: true })).toBeVisible();
+        await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+        await page.reload();
+        await expect(page.getByRole('heading', { name: '登录 updu' })).toBeVisible();
+        await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en');
+        await expect(page.getByRole('heading', { name: 'Sign in to updu' })).toBeVisible();
+    });
+
+    test('saved default applies to new visitors while personal preference wins', async ({ page, browser, request }) => {
+        // 复用测试请求的已登录会话，避免重复登录触发正常的限流保护。
+        await page.context().addCookies((await request.storageState()).cookies);
+        await page.goto('/settings/general');
+        await expect(page.getByLabel('Default Language', { exact: true })).toBeVisible();
+        await page.getByLabel('Default Language', { exact: true }).selectOption('zh-CN');
+        await page.getByRole('button', { name: 'Save Settings', exact: true }).click();
+        await expect(page.getByText('设置保存成功。', { exact: true })).toBeVisible();
+        await expect(page.getByRole('heading', { name: '设置', exact: true })).toBeVisible();
+        const saved = await request.get('/api/v1/settings');
+        expect((await saved.json()).default_language).toBe('zh-CN');
+        await page.reload();
+        await expect(page.getByLabel('默认语言', { exact: true })).toHaveValue('zh-CN');
+        await page.getByRole('combobox', { name: '语言', exact: true }).selectOption('en');
+        await page.reload();
+        await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+
+        // 新上下文没有本地偏好或登录态，必须采用服务器保存的中文默认值。
+        const visitor = await browser.newContext({ baseURL: page.url().split('/settings')[0] });
+        try {
+            const login = await visitor.newPage();
+            await login.goto('/login');
+            await expect(login.getByRole('heading', { name: '登录 updu' })).toBeVisible();
+            await expect(login.locator('html')).toHaveAttribute('lang', 'zh-CN');
+        } finally { await visitor.close(); }
+        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('');
+        await expect(page.getByRole('heading', { name: '设置', exact: true })).toBeVisible();
+    });
+
+    test('unsupported preferences and missing translations fall back safely', async ({ page, request }) => {
+        await page.addInitScript(() => localStorage.setItem('updu_language', 'unsupported'));
+        await page.context().clearCookies();
+        await page.goto('/login');
+        await expect(page.getByRole('heading', { name: 'Sign in to updu' })).toBeVisible();
+        const response = await request.post('/api/v1/settings', { data: { default_language: 'fr' } });
+        expect(response.status()).toBe(400);
+        expect(normalizeLocale('fr')).toBe('en');
+        expect(translate('zh-CN', 'An untranslated message')).toBe('An untranslated message');
+        expect(translate('zh-CN', 'constructor')).toBe('constructor');
+        expect(translate('zh-CN', '__proto__')).toBe('__proto__');
+        expect(translate('zh-CN', 'Error: {message}', { message: '<b>example</b>' })).toBe('错误：<b>example</b>');
+        expect(locales.map(locale => locale.code)).toEqual(['en', 'zh-CN']);
+    });
+
+    test('Chinese navigation and all main pages render without runtime errors', async ({ page, request }) => {
+        const errors: string[] = [];
+        page.on('pageerror', error => errors.push(error.message));
+        await page.context().addCookies((await request.storageState()).cookies);
+        await page.goto('/');
+        await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('zh-CN');
+        // 检查各路由的实际浏览器渲染，发现翻译接入导致的运行时错误。
+        for (const route of ['/', '/services', '/topology', '/certificates', '/stats',
+            '/incidents', '/maintenance', '/status-pages', '/settings/general',
+            '/settings/notifications', '/settings/users', '/settings/backup',
+            '/settings/system', '/settings/peers']) {
+            await page.goto(route);
+            await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+            await expect(page.locator('#main-content'), route).toBeVisible();
+            await expect(page.getByRole('combobox', { name: '语言', exact: true })).toBeVisible();
+        }
+        expect(errors).toEqual([]);
+    });
+});

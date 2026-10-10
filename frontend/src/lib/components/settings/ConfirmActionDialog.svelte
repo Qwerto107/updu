@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { Dialog } from 'bits-ui';
     import { AlertOctagon, Info, X } from 'lucide-svelte';
     import type { Snippet } from 'svelte';
@@ -100,7 +101,7 @@
                         <Dialog.Close
                             class="size-7 inline-flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors"
                             onclick={closeDialog}
-                            aria-label="Close dialog"
+                            aria-label={translateUI("Close dialog")}
                         >
                             <X class="size-4" />
                         </Dialog.Close>
@@ -115,13 +116,13 @@
                     {#if requiredText}
                         <div class="mt-4 rounded-xl border border-danger/20 bg-danger/5 p-3">
                             <p class="mb-2 inline-flex items-center rounded-full border border-danger/20 bg-danger/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-danger">
-                                Danger zone
+                                {translateUI("Danger zone")}
                             </p>
                             <label
                                 for="settings-confirm-required-text"
                                 class="text-xs font-medium text-text"
                             >
-                                Type <span class="font-mono font-bold text-danger">{requiredText}</span> to confirm
+                                {translateUI("Type")} <span class="font-mono font-bold text-danger">{requiredText}</span> {translateUI("to confirm")}
                             </label>
                             <input
                                 id="settings-confirm-required-text"
@@ -136,7 +137,7 @@
                             <p id="settings-confirm-required-help" class="mt-2 text-[11px] text-text-muted">
                                 {remainingSeconds > 0
                                     ? `Available in ${remainingSeconds}s.`
-                                    : 'This extra step prevents accidental destructive actions.'}
+                                    : translateUI("This extra step prevents accidental destructive actions.")}
                             </p>
                         </div>
                     {/if}

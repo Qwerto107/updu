@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { Activity, Webhook } from "lucide-svelte";
     import {
         buildHeartbeatTokenUrl,
@@ -57,7 +58,7 @@
 
 <CheckCardShell
     typeLabel="Push Check-In"
-    description="Passive monitor. Your job, backup, or cron task checks in here; updu marks it down when the expected window expires without an inbound request."
+    description={translateUI("Passive monitor. Your job, backup, or cron task checks in here; updu marks it down when the expected window expires without an inbound request.")}
     hasDetails
 >
     {#snippet hero()}
@@ -71,13 +72,13 @@
                         <p
                             class="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary"
                         >
-                            Check-In URL
+                            {translateUI("Check-In URL")}
                         </p>
                     </div>
                     {#if primaryHeartbeatUrl}
                         <CopyButton
                             value={primaryHeartbeatUrl}
-                            label="Copy check-in URL"
+                            label={translateUI("Copy check-in URL")}
                             successMessage="Check-in URL copied"
                             testId="monitor-push-copy-url"
                         />
@@ -91,19 +92,18 @@
                         {primaryHeartbeatUrl}
                     </code>
                     <p class="text-[11px] text-text-muted">
-                        Recommended endpoint for jobs, cron tasks, workers,
-                        and backups. GET, POST, and PUT all work.
+                        {translateUI("Recommended endpoint for jobs, cron tasks, workers, and backups. GET, POST, and PUT all work.")}
                     </p>
                 {:else}
                     <p class="text-sm text-text-muted italic">
-                        Save the monitor to activate this check-in URL.
+                        {translateUI("Save the monitor to activate this check-in URL.")}
                     </p>
                 {/if}
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <FieldTile
-                    label="Token"
+                    label={translateUI("Token")}
                     value={token || undefined}
                     monospace
                     copyable={Boolean(token)}
@@ -111,15 +111,15 @@
                     testId="monitor-push-token"
                 />
                 <FieldTile
-                    label="Expected Cadence"
+                    label={translateUI("Expected Cadence")}
                     value={cadenceLabel}
                 />
                 <FieldTile
-                    label="Late Tolerance"
+                    label={translateUI("Late Tolerance")}
                     value={gracePeriodLabel}
                 />
                 <FieldTile
-                    label="Down After"
+                    label={translateUI("Down After")}
                     value={downAfterLabel}
                 />
             </div>
@@ -127,7 +127,7 @@
             {#if curlSnippet}
                 <div class="grid gap-3 sm:grid-cols-2">
                     <FieldTile
-                        label="curl check-in"
+                        label={translateUI("curl check-in")}
                         value={curlSnippet}
                         monospace
                         multiline
@@ -137,7 +137,7 @@
                     />
                     {#if legacyPingUrl}
                         <FieldTile
-                            label="Legacy POST URL"
+                            label={translateUI("Legacy POST URL")}
                             value={legacyPingUrl}
                             monospace
                             copyable
@@ -150,23 +150,23 @@
     {/snippet}
 
     {#snippet details()}
-        <DetailSection title="Check-In Endpoints">
+        <DetailSection title={translateUI("Check-In Endpoints")}>
             <FieldTile
-                label="Recommended Endpoint"
+                label={translateUI("Recommended Endpoint")}
                 value={tokenUrl || undefined}
                 monospace
                 copyable={Boolean(tokenUrl)}
                 copyLabel="Copy recommended endpoint"
             />
             <FieldTile
-                label="Legacy Slug Endpoint (POST only)"
+                label={translateUI("Legacy Slug Endpoint (POST only)")}
                 value={legacyPingUrl || undefined}
                 monospace
                 copyable={Boolean(legacyPingUrl)}
                 copyLabel="Copy legacy endpoint"
             />
             <FieldTile
-                label="Failure URL"
+                label={translateUI("Failure URL")}
                 value={markDownUrl || undefined}
                 monospace
                 multiline
@@ -174,20 +174,20 @@
                 copyLabel="Copy failure URL"
             />
             <FieldTile
-                label="Accepted Methods"
+                label={translateUI("Accepted Methods")}
                 value="GET, POST, PUT"
             />
             <FieldTile
-                label="Late Check-in Tolerance"
+                label={translateUI("Late Check-in Tolerance")}
                 value={gracePeriodLabel}
             />
             <FieldTile
-                label="Down After"
+                label={translateUI("Down After")}
                 value={downAfterLabel}
             />
         </DetailSection>
 
-        <DetailSection title="How It Works">
+        <DetailSection title={translateUI("How It Works")}>
             <div
                 class="sm:col-span-2 space-y-2 rounded-xl border border-border/70 bg-background/60 p-3"
             >
@@ -196,12 +196,11 @@
                     <p
                         class="text-[10px] font-semibold uppercase tracking-[0.16em]"
                     >
-                        Cron example
+                        {translateUI("Cron example")}
                     </p>
                 </div>
                 <p class="text-xs text-text-muted">
-                    This is a passive monitor. updu waits for inbound
-                    check-ins instead of polling a target directly.
+                    {translateUI("This is a passive monitor. updu waits for inbound check-ins instead of polling a target directly.")}
                 </p>
                 <code
                     class="block whitespace-pre-wrap break-all rounded-lg bg-surface/40 px-3 py-2 font-mono text-xs text-text"

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import {
         Plus,
         Search,
@@ -241,7 +242,7 @@
 </script>
 
 <svelte:head>
-    <title>Status Pages – updu</title>
+    <title>{translateUI("Status Pages – updu")}</title>
 </svelte:head>
 
 <div class="space-y-5 max-w-7xl">
@@ -250,15 +251,15 @@
     >
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-text">
-                Status Pages
+                {translateUI("Status Pages")}
             </h1>
             <p class="text-sm text-text-muted mt-1">
-                Public dashboards for your services
+                {translateUI("Public dashboards for your services")}
             </p>
         </div>
         <Button onclick={openCreate}>
             <Plus class="size-4" />
-            New Status Page
+            {translateUI("New Status Page")}
         </Button>
     </div>
 
@@ -269,14 +270,14 @@
         />
         <input
             type="text"
-            placeholder="Search pages..."
+            placeholder={translateUI("Search pages...")}
             bind:value={searchQuery}
             class="input-base pl-9 h-9 text-xs"
         />
     </div>
 
     {#if loading}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true" aria-label="Loading status pages">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" aria-busy="true" aria-label={translateUI("Loading status pages")}>
             {#each { length: 3 } as _}
                 <div class="card p-5 space-y-3">
                     <div class="flex items-center gap-3">
@@ -307,7 +308,7 @@
                     : "Create a page to share your service status publicly."}
             >
                 {#if !searchQuery}
-                    <Button onclick={openCreate}>Create Status Page</Button>
+                    <Button onclick={openCreate}>{translateUI("Create Status Page")}</Button>
                 {/if}
             </EmptyState>
         </div>
@@ -340,11 +341,11 @@
                                       ? 'text-primary'
                                       : 'text-text-subtle'}">
                                     {#if p.password_protected}
-                                        Password protected
+                                        {translateUI("Password protected")}
                                     {:else if p.is_public}
-                                        Public
+                                        {translateUI("Public")}
                                     {:else}
-                                        Internal only
+                                        {translateUI("Internal only")}
                                     {/if}
                                 </p>
                                 <a
@@ -365,7 +366,7 @@
                             <button
                                 onclick={() => openEdit(p)}
                                 class="size-7 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-subtle hover:text-text transition-colors"
-                                title="Edit"
+                                title={translateUI("Edit")}
                                 aria-label={`Edit status page ${p.name}`}
                             >
                                 <Pencil class="size-3.5" />
@@ -373,7 +374,7 @@
                             <button
                                 onclick={() => deletePage(p.id)}
                                 class="size-7 flex items-center justify-center rounded-lg hover:bg-danger/10 text-text-subtle hover:text-danger transition-colors"
-                                title="Delete"
+                                title={translateUI("Delete")}
                                 aria-label={`Delete status page ${p.name}`}
                             >
                                 <Trash2 class="size-3.5" />
@@ -418,12 +419,12 @@
             <div class="flex items-center justify-between mb-5">
                 <div>
                     <Dialog.Title class="text-base font-semibold text-text">
-                        {editTarget ? "Edit Status Page" : "New Status Page"}
+                        {editTarget ? translateUI("Edit Status Page") : translateUI("New Status Page")}
                     </Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
                         {editTarget
-                            ? "Update the configuration for this page."
-                            : "Create a shareable status page for your services."}
+                            ? translateUI("Update the configuration for this page.")
+                            : translateUI("Create a shareable status page for your services.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close
@@ -437,7 +438,7 @@
                 <div
                     class="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm"
                 >
-                    {formError}
+                    {translateUI(formError ?? '')}
                 </div>
             {/if}
 
@@ -446,13 +447,13 @@
                     <label
                         class="text-sm font-medium text-text-muted"
                         for="sp-name"
-                        >Name <span class="text-danger">*</span></label
+                        >{translateUI("Name")} <span class="text-danger">*</span></label
                     >
                     <input
                         id="sp-name"
                         type="text"
                         bind:value={formName}
-                        placeholder="My Services"
+                        placeholder={translateUI("My Services")}
                         class="input-base"
                     />
                 </div>
@@ -460,7 +461,7 @@
                     <label
                         class="text-sm font-medium text-text-muted"
                         for="sp-slug"
-                        >Slug <span class="text-danger">*</span></label
+                        >{translateUI("Slug")} <span class="text-danger">*</span></label
                     >
                     <div class="relative">
                         <span
@@ -479,13 +480,13 @@
                 <div class="space-y-1.5">
                     <label
                         class="text-sm font-medium text-text-muted"
-                        for="sp-desc">Description</label
+                        for="sp-desc">{translateUI("Description")}</label
                     >
                     <textarea
                         id="sp-desc"
                         bind:value={formDescription}
                         rows={3}
-                        placeholder="Brief description of this status page..."
+                        placeholder={translateUI("Brief description of this status page...")}
                         class="input-base h-auto py-2.5 resize-none"
                     ></textarea>
                 </div>
@@ -494,11 +495,10 @@
                     <div class="space-y-2">
                         <div>
                             <div class="text-sm font-medium text-text">
-                                Include Groups
+                                {translateUI("Include Groups")}
                             </div>
                             <p class="text-[11px] text-text-subtle mt-0.5">
-                                Automatically include all services assigned to
-                                these groups.
+                                {translateUI("Automatically include all services assigned to these groups.")}
                             </p>
                         </div>
                         <div class="flex flex-wrap gap-2">
@@ -541,11 +541,10 @@
                     <div class="space-y-2">
                         <div>
                             <div class="text-sm font-medium text-text">
-                                Include Standalone Services
+                                {translateUI("Include Standalone Services")}
                             </div>
                             <p class="text-[11px] text-text-subtle mt-0.5">
-                                Display specific services that are not already
-                                covered by the selected groups.
+                                {translateUI("Display specific services that are not already covered by the selected groups.")}
                             </p>
                         </div>
                         <div class="max-h-40 overflow-y-auto pr-2 space-y-1">
@@ -583,9 +582,9 @@
                 </div>
                 <div class="space-y-2 pt-2 border-t border-border/50">
                     <div>
-                        <div class="text-sm font-medium text-text">Access</div>
+                        <div class="text-sm font-medium text-text">{translateUI("Access")}</div>
                         <p class="text-[11px] text-text-subtle mt-0.5">
-                            Choose whether this page is public, password protected, or only visible to signed-in users.
+                            {translateUI("Choose whether this page is public, password protected, or only visible to signed-in users.")}
                         </p>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -602,10 +601,10 @@
                             />
                             <div class="flex items-center gap-2 text-text">
                                 <Globe class="size-4 text-primary" />
-                                <span class="text-sm font-medium">Public</span>
+                                <span class="text-sm font-medium">{translateUI("Public")}</span>
                             </div>
                             <p class="text-[11px] text-text-subtle mt-2">
-                                Anyone with the link can view it.
+                                {translateUI("Anyone with the link can view it.")}
                             </p>
                         </label>
                         <label
@@ -621,10 +620,10 @@
                             />
                             <div class="flex items-center gap-2 text-text">
                                 <Lock class="size-4 text-warning" />
-                                <span class="text-sm font-medium">Protected</span>
+                                <span class="text-sm font-medium">{translateUI("Protected")}</span>
                             </div>
                             <p class="text-[11px] text-text-subtle mt-2">
-                                Visitors need the page password.
+                                {translateUI("Visitors need the page password.")}
                             </p>
                         </label>
                         <label
@@ -640,10 +639,10 @@
                             />
                             <div class="flex items-center gap-2 text-text">
                                 <Lock class="size-4 text-text-subtle" />
-                                <span class="text-sm font-medium">Internal</span>
+                                <span class="text-sm font-medium">{translateUI("Internal")}</span>
                             </div>
                             <p class="text-[11px] text-text-subtle mt-2">
-                                Only signed-in users can view it.
+                                {translateUI("Only signed-in users can view it.")}
                             </p>
                         </label>
                     </div>
@@ -656,8 +655,8 @@
                             for="sp-password"
                         >
                             {editTarget?.password_protected
-                                ? 'New password'
-                                : 'Password'}
+                                ? translateUI("New password")
+                                : translateUI("Password")}
                         </label>
                         <input
                             id="sp-password"
@@ -671,8 +670,8 @@
                         />
                         <p class="text-[11px] text-text-subtle">
                             {editTarget?.password_protected
-                                ? 'Leave this blank to keep the existing password.'
-                                : 'Anyone with the link will need this password to view the page, and it must satisfy the server policy.'}
+                                ? translateUI("Leave this blank to keep the existing password.")
+                                : translateUI("Anyone with the link will need this password to view the page, and it must satisfy the server policy.")}
                         </p>
                     </div>
                 {/if}
@@ -680,14 +679,14 @@
 
             <div class="flex gap-2 justify-end mt-6">
                 <Button variant="outline" onclick={() => (dialogOpen = false)}
-                    >Cancel</Button
+                    >{translateUI("Cancel")}</Button
                 >
                 <Button loading={formSaving} onclick={savePage}>
                     {formSaving
-                        ? "Saving..."
+                        ? translateUI("Saving...")
                         : editTarget
-                          ? "Save Changes"
-                          : "Create Page"}
+                          ? translateUI("Save Changes")
+                          : translateUI("Create Page")}
                 </Button>
             </div>
         </Dialog.Content>

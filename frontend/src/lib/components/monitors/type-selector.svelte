@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	// Tabbed grid of monitor-type options rendered as icon tiles. Used by MonitorForm.
 	import { cn } from "$lib/utils";
 
@@ -84,7 +85,7 @@
 						: "border-transparent text-text-muted hover:text-text hover:border-border"
 				)}
 			>
-				{group.label}
+				{translateUI(group.label ?? '')}
 			</button>
 		{/each}
 	</div>
@@ -94,7 +95,7 @@
 	<div
 		class={cn("grid gap-2", gridCols)}
 		role="radiogroup"
-		aria-label="Monitor type"
+		aria-label={translateUI("Monitor type")}
 	>
 		{#each activeGroup?.options || [] as opt (opt.value)}
 			{@const active = value === opt.value}
@@ -114,10 +115,10 @@
 			>
 				<opt.icon class="size-5" />
 				<span class="text-[11px] font-bold uppercase tracking-wider text-center leading-tight">
-					{opt.label}
+					{translateUI(opt.label ?? '')}
 				</span>
 				{#if opt.desc}
-					<span class="text-[10px] opacity-60 text-center leading-tight">{opt.desc}</span>
+					<span class="text-[10px] opacity-60 text-center leading-tight">{translateUI(opt.desc ?? '')}</span>
 				{/if}
 			</button>
 		{/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import type { Snippet } from "svelte";
     import CopyButton from "./CopyButton.svelte";
 
@@ -69,7 +70,7 @@
         <p
             class="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-subtle"
         >
-            {label}
+            {translateUI(label ?? '')}
         </p>
         {#if copyable && copyText}
             <CopyButton

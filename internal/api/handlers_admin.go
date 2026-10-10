@@ -440,6 +440,7 @@ var allowedSettingsKeys = map[string]bool{
 	"logo_url":          true,
 	"favicon_url":       true,
 	"theme":             true,
+	"default_language":  true,
 	"timezone":          true,
 	"date_format":       true,
 	"enable_public":     true,
@@ -462,6 +463,11 @@ func (s *Server) handleUpdateSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 语言值先校验，避免无效语言与其他设置一起提交时产生部分写入。
+	if value, exists := req["default_language"]; exists && !isSupportedLanguage(value) {
+		jsonError(w, "unsupported default language", http.StatusBadRequest)
+		return
+	}
 	for k, v := range req {
 		if !allowedSettingsKeys[k] {
 			jsonError(w, "unknown setting key: "+k, http.StatusBadRequest)

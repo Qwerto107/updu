@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import {
         createNotificationChannel,
         deleteNotificationChannel,
@@ -381,21 +382,21 @@
                     <Bell class="size-4 text-primary" />
                 </div>
                 <div>
-                    <h2 class="text-base font-semibold text-text">Notification Channels</h2>
+                    <h2 class="text-base font-semibold text-text">{translateUI("Notification Channels")}</h2>
                     <p class="text-[11px] text-text-subtle mt-0.5 max-w-2xl">
-                        Keep routing explicit and test each destination before you rely on it for incidents or heartbeat failures.
+                        {translateUI("Keep routing explicit and test each destination before you rely on it for incidents or heartbeat failures.")}
                     </p>
                     {#if !channelsLoading}
                         <div class="settings-meta-row">
                             <span class="settings-pill settings-pill-primary">
-                                {channels.length} configured
+                                {channels.length} {translateUI("configured")}
                             </span>
                             <span class="settings-pill settings-pill-muted">
-                                {activeChannelCount()} enabled
+                                {activeChannelCount()} {translateUI("enabled")}
                             </span>
                             {#if disabledChannelCount() > 0}
                                 <span class="settings-pill settings-pill-muted">
-                                    {disabledChannelCount()} disabled
+                                    {disabledChannelCount()} {translateUI("disabled")}
                                 </span>
                             {/if}
                         </div>
@@ -405,12 +406,12 @@
 
             <Button class="settings-header-action" onclick={openCreateChannel}>
                 <Plus class="size-4" />
-                New Channel
+                {translateUI("New Channel")}
             </Button>
         </div>
 
         {#if channelsLoading}
-            <div class="space-y-3" aria-busy="true" aria-label="Loading notification channels">
+            <div class="space-y-3" aria-busy="true" aria-label={translateUI("Loading notification channels")}>
                 {#each Array.from({ length: 3 }) as _, index (index)}
                     <div class="settings-skeleton-item flex gap-4">
                         <Skeleton height="h-9" width="w-9" rounded="rounded-xl" />
@@ -424,11 +425,11 @@
         {:else if channels.length === 0}
             <EmptyState
                 icon={Bell}
-                title="No notification channels"
-                description="Add a webhook, chat integration, or email target to start receiving alerts."
+                title={translateUI("No notification channels")}
+                description={translateUI("Add a webhook, chat integration, or email target to start receiving alerts.")}
             >
                 <Button onclick={openCreateChannel} variant="outline" size="sm">
-                    Add Channel
+                    {translateUI("Add Channel")}
                 </Button>
             </EmptyState>
         {:else}
@@ -452,7 +453,7 @@
                                     </span>
                                     {#if !channel.enabled}
                                         <span class="settings-pill-label settings-pill-label-warning">
-                                            Disabled
+                                            {translateUI("Disabled")}
                                         </span>
                                     {/if}
                                 </div>
@@ -470,11 +471,11 @@
                                 loading={testingId === channel.id}
                             >
                                 <Send class="size-3.5" />
-                                Send Test
+                                {translateUI("Send Test")}
                             </Button>
                             <Button size="sm" variant="ghost" onclick={() => openEditChannel(channel)}>
                                 <Pencil class="size-3.5" />
-                                Edit
+                                {translateUI("Edit")}
                             </Button>
                             <Button
                                 size="sm"
@@ -484,7 +485,7 @@
                                 loading={actionChannelID === channel.id}
                             >
                                 <Trash2 class="size-3.5" />
-                                Delete
+                                {translateUI("Delete")}
                             </Button>
                         </div>
                     </article>
@@ -505,12 +506,12 @@
             <div class="flex items-center justify-between mb-5">
                 <div>
                     <Dialog.Title class="text-base font-semibold text-text">
-                        {editTarget ? 'Edit Channel' : 'New Channel'}
+                        {editTarget ? translateUI("Edit Channel") : translateUI("New Channel")}
                     </Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
                         {editTarget
-                            ? 'Update this notification channel.'
-                            : 'Add a new notification channel.'}
+                            ? translateUI("Update this notification channel.")
+                            : translateUI("Add a new notification channel.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close class="size-7 inline-flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors">
@@ -527,26 +528,26 @@
             <div class="space-y-4">
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="channel-name">
-                        Name <span class="text-danger">*</span>
+                        {translateUI("Name")} <span class="text-danger">*</span>
                     </label>
                     <input
                         id="channel-name"
                         type="text"
                         bind:value={channelName}
-                        placeholder="Production Alerts"
+                        placeholder={translateUI("Production Alerts")}
                         class="input-base"
                     />
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="channel-type">
-                        Type
+                        {translateUI("Type")}
                     </label>
                     <select id="channel-type" bind:value={channelType} class="input-base text-sm">
                         <option value="webhook">Webhook</option>
                         <option value="discord">Discord</option>
                         <option value="slack">Slack</option>
-                        <option value="email">Email</option>
+                        <option value="email">{translateUI("Email")}</option>
                         <option value="gotify">Gotify</option>
                         <option value="ntfy">ntfy</option>
                         <option value="telegram">Telegram</option>
@@ -558,75 +559,75 @@
 
                 {#if channelType === 'telegram'}
                     <fieldset class="space-y-3 rounded-xl border border-border/60 p-4">
-                        <legend class="px-1 text-sm font-medium text-text">Telegram configuration</legend>
+                        <legend class="px-1 text-sm font-medium text-text">{translateUI("Telegram configuration")}</legend>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="tg-bot-token">
-                                Bot Token <span class="text-danger">*</span>
+                                {translateUI("Bot Token")} <span class="text-danger">*</span>
                             </label>
                             <input id="tg-bot-token" type="text" bind:value={telegramBotToken} placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" class="input-base font-mono text-xs" />
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="tg-chat-id">
-                                Chat ID <span class="text-danger">*</span>
+                                {translateUI("Chat ID")} <span class="text-danger">*</span>
                             </label>
                             <input id="tg-chat-id" type="text" bind:value={telegramChatId} placeholder="-1001234567890" class="input-base font-mono text-xs" />
                         </div>
                     </fieldset>
                 {:else if channelType === 'pushover'}
                     <fieldset class="space-y-3 rounded-xl border border-border/60 p-4">
-                        <legend class="px-1 text-sm font-medium text-text">Pushover configuration</legend>
+                        <legend class="px-1 text-sm font-medium text-text">{translateUI("Pushover configuration")}</legend>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="po-user-key">
-                                User Key <span class="text-danger">*</span>
+                                {translateUI("User Key")} <span class="text-danger">*</span>
                             </label>
                             <input id="po-user-key" type="text" bind:value={pushoverUserKey} placeholder="uQiRzBgQuq..." class="input-base font-mono text-xs" />
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="po-token">
-                                App / API Token <span class="text-danger">*</span>
+                                {translateUI("App / API Token")} <span class="text-danger">*</span>
                             </label>
                             <input id="po-token" type="text" bind:value={pushoverToken} placeholder="azGDORePK8..." class="input-base font-mono text-xs" />
                         </div>
                     </fieldset>
                 {:else if channelType === 'matrix'}
                     <fieldset class="space-y-3 rounded-xl border border-border/60 p-4">
-                        <legend class="px-1 text-sm font-medium text-text">Matrix configuration</legend>
+                        <legend class="px-1 text-sm font-medium text-text">{translateUI("Matrix configuration")}</legend>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="mx-homeserver">
-                                Homeserver URL <span class="text-danger">*</span>
+                                {translateUI("Homeserver URL")} <span class="text-danger">*</span>
                             </label>
                             <input id="mx-homeserver" type="url" bind:value={matrixHomeserver} placeholder="https://matrix.org" class="input-base text-xs" />
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="mx-room-id">
-                                Room ID <span class="text-danger">*</span>
+                                {translateUI("Room ID")} <span class="text-danger">*</span>
                             </label>
                             <input id="mx-room-id" type="text" bind:value={matrixRoomId} placeholder="!roomid:matrix.org" class="input-base font-mono text-xs" />
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="mx-token">
-                                Access Token <span class="text-danger">*</span>
+                                {translateUI("Access Token")} <span class="text-danger">*</span>
                             </label>
                             <input id="mx-token" type="password" bind:value={matrixAccessToken} placeholder="syt_..." class="input-base font-mono text-xs" />
                         </div>
                     </fieldset>
                 {:else if channelType === 'email'}
                     <fieldset class="space-y-3 rounded-xl border border-border/60 p-4">
-                        <legend class="px-1 text-sm font-medium text-text">Email configuration</legend>
+                        <legend class="px-1 text-sm font-medium text-text">{translateUI("Email configuration")}</legend>
                         <p class="text-[11px] text-text-subtle">
-                            Configure an SMTP server or mail relay to deliver alert messages.
+                            {translateUI("Configure an SMTP server or mail relay to deliver alert messages.")}
                         </p>
 
                         <div class="grid gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <label class="text-sm font-medium text-text-muted" for="email-host">
-                                    SMTP Host
+                                    {translateUI("SMTP Host")}
                                 </label>
                                 <input id="email-host" type="text" bind:value={emailHost} class="input-base" />
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-sm font-medium text-text-muted" for="email-port">
-                                    Port
+                                    {translateUI("Port")}
                                 </label>
                                 <input id="email-port" type="number" bind:value={emailPort} class="input-base" />
                             </div>
@@ -635,13 +636,13 @@
                         <div class="grid gap-3 sm:grid-cols-2">
                             <div class="space-y-1.5">
                                 <label class="text-sm font-medium text-text-muted" for="email-user">
-                                    Username
+                                    {translateUI("Username")}
                                 </label>
                                 <input id="email-user" type="text" bind:value={emailUser} class="input-base" />
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-sm font-medium text-text-muted" for="email-pass">
-                                    Password
+                                    {translateUI("Password")}
                                 </label>
                                 <input id="email-pass" type="password" bind:value={emailPass} class="input-base" />
                             </div>
@@ -649,14 +650,14 @@
 
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="email-from">
-                                From Address <span class="text-danger">*</span>
+                                {translateUI("From Address")} <span class="text-danger">*</span>
                             </label>
                             <input id="email-from" type="email" bind:value={emailFrom} class="input-base" />
                         </div>
 
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="email-to">
-                                To Address(es) <span class="text-danger">*</span>
+                                {translateUI("To Address(es)")} <span class="text-danger">*</span>
                             </label>
                             <input
                                 id="email-to"
@@ -669,14 +670,14 @@
                     </fieldset>
                 {:else if channelType === 'gotify'}
                     <fieldset class="space-y-3 rounded-xl border border-border/60 p-4">
-                        <legend class="px-1 text-sm font-medium text-text">Gotify configuration</legend>
+                        <legend class="px-1 text-sm font-medium text-text">{translateUI("Gotify configuration")}</legend>
                         <p class="text-[11px] text-text-subtle">
-                            Use the Gotify server URL and an application token. updu sends event notifications to the standard message endpoint automatically.
+                            {translateUI("Use the Gotify server URL and an application token. updu sends event notifications to the standard message endpoint automatically.")}
                         </p>
 
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="channel-url">
-                                Server URL <span class="text-danger">*</span>
+                                {translateUI("Server URL")} <span class="text-danger">*</span>
                             </label>
                             <input
                                 id="channel-url"
@@ -689,13 +690,13 @@
 
                         <div class="space-y-1.5">
                             <label class="text-sm font-medium text-text-muted" for="gotify-token">
-                                App Token <span class="text-danger">*</span>
+                                {translateUI("App Token")} <span class="text-danger">*</span>
                             </label>
                             <input
                                 id="gotify-token"
                                 type="password"
                                 bind:value={gotifyToken}
-                                placeholder="Generated by your Gotify application"
+                                placeholder={translateUI("Generated by your Gotify application")}
                                 class="input-base"
                             />
                         </div>
@@ -713,7 +714,7 @@
                             class="input-base"
                         />
                         <p class="text-[11px] text-text-subtle mt-1">
-                            Provide the destination endpoint or webhook URL for this alert integration.
+                            {translateUI("Provide the destination endpoint or webhook URL for this alert integration.")}
                         </p>
                     </div>
                 {/if}
@@ -725,18 +726,18 @@
                         <div class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4"></div>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-text">Enable delivery</p>
+                        <p class="text-sm font-medium text-text">{translateUI("Enable delivery")}</p>
                         <p class="text-[11px] text-text-subtle">
-                            New channels stay quiet until this is turned on.
+                            {translateUI("New channels stay quiet until this is turned on.")}
                         </p>
                     </div>
                 </label>
             </div>
 
             <div class="flex gap-2 justify-end mt-6">
-                <Button variant="outline" onclick={() => (dialogOpen = false)}>Cancel</Button>
+                <Button variant="outline" onclick={() => (dialogOpen = false)}>{translateUI("Cancel")}</Button>
                 <Button loading={saving} onclick={saveChannel}>
-                    {saving ? 'Saving...' : editTarget ? 'Save Changes' : 'Create Channel'}
+                    {saving ? translateUI("Saving...") : editTarget ? translateUI("Save Changes") : translateUI("Create Channel")}
                 </Button>
             </div>
         </Dialog.Content>
@@ -745,8 +746,8 @@
 
 <ConfirmActionDialog
     bind:open={deleteDialogOpen}
-    title="Delete Notification Channel"
-    description="Alerts will stop flowing to this destination immediately after removal."
+    title={translateUI("Delete Notification Channel")}
+    description={translateUI("Alerts will stop flowing to this destination immediately after removal.")}
     confirmLabel="Delete Channel"
     loading={Boolean(deleteTarget && actionChannelID === deleteTarget.id)}
     onConfirm={deleteChannel}
@@ -755,13 +756,13 @@
         <div class="space-y-3 text-sm">
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Channel
+                    {translateUI("Channel")}
                 </p>
                 <p class="mt-1 text-text">{deleteTarget.name}</p>
             </div>
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Destination
+                    {translateUI("Destination")}
                 </p>
                 <p class="mt-1 text-text break-all">{channelDestination(deleteTarget)}</p>
             </div>

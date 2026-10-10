@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { CheckCircle2, Info, AlertTriangle, XCircle, X } from 'lucide-svelte';
     import { toastStore, type Toast } from '$lib/stores/toast.svelte';
     import { fade, slide } from '$lib/transitions';
@@ -37,7 +38,7 @@
 <div
     class="pointer-events-none fixed inset-x-0 top-4 z-[70] flex flex-col items-center gap-2 px-4 sm:right-4 sm:left-auto sm:top-4 sm:items-end sm:px-0"
     role="region"
-    aria-label="Notifications"
+    aria-label={translateUI("Notifications")}
 >
     {#each toasts as toast (toast.id)}
         {@const v = variantStyles[toast.variant]}
@@ -59,11 +60,11 @@
                 </div>
                 <div class="min-w-0 flex-1 pt-0.5">
                     <p class="text-sm font-semibold leading-tight text-text">
-                        {toast.title}
+                        {translateUI(toast.title)}
                     </p>
                     {#if toast.description}
                         <p class="mt-1 text-xs leading-relaxed text-text-muted">
-                            {toast.description}
+                            {translateUI(toast.description)}
                         </p>
                     {/if}
                 </div>
@@ -71,7 +72,7 @@
                     type="button"
                     class="flex size-6 shrink-0 items-center justify-center rounded-md text-text-subtle transition-colors hover:bg-surface hover:text-text"
                     onclick={() => toastStore.dismiss(toast.id)}
-                    aria-label="Dismiss notification"
+                    aria-label={translateUI("Dismiss notification")}
                 >
                     <X class="size-3.5" />
                 </button>

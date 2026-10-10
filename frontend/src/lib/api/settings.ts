@@ -11,6 +11,7 @@ export const GENERAL_SETTINGS_KEYS = [
     'logo_url',
     'favicon_url',
     'theme',
+    'default_language',
     'timezone',
     'date_format',
     'enable_public',

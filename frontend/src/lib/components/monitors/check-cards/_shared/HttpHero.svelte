@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { ExternalLink, Globe } from "lucide-svelte";
     import CopyButton from "./CopyButton.svelte";
 
@@ -39,14 +40,14 @@
                     target="_blank"
                     rel="noopener noreferrer"
                     class="p-1 hover:bg-surface-elevated rounded-md transition-colors text-text-muted hover:text-text"
-                    title="Open URL in new tab"
-                    aria-label="Open URL in new tab"
+                    title={translateUI("Open URL in new tab")}
+                    aria-label={translateUI("Open URL in new tab")}
                 >
                     <ExternalLink class="size-3.5" />
                 </a>
                 <CopyButton
                     value={url}
-                    label="Copy URL"
+                    label={translateUI("Copy URL")}
                     successMessage="URL copied"
                     size="xs"
                 />

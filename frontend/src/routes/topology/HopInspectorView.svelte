@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import type { NetworkTopology, Service, ServiceEndpoint, HopTrace } from "$lib/api/services";
 	import {
 		Activity,
@@ -117,11 +118,11 @@
 				</div>
 				<div>
 					<div class="flex items-center gap-2 flex-wrap">
-						<span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Troubleshooting & Hop Inspector</span>
+						<span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">{translateUI("Troubleshooting & Hop Inspector")}</span>
 						{#if service?.ha_group}
 							<span class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60">
 								<GitBranch class="w-3 h-3 text-indigo-400" />
-								HA: {service.ha_group}
+								{translateUI("HA:")} {service.ha_group}
 							</span>
 						{/if}
 					</div>
@@ -163,7 +164,7 @@
 						class="gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold"
 					>
 						<RefreshCw class={`w-3.5 h-3.5 ${probingId === service.id ? "animate-spin" : ""}`} />
-						Run Probe Now
+						{translateUI("Run Probe Now")}
 					</Button>
 
 					<Button
@@ -172,7 +173,7 @@
 						class="gap-1 text-xs bg-slate-800 hover:bg-slate-700 text-white"
 					>
 						<Plus class="w-3.5 h-3.5 text-emerald-400" />
-						Add Scope Endpoint
+						{translateUI("Add Scope Endpoint")}
 					</Button>
 
 					<Button
@@ -181,7 +182,7 @@
 						class="gap-1 text-xs text-rose-400 border-rose-900/40 hover:bg-rose-950/40"
 					>
 						<Trash2 class="w-3.5 h-3.5" />
-						Delete
+						{translateUI("Delete")}
 					</Button>
 
 					{#if onClose}
@@ -190,7 +191,7 @@
 							onclick={onClose}
 							class="text-slate-400 hover:text-white px-2 py-1 text-sm rounded-lg hover:bg-slate-800 transition-colors"
 						>
-							✕ Close
+							{translateUI("✕ Close")}
 						</button>
 					{/if}
 				</div>
@@ -200,7 +201,7 @@
 
 	{#if !service}
 		<div class="p-12 text-center rounded-2xl border border-slate-800 bg-slate-900/30 text-slate-500 text-sm">
-			Select a service above to inspect its hop-by-hop reachability pipelines.
+			{translateUI("Select a service above to inspect its hop-by-hop reachability pipelines.")}
 		</div>
 	{:else}
 		<!-- Diagnostic Autopsy Summary Banner -->
@@ -212,29 +213,29 @@
 							<ShieldAlert class="w-6 h-6" />
 						</div>
 						<div>
-							<h3 class="font-bold text-white text-base">Diagnostic Autopsy: {service.name}</h3>
+							<h3 class="font-bold text-white text-base">{translateUI("Diagnostic Autopsy:")} {service.name}</h3>
 							<p class="text-xs text-amber-300 font-medium mt-0.5">
-								{service.diagnosis || "Probe discrepancy detected across reachability scopes."}
+								{service.diagnosis || translateUI("Probe discrepancy detected across reachability scopes.")}
 							</p>
 						</div>
 					</div>
 					<span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/80 border border-amber-800/80 text-amber-400">
-						Differential Root-Cause
+						{translateUI("Differential Root-Cause")}
 					</span>
 				</div>
 
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
 					<div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-						<span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Probable Cause</span>
+						<span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">{translateUI("Probable Cause")}</span>
 						<p class="text-slate-300">
-							Backend responded on some scopes (e.g. LAN/Tailnet), but external or local routing failed on others.
+							{translateUI("Backend responded on some scopes (e.g. LAN/Tailnet), but external or local routing failed on others.")}
 						</p>
 					</div>
 
 					<div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-						<span class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">Actionable Recommendation</span>
+						<span class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">{translateUI("Actionable Recommendation")}</span>
 						<p class="text-slate-300">
-							Check reverse proxy (Caddy / Traefik), Cloudflare tunnel / WAN port forward, or host firewall bindings.
+							{translateUI("Check reverse proxy (Caddy / Traefik), Cloudflare tunnel / WAN port forward, or host firewall bindings.")}
 						</p>
 					</div>
 				</div>
@@ -248,10 +249,10 @@
 				<div class="flex items-center justify-between text-xs">
 					<div class="flex items-center gap-2 font-bold text-white">
 						<GitBranch class="w-4 h-4 text-indigo-400" />
-						<span>High Availability Cluster: {service.ha_group}</span>
+						<span>{translateUI("High Availability Cluster:")} {service.ha_group}</span>
 					</div>
 					<span class="text-[11px] font-mono text-indigo-300">
-						{haPeers.length + 1} Replicas across zones
+						{haPeers.length + 1} {translateUI("Replicas across zones")}
 					</span>
 				</div>
 
@@ -259,12 +260,12 @@
 					<!-- Current Service Replica -->
 					<div class="p-3 rounded-xl bg-slate-950/80 border border-indigo-500/40 space-y-1">
 						<div class="flex items-center justify-between">
-							<span class="font-bold text-white">{service.name} (Active View)</span>
+							<span class="font-bold text-white">{service.name} {translateUI("(Active View)")}</span>
 							<span class={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${getStatusBadgeClass(service.status)}`}>
 								{service.status?.toUpperCase()}
 							</span>
 						</div>
-						<div class="text-[11px] text-slate-400 font-mono">Zone: {service.zone_id || "default"}</div>
+						<div class="text-[11px] text-slate-400 font-mono">{translateUI("Zone:")} {service.zone_id || "default"}</div>
 					</div>
 
 					<!-- Peer Replicas -->
@@ -284,7 +285,7 @@
 									{peer.status?.toUpperCase()}
 								</span>
 							</div>
-							<div class="text-[11px] text-slate-400 font-mono">Zone: {peer.zone_id || "default"} (Click to inspect)</div>
+							<div class="text-[11px] text-slate-400 font-mono">{translateUI("Zone:")} {peer.zone_id || "default"} {translateUI("(Click to inspect)")}</div>
 						</div>
 					{/each}
 				</div>
@@ -296,16 +297,16 @@
 			<div class="flex items-center justify-between">
 				<h3 class="font-bold text-base text-white flex items-center gap-2">
 					<Network class="w-5 h-5 text-emerald-400" />
-					Multi-Vantage Reachability Pipelines ({service.endpoints?.length || 0} Scopes)
+					{translateUI("Multi-Vantage Reachability Pipelines (")}{service.endpoints?.length || 0} {translateUI("Scopes)")}
 				</h3>
 				<span class="text-xs text-slate-400">
-					Sequential Hop-by-Hop Stage Attribution
+					{translateUI("Sequential Hop-by-Hop Stage Attribution")}
 				</span>
 			</div>
 
 			{#if !service.endpoints || service.endpoints.length === 0}
 				<div class="p-8 text-center rounded-xl border border-slate-800 bg-slate-900/40 text-slate-400 text-xs">
-					No endpoints configured for this service. Click "Add Scope Endpoint" to add a LAN, Tailnet, or Public WAN ingress check.
+					{translateUI("No endpoints configured for this service. Click \"Add Scope Endpoint\" to add a LAN, Tailnet, or Public WAN ingress check.")}
 				</div>
 			{:else}
 				{#each service.endpoints as ep (ep.id)}
@@ -336,21 +337,21 @@
 										{ep.name}
 										{#if ep.is_primary}
 											<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-semibold">
-												Primary
+												{translateUI("Primary")}
 											</span>
 										{/if}
 										{#if ep.is_isolated || ep.status === "isolated"}
 											<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold flex items-center gap-1">
 												<Shield class="w-2.5 h-2.5 text-slate-400" />
-												Isolated
+												{translateUI("Isolated")}
 											</span>
 										{/if}
 									</h4>
 									<div class="text-[11px] text-slate-400 font-mono mt-0.5">
 										{#if ep.is_isolated || ep.status === "isolated"}
-											Status: Segmented from scope • Outbound probes inactive
+											{translateUI("Status: Segmented from scope • Outbound probes inactive")}
 										{:else}
-											Target: {ep.target_type} • Config: {JSON.stringify(ep.config)}
+											{translateUI("Target:")} {ep.target_type} {translateUI("• Config:")} {JSON.stringify(ep.config)}
 										{/if}
 									</div>
 								</div>
@@ -360,7 +361,7 @@
 								{#if ep.last_latency_ms != null && !ep.is_isolated && ep.status !== "isolated"}
 									<div class="text-right">
 										<div class="text-sm font-bold text-white font-mono">{ep.last_latency_ms}ms</div>
-										<div class="text-[10px] text-slate-400">Total Latency</div>
+										<div class="text-[10px] text-slate-400">{translateUI("Total Latency")}</div>
 									</div>
 								{/if}
 
@@ -372,8 +373,8 @@
 									type="button"
 									onclick={() => onDeleteEndpoint(service.id, ep.id)}
 									class="text-slate-500 hover:text-rose-400 p-1 rounded hover:bg-slate-800 transition-colors"
-									title="Delete Endpoint"
-									aria-label="Delete Endpoint"
+									title={translateUI("Delete Endpoint")}
+									aria-label={translateUI("Delete Endpoint")}
 								>
 									<Trash2 class="w-3.5 h-3.5" />
 								</button>
@@ -384,9 +385,9 @@
 							<div class="p-4 rounded-xl border border-slate-800 bg-slate-900/60 flex items-start gap-3">
 								<Shield class="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
 								<div class="space-y-1">
-									<div class="text-xs font-bold text-slate-200">Segmented / Air-Gapped Route</div>
+									<div class="text-xs font-bold text-slate-200">{translateUI("Segmented / Air-Gapped Route")}</div>
 									<p class="text-xs text-slate-400 leading-relaxed">
-										This service is marked as intentionally unreachable from the <span class="font-mono text-slate-300">{ep.scope_id.toUpperCase()}</span> scope. Probes will not dial this network path and differential diagnostics treat this isolation as healthy architecture.
+										{translateUI("This service is marked as intentionally unreachable from the")} <span class="font-mono text-slate-300">{ep.scope_id.toUpperCase()}</span> {translateUI("scope. Probes will not dial this network path and differential diagnostics treat this isolation as healthy architecture.")}
 									</p>
 								</div>
 							</div>
@@ -400,16 +401,16 @@
 								<div class="flex items-center justify-between">
 									<span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
 										<Radio class="w-3 h-3 text-emerald-400" />
-										Hop 1: Origin
+										{translateUI("Hop 1: Origin")}
 									</span>
 									<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
 								</div>
 								<div>
-									<div class="font-bold text-xs text-white">Local Prober Node</div>
-									<div class="text-[11px] text-slate-400 mt-0.5">Source prober engine</div>
+									<div class="font-bold text-xs text-white">{translateUI("Local Prober Node")}</div>
+									<div class="text-[11px] text-slate-400 mt-0.5">{translateUI("Source prober engine")}</div>
 								</div>
 								<div class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40 inline-block self-start">
-									PASS • 0ms
+									{translateUI("PASS • 0ms")}
 								</div>
 							</div>
 
@@ -424,7 +425,7 @@
 								<div class="flex items-center justify-between">
 									<span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
 										<Globe class="w-3 h-3 text-sky-400" />
-										Hop 2: Fabric & DNS
+										{translateUI("Hop 2: Fabric & DNS")}
 									</span>
 									{#if isDnsFailing}
 										<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
@@ -434,17 +435,17 @@
 								</div>
 								<div>
 									<div class="font-bold text-xs text-white">
-										{ep.scope_id.toUpperCase()} Transport
+										{ep.scope_id.toUpperCase()} {translateUI("Transport")}
 									</div>
 									<div class="text-[11px] text-slate-400 mt-0.5 truncate font-mono">
 										{#if trace?.resolved_ip}
-											IP: {trace.resolved_ip}
+											{translateUI("IP:")} {trace.resolved_ip}
 										{:else if ep.scope_id === "lan"}
-											Direct RFC1918 Route
+											{translateUI("Direct RFC1918 Route")}
 										{:else if ep.scope_id === "tailnet"}
-											WireGuard Mesh Peer
+											{translateUI("WireGuard Mesh Peer")}
 										{:else}
-											DNS Resolution
+											{translateUI("DNS Resolution")}
 										{/if}
 									</div>
 								</div>
@@ -454,11 +455,11 @@
 										: 'text-sky-400 bg-sky-950/60 border-sky-800/40'
 								}`}>
 									{#if isDnsFailing}
-										FAIL • DNS Unreachable
+										{translateUI("FAIL • DNS Unreachable")}
 									{:else if trace?.dns_lookup_ms != null}
-										PASS • {trace.dns_lookup_ms}ms DNS
+										{translateUI("PASS •")} {trace.dns_lookup_ms}{translateUI("ms DNS")}
 									{:else}
-										PASS • Direct
+										{translateUI("PASS • Direct")}
 									{/if}
 								</div>
 							</div>
@@ -474,7 +475,7 @@
 								<div class="flex items-center justify-between">
 									<span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
 										<Lock class="w-3 h-3 text-indigo-400" />
-										Hop 3: Ingress & TLS
+										{translateUI("Hop 3: Ingress & TLS")}
 									</span>
 									{#if isIngressFailing}
 										<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
@@ -487,14 +488,14 @@
 										{#if trace?.connected_addr}
 											{trace.connected_addr}
 										{:else}
-											Edge Gateway / Proxy
+											{translateUI("Edge Gateway / Proxy")}
 										{/if}
 									</div>
 									<div class="text-[11px] text-slate-400 mt-0.5 truncate font-mono">
 										{#if trace?.tls_version}
 											{trace.tls_version} ({trace.tls_cipher || "Encrypted"})
 										{:else}
-											TCP Handshake & Certs
+											{translateUI("TCP Handshake & Certs")}
 										{/if}
 									</div>
 								</div>
@@ -504,11 +505,11 @@
 										: 'text-indigo-400 bg-indigo-950/60 border-indigo-800/40'
 								}`}>
 									{#if isIngressFailing}
-										FAIL • {failingHop?.toUpperCase()} Error
+										{translateUI("FAIL •")} {failingHop?.toUpperCase()} {translateUI("Error")}
 									{:else if trace?.tls_handshake_ms != null || trace?.tcp_connect_ms != null}
-										PASS • {(trace.tcp_connect_ms || 0) + (trace.tls_handshake_ms || 0)}ms Handshake
+										{translateUI("PASS •")} {(trace.tcp_connect_ms || 0) + (trace.tls_handshake_ms || 0)}{translateUI("ms Handshake")}
 									{:else}
-										PASS • Gateway OK
+										{translateUI("PASS • Gateway OK")}
 									{/if}
 								</div>
 							</div>
@@ -524,7 +525,7 @@
 								<div class="flex items-center justify-between">
 									<span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
 										<Server class="w-3 h-3 text-emerald-400" />
-										Hop 4: Target App
+										{translateUI("Hop 4: Target App")}
 									</span>
 									{#if isAppFailing}
 										<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
@@ -539,16 +540,16 @@
 										{#if ep.last_status_code}
 											HTTP {ep.last_status_code}
 										{:else}
-											Target Service
+											{translateUI("Target Service")}
 										{/if}
 									</div>
 									<div class="text-[11px] text-slate-400 mt-0.5 truncate font-mono">
 										{#if trace?.ttfb_ms != null}
-											TTFB: {trace.ttfb_ms}ms
+											{translateUI("TTFB:")} {trace.ttfb_ms}ms
 										{:else if ep.last_message}
 											{ep.last_message}
 										{:else}
-											Container Response
+											{translateUI("Container Response")}
 										{/if}
 									</div>
 								</div>
@@ -558,11 +559,11 @@
 										: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/40'
 								}`}>
 									{#if isAppFailing}
-										FAIL • {ep.last_message || "Non-200 Status"}
+										{translateUI("FAIL •")} {ep.last_message || "Non-200 Status"}
 									{:else if ep.status === "up"}
-										PASS • Verified
+										{translateUI("PASS • Verified")}
 									{:else}
-										Pending
+										{translateUI("Pending")}
 									{/if}
 								</div>
 							</div>
@@ -573,11 +574,11 @@
 							<div class="p-3 rounded-xl bg-rose-950/30 border border-rose-900/50 flex items-center justify-between gap-3 text-xs">
 								<div class="flex items-center gap-2 text-rose-300">
 									<XCircle class="w-4 h-4 text-rose-400 shrink-0" />
-									<span><strong class="font-semibold">Failing Point:</strong> {ep.last_message}</span>
+									<span><strong class="font-semibold">{translateUI("Failing Point:")}</strong> {ep.last_message}</span>
 								</div>
 								{#if failingHop}
 									<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-900/60 text-rose-200 uppercase font-bold">
-										Hop: {failingHop}
+										{translateUI("Hop:")} {failingHop}
 									</span>
 								{/if}
 							</div>

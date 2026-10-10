@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import "../app.css";
 	import { page } from "$app/stores";
 	import { goto } from "$app/navigation";
@@ -33,6 +34,8 @@
 	import Toast from "$lib/components/ui/toast.svelte";
 	import ConfirmDialog from "$lib/components/ui/confirm-dialog.svelte";
 	import { fetchAPI } from "$lib/api/client";
+	import { languageStore } from "$lib/i18n/index.svelte";
+	import LanguageSelect from "$lib/components/ui/language-select.svelte";
 
 	let { children } = $props();
 
@@ -41,6 +44,13 @@
 	const isUpdatingPage = $derived($page.url.pathname === "/updating");
 
 	// Custom CSS injection
+	onMount(() => {
+		// 异步初始化完成后注册清理；导航卸载时不遗留跨标签监听器。
+		let disposed = false;
+		let cleanup: (() => void) | undefined;
+		void languageStore.init().then(stop => { if (disposed) stop?.(); else cleanup = stop; });
+		return () => { disposed = true; cleanup?.(); };
+	});
 	let customCSS = $state("");
 	let navMonitors = $state<NavMonitorStatus[]>([]);
 	let unresolvedIncidentCount = $state(0);
@@ -157,7 +167,7 @@
 					icon: Server,
 					badge: downMonitorCount,
 					badgeTone: "danger",
-					badgeLabel: `${downMonitorCount} down service${downMonitorCount === 1 ? "" : "s"}`,
+					badgeLabel: translateUI('{count} down services', { count: downMonitorCount }),
 				},
 				{ href: "/topology", label: "Topology", icon: Network },
 				{ href: "/certificates", label: "TLS Certs", icon: Lock },
@@ -173,7 +183,7 @@
 					icon: TriangleAlert,
 					badge: unresolvedIncidentCount,
 					badgeTone: "warning",
-					badgeLabel: `${unresolvedIncidentCount} unresolved incident${unresolvedIncidentCount === 1 ? "" : "s"}`,
+					badgeLabel: translateUI('{count} unresolved incidents', { count: unresolvedIncidentCount }),
 				},
 				{ href: "/status-pages", label: "Status Pages", icon: FileText },
 				{ href: "/maintenance", label: "Maintenance", icon: Wrench },
@@ -265,11 +275,15 @@
 <Toast />
 <ConfirmDialog />
 
+{#if isStatusPage || isUpdatingPage}
+	<div class="fixed top-4 right-4 z-50"><LanguageSelect /></div>
+{/if}
+
 <a
 	href="#main-content"
 	class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-white focus:shadow-lg focus:outline-2 focus:outline-primary"
 >
-	Skip to content
+	{translateUI("Skip to content")}
 </a>
 
 {#if isLoginPage || isStatusPage || isUpdatingPage}
@@ -289,7 +303,7 @@
 			</div>
 			<div class="flex items-center gap-3">
 				<Spinner size="sm" />
-				<p class="text-sm text-text-subtle">Loading updu...</p>
+				<p class="text-sm text-text-subtle">{translateUI("Loading updu...")}</p>
 			</div>
 		</div>
 	</div>
@@ -313,25 +327,26 @@
 					</div>
 					<div class="flex items-baseline gap-2">
 						<span class="text-base font-bold tracking-tight text-text">updu</span>
-						<span class="text-xs text-text-subtle font-medium">Service Portal</span>
+						<span class="text-xs text-text-subtle font-medium">{translateUI("Service Portal")}</span>
 					</div>
 				</div>
 
 				<div class="flex items-center gap-3">
+					<LanguageSelect />
 					<!-- Live indicator -->
 					<div
 						class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
 					>
 						<Radio class="size-3.5" />
-						<span class="hidden sm:inline">Live</span>
+						<span class="hidden sm:inline">{translateUI("Live")}</span>
 					</div>
 
 					<!-- Density cycle -->
 					<button
 						onclick={() => densityStore.cycle()}
 						class="size-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors"
-						title="Density: {densityStore.current} (click to cycle)"
-						aria-label="UI density: {densityStore.current}. Click to cycle."
+						title={translateUI('Density: {density} (click to cycle)', { density: translateUI(densityStore.current) })}
+						aria-label={translateUI('UI density: {density}. Click to cycle.', { density: translateUI(densityStore.current) })}
 					>
 						{#if densityStore.current === "comfortable"}
 							<Rows2 class="size-4" />
@@ -385,10 +400,10 @@
 						<button
 							onclick={() => authStore.logout()}
 							class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-text-muted hover:text-danger hover:bg-danger/10 transition-colors font-medium ml-1"
-							aria-label="Sign out"
+							aria-label={translateUI("Sign out")}
 						>
 							<LogOut class="size-3.5" />
-							<span class="hidden sm:inline">Sign out</span>
+							<span class="hidden sm:inline">{translateUI("Sign out")}</span>
 						</button>
 					{/if}
 				</div>
@@ -405,7 +420,7 @@
 			<button
 				class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
 				onclick={() => (sidebarOpen = false)}
-				aria-label="Close sidebar"
+				aria-label={translateUI("Close sidebar")}
 			></button>
 		{/if}
 
@@ -435,17 +450,17 @@
 						>updu</span
 					>
 					<p class="text-[10px] text-text-subtle leading-none mt-0.5">
-						Uptime Monitor
+						{translateUI("Uptime Monitor")}
 					</p>
 				</div>
 			</div>
 
 			<!-- Nav -->
-			<nav class="flex-1 px-2.5 py-3 space-y-4 overflow-y-auto" aria-label="Main">
+			<nav class="flex-1 px-2.5 py-3 space-y-4 overflow-y-auto" aria-label={translateUI("Main")}>
 				{#each navSections as section (section.label)}
 					<div class="space-y-0.5">
 						<p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-text-subtle">
-							{section.label}
+							{translateUI(section.label ?? '')}
 						</p>
 						{#each section.links as { href, label, icon: Icon, badge = 0, badgeTone = "warning", badgeLabel } (href)}
 							{@const active = isActive(href)}
@@ -464,7 +479,7 @@
 									></span>
 								{/if}
 								<Icon class="size-4 shrink-0" />
-								<span class="min-w-0 flex-1 truncate">{label}</span>
+								<span class="min-w-0 flex-1 truncate">{translateUI(label ?? '')}</span>
 								{#if badge > 0 && badgeLabel}
 									<span
 										class="ml-auto inline-flex min-w-5 items-center justify-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none {badgeTone === 'danger'
@@ -493,7 +508,7 @@
 						: 'text-text-muted hover:text-text hover:bg-surface-elevated'}"
 				>
 					<Settings class="size-4 shrink-0" />
-					<span>Settings</span>
+					<span>{translateUI("Settings")}</span>
 				</a>
 			</div>
 		</aside>
@@ -508,7 +523,7 @@
 				<button
 					class="lg:hidden p-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors"
 					onclick={() => (sidebarOpen = !sidebarOpen)}
-					aria-label="Toggle sidebar"
+					aria-label={translateUI("Toggle sidebar")}
 				>
 					<svg
 						class="size-5"
@@ -528,20 +543,20 @@
 					<p
 						class="text-xs text-text-subtle font-medium capitalize tracking-wide"
 					>
-						{$page.url.pathname === "/"
-							? "Dashboard"
-							: $page.url.pathname.replace("/", "").split("/")[0]}
+						{translateUI($page.url.pathname === '/' ? 'Dashboard' :
+							navSections.flatMap(section => section.links).find(link => link.href !== '/' && isActive(link.href))?.label ?? 'Settings')}
 					</p>
 				</div>
 
 				<!-- Right side -->
 				<div class="flex items-center gap-2 ml-auto">
+					<LanguageSelect />
 					<!-- Live indicator -->
 					<div
 						class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
 					>
 						<Radio class="size-3.5" />
-						<span class="hidden sm:inline">Live</span>
+						<span class="hidden sm:inline">{translateUI("Live")}</span>
 					</div>
 
 					<div class="w-px h-5 bg-border"></div>
@@ -550,8 +565,8 @@
 					<button
 						onclick={() => densityStore.cycle()}
 						class="size-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text transition-colors"
-						title="Density: {densityStore.current} (click to cycle)"
-						aria-label="UI density: {densityStore.current}. Click to cycle."
+						title={translateUI('Density: {density} (click to cycle)', { density: translateUI(densityStore.current) })}
+						aria-label={translateUI('UI density: {density}. Click to cycle.', { density: translateUI(densityStore.current) })}
 					>
 						{#if densityStore.current === "comfortable"}
 							<Rows2 class="size-4" />
@@ -597,7 +612,7 @@
 								<p
 									class="text-[9px] text-primary uppercase font-bold tracking-wider leading-none mt-0.5"
 								>
-									Admin
+									{translateUI("Admin")}
 								</p>
 							{/if}
 						</div>
@@ -609,10 +624,10 @@
 						<button
 							onclick={() => authStore.logout()}
 							class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-text-muted hover:text-danger hover:bg-danger/10 transition-colors font-medium"
-							aria-label="Sign out"
+							aria-label={translateUI("Sign out")}
 						>
 							<LogOut class="size-3.5" />
-							<span class="hidden sm:inline">Sign out</span>
+							<span class="hidden sm:inline">{translateUI("Sign out")}</span>
 						</button>
 					{/if}
 				</div>
@@ -624,14 +639,14 @@
 			</main>
 
 			<!-- Mobile Bottom Navigation Bar (PWA ergonomic thumb nav) -->
-			<nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur border-t border-border px-4 py-2 flex justify-around items-center" aria-label="Mobile Navigation">
+			<nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur border-t border-border px-4 py-2 flex justify-around items-center" aria-label={translateUI("Mobile Navigation")}>
 				<a href="/" class={`flex flex-col items-center gap-1 text-[11px] font-medium transition-colors ${isActive("/") ? "text-primary font-bold" : "text-text-muted hover:text-text"}`}>
 					<LayoutDashboard class="size-4" />
-					<span>Home</span>
+					<span>{translateUI("Home")}</span>
 				</a>
 				<a href="/services" class={`flex flex-col items-center gap-1 text-[11px] font-medium relative transition-colors ${isActive("/services") ? "text-primary font-bold" : "text-text-muted hover:text-text"}`}>
 					<Server class="size-4" />
-					<span>Services</span>
+					<span>{translateUI("Services")}</span>
 					{#if downMonitorCount > 0}
 						<span class="absolute -top-1 -right-2 px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-danger text-white">
 							{downMonitorCount}
@@ -640,7 +655,7 @@
 				</a>
 				<a href="/topology" class={`flex flex-col items-center gap-1 text-[11px] font-medium transition-colors ${isActive("/topology") ? "text-primary font-bold" : "text-text-muted hover:text-text"}`}>
 					<Network class="size-4" />
-					<span>Topology</span>
+					<span>{translateUI("Topology")}</span>
 				</a>
 				<a href="/certificates" class={`flex flex-col items-center gap-1 text-[11px] font-medium transition-colors ${isActive("/certificates") ? "text-primary font-bold" : "text-text-muted hover:text-text"}`}>
 					<Lock class="size-4" />
@@ -648,7 +663,7 @@
 				</a>
 				<a href="/settings" class={`flex flex-col items-center gap-1 text-[11px] font-medium transition-colors ${isActive("/settings") ? "text-primary font-bold" : "text-text-muted hover:text-text"}`}>
 					<Settings class="size-4" />
-					<span>Settings</span>
+					<span>{translateUI("Settings")}</span>
 				</a>
 			</nav>
 		</div>

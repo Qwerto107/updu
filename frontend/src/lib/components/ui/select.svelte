@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Select built on bits-ui Select primitive. Themed to match Input.
     import { Select } from "bits-ui";
     import { Check, ChevronDown } from "lucide-svelte";
@@ -77,7 +78,7 @@
                                 <Check class="size-3.5" />
                             {/if}
                         </span>
-                        <span class="truncate">{option.label}</span>
+                        <span class="truncate">{translateUI(option.label ?? '')}</span>
                     {/snippet}
                 </Select.Item>
             {/each}

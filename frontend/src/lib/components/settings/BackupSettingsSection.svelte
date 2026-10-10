@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { Download, HardDrive, Upload } from 'lucide-svelte';
     import Button from '$lib/components/ui/button.svelte';
     import ConfirmActionDialog from '$lib/components/settings/ConfirmActionDialog.svelte';
@@ -133,19 +134,19 @@
             <HardDrive class="size-4 text-primary" />
         </div>
         <div>
-            <h2 class="text-base font-semibold text-text">Backups & Export</h2>
+            <h2 class="text-base font-semibold text-text">{translateUI("Backups & Export")}</h2>
             <p class="text-[11px] text-text-subtle mt-0.5">
-                Download configuration snapshots or import an existing backup into this instance.
+                {translateUI("Download configuration snapshots or import an existing backup into this instance.")}
             </p>
             <div class="settings-meta-row">
                 <span class="settings-pill settings-pill-primary">
-                    JSON snapshots
+                    {translateUI("JSON snapshots")}
                 </span>
                 <span class="settings-pill settings-pill-muted">
-                    GitOps export
+                    {translateUI("GitOps export")}
                 </span>
                 <span class="settings-pill settings-pill-muted">
-                    Reviewed imports
+                    {translateUI("Reviewed imports")}
                 </span>
             </div>
         </div>
@@ -154,36 +155,36 @@
     <div class="grid gap-6 xl:grid-cols-2">
         <div class="settings-panel">
             <div>
-                <h3 class="text-sm font-semibold text-text">Export JSON Backup</h3>
+                <h3 class="text-sm font-semibold text-text">{translateUI("Export JSON Backup")}</h3>
                 <p class="text-xs text-text-muted mt-1">
-                    Download monitors, incidents, maintenance windows, notification channels, and settings as a JSON file.
+                    {translateUI("Download monitors, incidents, maintenance windows, notification channels, and settings as a JSON file.")}
                 </p>
             </div>
             <Button onclick={exportBackup} variant="outline">
                 <Download class="size-4" />
-                Export Backup
+                {translateUI("Export Backup")}
             </Button>
         </div>
 
         <div class="settings-panel">
             <div>
-                <h3 class="text-sm font-semibold text-text">Export updu.conf</h3>
+                <h3 class="text-sm font-semibold text-text">{translateUI("Export updu.conf")}</h3>
                 <p class="text-xs text-text-muted mt-1">
-                    Generate a YAML configuration file for GitOps workflows or manual deployment.
+                    {translateUI("Generate a YAML configuration file for GitOps workflows or manual deployment.")}
                 </p>
             </div>
             <Button onclick={exportYAML} variant="outline">
                 <Download class="size-4" />
-                Export updu.conf
+                {translateUI("Export updu.conf")}
             </Button>
         </div>
     </div>
 
     <div class="settings-panel">
         <div>
-            <h3 class="text-sm font-semibold text-text">Import Configuration</h3>
+            <h3 class="text-sm font-semibold text-text">{translateUI("Import Configuration")}</h3>
             <p class="text-xs text-text-muted mt-1">
-                Upload a previously exported JSON backup. Existing data is merged; invalid records are reported after import.
+                {translateUI("Upload a previously exported JSON backup. Existing data is merged; invalid records are reported after import.")}
             </p>
         </div>
 
@@ -193,10 +194,10 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Importing...
+                {translateUI("Importing...")}
             {:else}
                 <Upload class="size-4" />
-                Choose JSON File
+                {translateUI("Choose JSON File")}
             {/if}
             <input
                 type="file"
@@ -208,7 +209,7 @@
             />
         </label>
         <p class="text-[11px] text-text-subtle">
-            Selecting a file opens a short review step before anything is imported.
+            {translateUI("Selecting a file opens a short review step before anything is imported.")}
         </p>
     </div>
 
@@ -229,8 +230,8 @@
 
 <ConfirmActionDialog
     bind:open={importDialogOpen}
-    title="Import Configuration Backup"
-    description="The uploaded JSON backup will be merged into the current instance. Invalid records are skipped and reported after import."
+    title={translateUI("Import Configuration Backup")}
+    description={translateUI("The uploaded JSON backup will be merged into the current instance. Invalid records are skipped and reported after import.")}
     confirmLabel="Import Backup"
     confirmVariant="default"
     loading={importing}
@@ -241,13 +242,13 @@
         <div class="grid gap-3 text-sm sm:grid-cols-2">
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    File
+                    {translateUI("File")}
                 </p>
                 <p class="mt-1 text-text break-all">{stagedImportFile.name}</p>
             </div>
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Size
+                    {translateUI("Size")}
                 </p>
                 <p class="mt-1 text-text">{formatBytes(stagedImportFile.size)}</p>
             </div>

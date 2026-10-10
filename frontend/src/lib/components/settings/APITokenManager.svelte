@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { formatDistanceToNow } from "date-fns";
     import { Dialog } from "bits-ui";
@@ -163,18 +164,18 @@
                 <KeyRound class="size-4 text-primary" />
             </div>
             <div>
-                <h3 class="text-sm font-semibold text-text">API Tokens</h3>
+                <h3 class="text-sm font-semibold text-text">{translateUI("API Tokens")}</h3>
                 <p class="text-[11px] text-text-subtle mt-0.5 max-w-2xl">
-                    Create session-independent credentials for automation and integrations. Tokens only reveal their full secret once.
+                    {translateUI("Create session-independent credentials for automation and integrations. Tokens only reveal their full secret once.")}
                 </p>
                 {#if !loading}
                     <div class="settings-meta-row">
                         <span class="settings-pill settings-pill-primary">
-                            {activeTokenCount()} active
+                            {activeTokenCount()} {translateUI("active")}
                         </span>
                         {#if revokedTokenCount() > 0}
                             <span class="settings-pill settings-pill-muted">
-                                {revokedTokenCount()} revoked
+                                {revokedTokenCount()} {translateUI("revoked")}
                             </span>
                         {/if}
                     </div>
@@ -190,7 +191,7 @@
             data-testid="create-api-token"
         >
             <Plus class="size-4" />
-            Create Token
+            {translateUI("Create Token")}
         </Button>
     </div>
 
@@ -201,9 +202,9 @@
         >
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <p class="text-sm font-semibold text-text">Store this token now</p>
+                    <p class="text-sm font-semibold text-text">{translateUI("Store this token now")}</p>
                     <p class="text-xs text-text-muted mt-1">
-                        This is the only time the full token value is shown for <span class="font-medium text-text">{latestCreatedToken.name}</span>.
+                        {translateUI("This is the only time the full token value is shown for")} <span class="font-medium text-text">{latestCreatedToken.name}</span>.
                     </p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -214,7 +215,7 @@
                         type="button"
                         class="size-8 rounded-lg border border-border/60 text-text-muted hover:text-text hover:bg-surface-elevated transition-colors"
                         onclick={clearLatestToken}
-                        aria-label="Hide token"
+                        aria-label={translateUI("Hide token")}
                     >
                         <X class="size-4 mx-auto" />
                     </button>
@@ -225,7 +226,7 @@
             </div>
             <div class="flex justify-end">
                 <Button size="sm" variant="outline" onclick={copyLatestToken}>
-                    Copy Token
+                    {translateUI("Copy Token")}
                 </Button>
             </div>
         </div>
@@ -233,13 +234,13 @@
 
     {#if error}
         <div class="settings-banner settings-banner-danger">
-            {error}
+            {translateUI(error ?? '')}
         </div>
     {/if}
 
     <div class="space-y-3" data-testid="api-token-list">
         {#if loading}
-            <div class="space-y-3" aria-busy="true" aria-label="Loading API tokens">
+            <div class="space-y-3" aria-busy="true" aria-label={translateUI("Loading API tokens")}>
                 {#each Array.from({ length: 3 }) as _, index (index)}
                     <div class="rounded-2xl border border-border/60 p-4 space-y-3">
                         <Skeleton height="h-4" width="w-1/3" />
@@ -251,8 +252,8 @@
         {:else if tokens.length === 0}
             <EmptyState
                 icon={Shield}
-                title="No API tokens yet"
-                description="Create a read or write token for CI jobs, scripts, or external automation."
+                title={translateUI("No API tokens yet")}
+                description={translateUI("Create a read or write token for CI jobs, scripts, or external automation.")}
             />
         {:else}
             <div class="settings-danger-zone">
@@ -261,9 +262,9 @@
                         <AlertOctagon class="size-4" />
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-text">Credential Danger Zone</h4>
+                        <h4 class="text-sm font-semibold text-text">{translateUI("Credential Danger Zone")}</h4>
                         <p class="mt-1 text-xs text-text-muted">
-                            Revoking a token immediately disables scripts, CI jobs, and external integrations using that credential.
+                            {translateUI("Revoking a token immediately disables scripts, CI jobs, and external integrations using that credential.")}
                         </p>
                     </div>
                 </div>
@@ -280,22 +281,22 @@
                                     <Badge status={token.scope} dot={false}>{token.scope}</Badge>
                                     {#if token.revoked_at}
                                         <span class="inline-flex items-center rounded-full border border-danger/20 bg-danger/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-danger">
-                                            revoked
+                                            {translateUI("revoked")}
                                         </span>
                                     {/if}
                                 </div>
 
                                 <div class="grid gap-2 text-xs text-text-muted sm:grid-cols-3">
                                     <div>
-                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Prefix</span>
+                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Prefix")}</span>
                                         <span class="font-mono text-text">{token.prefix}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Created</span>
+                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Created")}</span>
                                         <span class="text-text">{formatTimestamp(token.created_at)}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">Last used</span>
+                                        <span class="block text-[10px] uppercase tracking-wider text-text-subtle font-semibold">{translateUI("Last used")}</span>
                                         <span class="text-text">{formatTimestamp(token.last_used_at)}</span>
                                     </div>
                                 </div>
@@ -308,7 +309,7 @@
                                     onclick={() => openRevokeDialog(token)}
                                     disabled={Boolean(token.revoked_at)}
                                     loading={actionTokenID === token.id}
-                                    aria-label="Revoke token"
+                                    aria-label={translateUI("Revoke token")}
                                 >
                                     <Trash2 class="size-4" />
                                     {token.revoked_at ? "Revoked" : "Revoke"}
@@ -333,10 +334,10 @@
             <div class="flex items-center justify-between mb-5">
                 <div>
                     <Dialog.Title class="text-base font-semibold text-text">
-                        Create API Token
+                        {translateUI("Create API Token")}
                     </Dialog.Title>
                     <Dialog.Description class="text-xs text-text-muted mt-0.5">
-                        Pick the smallest scope that fits the integration.
+                        {translateUI("Pick the smallest scope that fits the integration.")}
                     </Dialog.Description>
                 </div>
                 <Dialog.Close
@@ -355,7 +356,7 @@
             <div class="space-y-4">
                 <div class="space-y-1.5">
                     <label for="api-token-name" class="text-sm font-medium text-text-muted">
-                        Token Name
+                        {translateUI("Token Name")}
                     </label>
                     <input
                         id="api-token-name"
@@ -367,25 +368,25 @@
 
                 <div class="space-y-1.5">
                     <label for="api-token-scope" class="text-sm font-medium text-text-muted">
-                        Access Scope
+                        {translateUI("Access Scope")}
                     </label>
                     <select
                         id="api-token-scope"
                         bind:value={tokenScope}
                         class="input-base w-full"
                     >
-                        <option value="read">Read access</option>
-                        <option value="write">Write access</option>
+                        <option value="read">{translateUI("Read access")}</option>
+                        <option value="write">{translateUI("Write access")}</option>
                     </select>
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-2">
                 <Button variant="ghost" onclick={() => (dialogOpen = false)}>
-                    Cancel
+                    {translateUI("Cancel")}
                 </Button>
                 <Button loading={saving} onclick={createToken}>
-                    {saving ? "Creating..." : "Create Token"}
+                    {saving ? translateUI("Creating...") : translateUI("Create Token")}
                 </Button>
             </div>
         </Dialog.Content>
@@ -394,8 +395,8 @@
 
 <ConfirmActionDialog
     bind:open={revokeDialogOpen}
-    title="Revoke API Token"
-    description="Existing clients using this token will stop working immediately. This action cannot be undone."
+    title={translateUI("Revoke API Token")}
+    description={translateUI("Existing clients using this token will stop working immediately. This action cannot be undone.")}
     confirmLabel="Revoke Token"
     loading={Boolean(revokeTarget && actionTokenID === revokeTarget.id)}
     onConfirm={revokeToken}
@@ -404,13 +405,13 @@
         <div class="grid gap-3 text-sm sm:grid-cols-2">
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Token Name
+                    {translateUI("Token Name")}
                 </p>
                 <p class="mt-1 text-text">{revokeTarget.name}</p>
             </div>
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Scope
+                    {translateUI("Scope")}
                 </p>
                 <p class="mt-1 text-text uppercase">{revokeTarget.scope}</p>
             </div>

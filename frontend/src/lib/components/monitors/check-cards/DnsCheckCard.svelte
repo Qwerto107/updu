@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { Radar } from "lucide-svelte";
     import {
         parseCheckMetadata,
@@ -33,15 +34,15 @@
 
 <CheckCardShell
     typeLabel="DNS"
-    description="updu resolves the configured record and (optionally) compares the answer."
+    description={translateUI("updu resolves the configured record and (optionally) compares the answer.")}
     hasDetails
 >
     {#snippet basics()}
-        <FieldTile label="Record" value={recordType} />
-        <FieldTile label="Host" value={host} monospace />
-        <FieldTile label="Expected" value={expected} monospace />
+        <FieldTile label={translateUI("Record")} value={recordType} />
+        <FieldTile label={translateUI("Host")} value={host} monospace />
+        <FieldTile label={translateUI("Expected")} value={expected} monospace />
         <FieldTile
-            label="Cadence"
+            label={translateUI("Cadence")}
             value={cadence ? `Every ${cadence}s` : undefined}
         />
     {/snippet}
@@ -57,23 +58,23 @@
                         <p
                             class="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary"
                         >
-                            DNS Lookup
+                            {translateUI("DNS Lookup")}
                         </p>
                     </div>
                     {#if host}
                         <CopyButton
                             value={host}
-                            label="Copy host"
+                            label={translateUI("Copy host")}
                             size="xs"
                         />
                     {/if}
                 </div>
                 <p class="text-sm text-text">
                     <span class="font-mono text-xs">{recordType}</span>
-                    record for
+                    {translateUI("record for")}
                     <code class="font-mono text-xs break-all">{host ?? "—"}</code>
                     {#if resolver}
-                        via
+                        {translateUI("via")}
                         <code class="font-mono text-xs">{resolver}</code>
                     {/if}
                 </p>
@@ -91,7 +92,7 @@
                 {/if}
                 {#if answers.length > 0}
                     <FieldTile
-                        label="Latest Answers"
+                        label={translateUI("Latest Answers")}
                         value={answers.join("\n")}
                         monospace
                         multiline
@@ -103,22 +104,22 @@
     {/snippet}
 
     {#snippet details()}
-        <DetailSection title="Configuration">
+        <DetailSection title={translateUI("Configuration")}>
             <FieldTile
-                label="Domain"
+                label={translateUI("Domain")}
                 value={host}
                 monospace
                 copyable={Boolean(host)}
             />
-            <FieldTile label="Record Type" value={recordType} />
+            <FieldTile label={translateUI("Record Type")} value={recordType} />
             <FieldTile
-                label="Resolver"
+                label={translateUI("Resolver")}
                 value={resolver}
                 monospace
                 copyable={Boolean(resolver)}
             />
             <FieldTile
-                label="Expected Answer"
+                label={translateUI("Expected Answer")}
                 value={expected}
                 monospace
                 copyable={Boolean(expected)}

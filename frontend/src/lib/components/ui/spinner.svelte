@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { cn } from "$lib/utils";
 
     interface Props {
@@ -19,7 +20,7 @@
     class={cn("animate-spin text-primary", sizes[size], className)}
     viewBox="0 0 24 24"
     fill="none"
-    aria-label="Loading"
+    aria-label={translateUI("Loading")}
 >
     <circle
         class="opacity-20"

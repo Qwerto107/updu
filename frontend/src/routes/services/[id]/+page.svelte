@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { resolve } from "$app/paths";
     import { onMount } from "svelte";
     import { page } from "$app/stores";
@@ -175,7 +176,7 @@
     />
 
     {#if loading}
-        <div class="space-y-5" aria-busy="true" aria-label="Loading monitor details">
+        <div class="space-y-5" aria-busy="true" aria-label={translateUI("Loading monitor details")}>
             <div class="flex items-center gap-3">
                 <Skeleton height="h-8" width="w-48" />
                 <Skeleton height="h-6" width="w-16" rounded="rounded-full" />
@@ -195,7 +196,7 @@
         </div>
     {:else if error}
         <div class="card border-danger/30 bg-danger/5 p-5 text-danger text-sm">
-            {error}
+            {translateUI(error ?? '')}
         </div>
     {:else if monitor}
         {#if monitor.is_federated || monitor.id?.startsWith("fed_")}
@@ -203,9 +204,9 @@
                 <div class="flex items-center gap-2.5">
                     <span class="text-base">☁️</span>
                     <div>
-                        <p class="text-xs font-semibold text-emerald-500">Federated Peer Service</p>
+                        <p class="text-xs font-semibold text-emerald-500">{translateUI("Federated Peer Service")}</p>
                         <p class="type-caption text-text-muted">
-                            Executed on <span class="font-medium text-text">{monitor.peer_name || 'remote peer'}</span>
+                            {translateUI("Executed on")} <span class="font-medium text-text">{monitor.peer_name || translateUI("remote peer")}</span>
                             {#if monitor.peer_address}
                                 ({monitor.peer_address})
                             {/if}
@@ -219,7 +220,7 @@
                         rel="noopener noreferrer"
                         class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-500 transition-colors hover:bg-emerald-500/20"
                     >
-                        <ExternalLink class="size-3.5" /> Open on {monitor.peer_name || 'Origin Node'}
+                        <ExternalLink class="size-3.5" /> {translateUI("Open on")} {monitor.peer_name || translateUI("Origin Node")}
                     </a>
                 {/if}
             </div>
@@ -242,10 +243,10 @@
                     {#if monitor.enabled && monitorFlapping}
                         <span
                             class="type-kicker inline-flex items-center gap-1.5 rounded-full border border-warning/25 bg-warning/10 px-2.5 py-1 text-warning"
-                            aria-label="Flapping: three or more status changes in ten minutes"
+                            aria-label={translateUI("Flapping: three or more status changes in ten minutes")}
                         >
                             <Waves class="size-3.5" aria-hidden="true" />
-                            Flapping
+                            {translateUI("Flapping")}
                         </span>
                     {/if}
                 </div>
@@ -265,7 +266,7 @@
                     {/if}
                     <span class="flex items-center gap-1">
                         <Clock class="size-3" />
-                        Every {monitor.interval_s}s
+                        {translateUI("Every")} {monitor.interval_s}s
                     </span>
                     {#if monitorPrimaryURL}
                         <a
@@ -298,12 +299,12 @@
                         {:else}
                             <UserCheck class="size-3.5" />
                         {/if}
-                        {investigationActive ? "Investigating" : "I'm on it"}
+                        {investigationActive ? translateUI("Investigating") : translateUI("I'm on it")}
                     </button>
                 {/if}
                 {#if investigationActive}
                     <p class="type-micro font-medium text-warning">
-                        Marked {investigationAge}
+                        {translateUI("Marked")} {investigationAge}
                     </p>
                 {/if}
                 <a
@@ -311,7 +312,7 @@
                     class="type-data inline-flex items-center gap-1.5 rounded-md border border-border bg-surface/50 px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface hover:text-text"
                 >
                     <History class="size-3.5" />
-                    State History
+                    {translateUI("State History")}
                 </a>
 
                 <a
@@ -319,12 +320,12 @@
                     class="type-data inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
                 >
                     <Network class="size-3.5" />
-                    View in Network Topology
+                    {translateUI("View in Network Topology")}
                 </a>
 
                 {#if monitor.last_check}
                     <p class="type-micro text-text-subtle">
-                        Last checked
+                        {translateUI("Last checked")}
                         <time
                             datetime={monitor.last_check}
                             title={format(new Date(monitor.last_check), "PPpp")}
@@ -340,7 +341,7 @@
 
         <!-- In-page nav rail -->
         <nav
-            aria-label="Section navigation"
+            aria-label={translateUI("Section navigation")}
             class="type-caption -mt-1 flex flex-wrap gap-1 text-text-muted"
         >
             {#each sectionLinks as link (link.id)}
@@ -348,7 +349,7 @@
                     href={resolve(`/services/${monitor.id}#${link.id}`)}
                     class="rounded-md border border-transparent px-2 py-1 hover:border-border hover:bg-surface-elevated/40 hover:text-text"
                 >
-                    {link.label}
+                    {translateUI(link.label ?? '')}
                 </a>
             {/each}
         </nav>
@@ -364,7 +365,7 @@
                     aria-labelledby="health-heading"
                     class="card p-5"
                 >
-                    <h2 id="health-heading" class="sr-only">Health Overview</h2>
+                    <h2 id="health-heading" class="sr-only">{translateUI("Health Overview")}</h2>
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-[auto,1fr] sm:items-center">
                         <div class="flex justify-center sm:justify-start">
                             <StatusDonut
@@ -377,20 +378,20 @@
                         </div>
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <Stat
-                                label="Uptime 7d"
+                                label={translateUI("Uptime 7d")}
                                 value={uptimePct(uptime?.["7d"])}
                                 icon={TrendingUp}
                                 tone={uptimeTone(uptime?.["7d"])}
                             />
                             <Stat
-                                label="Uptime 30d"
+                                label={translateUI("Uptime 30d")}
                                 value={uptimePct(uptime?.["30d"])}
                                 icon={TrendingUp}
                                 tone={uptimeTone(uptime?.["30d"])}
                             />
                             <div class="card p-4">
                                 <BulletBar
-                                    label="Last latency"
+                                    label={translateUI("Last latency")}
                                     value={monitor.last_latency_ms ?? null}
                                     target={500}
                                     warning={1000}
@@ -402,7 +403,7 @@
                 </section>
 
                 <section id="config" aria-labelledby="config-heading">
-                    <h2 id="config-heading" class="sr-only">Configuration</h2>
+                    <h2 id="config-heading" class="sr-only">{translateUI("Configuration")}</h2>
                     <MonitorCheckDetails monitor={monitor} latestCheck={latestCheck} />
                 </section>
             </div>
@@ -422,10 +423,10 @@
                             id="history-heading"
                             class="type-section-title text-text"
                         >
-                            Check History
+                            {translateUI("Check History")}
                         </h2>
                         <span class="type-numeric text-xs text-text-subtle">
-                            {checks.length} checks
+                            {checks.length} {translateUI("checks")}
                         </span>
                     </div>
                     <UptimeRibbon
@@ -447,7 +448,7 @@
                                     id="events-heading"
                                     class="type-section-title text-text"
                                 >
-                                    State Transitions
+                                    {translateUI("State Transitions")}
                                 </h2>
                             </div>
                             <a
@@ -456,12 +457,12 @@
                                 })}
                                 class="type-caption text-primary hover:underline"
                             >
-                                View full history
+                                {translateUI("View full history")}
                             </a>
                         </div>
                         {#if events.length === 0}
                             <div class="p-8 text-center text-sm text-text-subtle">
-                                No status changes recorded yet.
+                                {translateUI("No status changes recorded yet.")}
                             </div>
                         {:else}
                             <div class="divide-y divide-border/60">
@@ -488,13 +489,13 @@
                             id="samples-heading"
                             class="type-section-title flex items-center gap-2 text-left text-text"
                         >
-                            Raw Monitor Samples
+                            {translateUI("Raw Monitor Samples")}
                             <Badge status="unknown" size="sm">
-                                {checks.length} recent
+                                {checks.length} {translateUI("recent")}
                             </Badge>
                         </h2>
                         <p class="mt-1 type-caption text-left text-text-muted">
-                            Individual check results and latency measurements.
+                            {translateUI("Individual check results and latency measurements.")}
                         </p>
                     </div>
                     <span
@@ -507,7 +508,7 @@
 
                 {#if checks.length === 0}
                     <div class="p-8 text-center text-sm text-text-subtle">
-                        No checks recorded yet.
+                        {translateUI("No checks recorded yet.")}
                     </div>
                 {:else}
                     <div class="overflow-x-auto border-t border-border">
@@ -517,16 +518,16 @@
                                     class="type-kicker border-b border-border bg-surface/20 text-text-subtle"
                                 >
                                     <th scope="col" class="px-4 py-3 font-medium">
-                                        Status
+                                        {translateUI("Status")}
                                     </th>
                                     <th scope="col" class="px-4 py-3 font-medium">
-                                        Latency
+                                        {translateUI("Latency")}
                                     </th>
                                     <th scope="col" class="px-4 py-3 font-medium">
-                                        Message
+                                        {translateUI("Message")}
                                     </th>
                                     <th scope="col" class="px-4 py-3 font-medium">
-                                        Time
+                                        {translateUI("Time")}
                                     </th>
                                 </tr>
                             </thead>

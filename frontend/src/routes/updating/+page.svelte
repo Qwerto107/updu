@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
@@ -61,9 +62,9 @@
             </div>
             
             <div class="space-y-2">
-                <h1 class="text-2xl font-bold text-text tracking-tight">Updating updu</h1>
+                <h1 class="text-2xl font-bold text-text tracking-tight">{translateUI("Updating updu")}</h1>
                 <p class="text-text-muted text-sm">
-                    Downloading and applying {to}{dots}
+                    {translateUI("Downloading and applying")} {to}{dots}
                 </p>
             </div>
         </div>
@@ -71,12 +72,12 @@
         <div class="bg-surface border border-border rounded-2xl p-6 space-y-6">
             <div class="flex items-center justify-center gap-8">
                 <div class="text-center">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-1">From</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-1">{translateUI("From")}</p>
                     <p class="font-mono text-sm font-semibold">{from}</p>
                 </div>
                 <div class="h-8 w-px bg-border"></div>
                 <div class="text-center">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-1">To</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-1">{translateUI("To")}</p>
                     <p class="font-mono text-sm font-semibold text-primary">{to}</p>
                 </div>
             </div>
@@ -84,10 +85,10 @@
             <div class="space-y-3">
                 <div class="flex items-center gap-3 text-sm text-text-muted justify-center">
                     <Spinner size="sm" />
-                    <span>Restarting process...</span>
+                    <span>{translateUI("Restarting process...")}</span>
                 </div>
                 <p class="text-[11px] text-text-subtle italic">
-                    The connection will drop briefly while the new binary starts.
+                    {translateUI("The connection will drop briefly while the new binary starts.")}
                 </p>
             </div>
         </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { Shield } from 'lucide-svelte';
@@ -246,20 +247,20 @@
     <section class="card settings-section-lg">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-                <h2 class="text-base font-semibold text-text">System Update</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("System Update")}</h2>
                 <p class="text-xs text-text-muted mt-1 max-w-2xl">
-                    Check the installed build, compare it to the selected release track, and decide whether this instance should follow stable releases or prereleases.
+                    {translateUI("Check the installed build, compare it to the selected release track, and decide whether this instance should follow stable releases or prereleases.")}
                 </p>
 
                 <div class="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
                     <span class="inline-flex items-center rounded-full border border-primary/20 bg-primary/8 px-2.5 py-1 font-semibold text-primary">
                         {effectiveReleaseChannel() === 'stable'
-                            ? 'Stable track'
-                            : 'Prerelease track'}
+                            ? translateUI("Stable track")
+                            : translateUI("Prerelease track")}
                     </span>
                     {#if updateInfo?.published_at}
                         <span class="inline-flex items-center rounded-full border border-border/60 bg-surface/40 px-2.5 py-1 text-text-muted">
-                            Release published {formatPublishedAt(updateInfo.published_at)}
+                            {translateUI("Release published")} {formatPublishedAt(updateInfo.published_at)}
                         </span>
                     {/if}
                 </div>
@@ -270,10 +271,10 @@
             <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div class="space-y-1">
                     <label for="update-channel" class="text-sm font-medium text-text">
-                        Release Channel
+                        {translateUI("Release Channel")}
                     </label>
                     <p class="text-xs text-text-muted max-w-xl">
-                        Stable ignores beta and release-candidate builds. Prerelease follows beta and RC builds for your current platform.
+                        {translateUI("Stable ignores beta and release-candidate builds. Prerelease follows beta and RC builds for your current platform.")}
                     </p>
                 </div>
 
@@ -293,12 +294,12 @@
                             updateChannelMsg = '';
                         }}
                     >
-                        <option value="stable">Stable only</option>
-                        <option value="prerelease">Include prereleases</option>
+                        <option value="stable">{translateUI("Stable only")}</option>
+                        <option value="prerelease">{translateUI("Include prereleases")}</option>
                     </select>
 
                     <Button variant="outline" loading={updateChannelSaving} onclick={saveUpdateChannel}>
-                        {updateChannelSaving ? 'Saving...' : 'Save & Recheck'}
+                        {updateChannelSaving ? translateUI("Saving...") : 'Save & Recheck'}
                     </Button>
                 </div>
             </div>
@@ -324,7 +325,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Checking for updates...
+                {translateUI("Checking for updates...")}
             </div>
         {:else if updateInfo}
             <div class="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)]">
@@ -332,7 +333,7 @@
                     <div class="grid gap-3 sm:grid-cols-2">
                         <article class="settings-panel-contrast">
                             <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                                Installed Build
+                                {translateUI("Installed Build")}
                             </p>
                             <p class="text-lg font-semibold font-mono text-text break-all">
                                 {updateInfo.current_version || 'unknown'}
@@ -364,9 +365,9 @@
                                     : 'settings-note-primary',
                             ]}
                         >
-                            <h3 class="text-sm font-semibold text-text">{contextNote.title}</h3>
+                            <h3 class="text-sm font-semibold text-text">{translateUI(contextNote.title)}</h3>
                             <p class="text-xs text-text-muted mt-1 max-w-2xl">
-                                {contextNote.body}
+                                {translateUI(contextNote.body)}
                             </p>
                         </div>
                     {/if}
@@ -378,9 +379,9 @@
                                     <Shield class="size-4 text-primary" />
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h3 class="text-sm font-semibold text-text">New version available</h3>
+                                    <h3 class="text-sm font-semibold text-text">{translateUI("New version available")}</h3>
                                     <p class="text-xs text-text-muted mt-1 max-w-2xl">
-                                        {updateInfo.latest_version} is available on the {effectiveReleaseChannel()} track. Update when you are ready to restart the process.
+                                        {updateInfo.latest_version} {translateUI("is available on the")} {effectiveReleaseChannel()} {translateUI("track. Update when you are ready to restart the process.")}
                                     </p>
                                     <div class="mt-4 flex flex-wrap items-center gap-3">
                                         <Button
@@ -388,7 +389,7 @@
                                             loading={updateApplying}
                                             onclick={() => (updateConfirmOpen = true)}
                                         >
-                                            {updateApplying ? 'Updating...' : 'Update Now'}
+                                            {updateApplying ? 'Updating...' : translateUI("Update Now")}
                                         </Button>
                                         {#if updateInfo.release_url}
                                             <a
@@ -397,7 +398,7 @@
                                                 rel="noreferrer"
                                                 class="text-xs font-medium text-primary hover:underline"
                                             >
-                                                Open release notes
+                                                {translateUI("Open release notes")}
                                             </a>
                                         {/if}
                                     </div>
@@ -411,12 +412,12 @@
                                     <Shield class="size-4 text-success" />
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h3 class="text-sm font-semibold text-text">Version check complete</h3>
+                                    <h3 class="text-sm font-semibold text-text">{translateUI("Version check complete")}</h3>
                                     <p class="text-xs text-text-muted mt-1">
                                         {#if effectiveReleaseChannel() === 'stable' && isPrereleaseVersion(updateInfo.current_version)}
-                                            This installed prerelease build is already ahead of the latest stable release.
+                                            {translateUI("This installed prerelease build is already ahead of the latest stable release.")}
                                         {:else}
-                                            This instance is current for the selected release track.
+                                            {translateUI("This instance is current for the selected release track.")}
                                         {/if}
                                     </p>
                                     {#if updateInfo.latest_version && updateInfo.latest_version !== 'unknown'}
@@ -427,7 +428,7 @@
                                                 loading={updateApplying}
                                                 onclick={() => (updateConfirmOpen = true)}
                                             >
-                                                Reinstall / Force Update
+                                                {translateUI("Reinstall / Force Update")}
                                             </Button>
                                         </div>
                                     {/if}
@@ -439,27 +440,27 @@
 
                 <aside class="settings-panel-sidebar">
                     <div>
-                        <h3 class="text-sm font-semibold text-text">Release Snapshot</h3>
+                        <h3 class="text-sm font-semibold text-text">{translateUI("Release Snapshot")}</h3>
                         <p class="text-xs text-text-muted mt-1">
-                            Extra context for the build selected by this page.
+                            {translateUI("Extra context for the build selected by this page.")}
                         </p>
                     </div>
 
                     <dl class="grid gap-4 text-sm">
                         <div>
                             <dt class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                                Release Channel
+                                {translateUI("Release Channel")}
                             </dt>
                             <dd class="mt-1 text-text">
                                 {effectiveReleaseChannel() === 'stable'
-                                    ? 'Stable releases only'
-                                    : 'Stable and prerelease builds'}
+                                    ? translateUI("Stable releases only")
+                                    : translateUI("Stable and prerelease builds")}
                             </dd>
                         </div>
 
                         <div>
                             <dt class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                                Published
+                                {translateUI("Published")}
                             </dt>
                             <dd class="mt-1 text-text">
                                 {formatPublishedAt(updateInfo.published_at)}
@@ -469,7 +470,7 @@
                         {#if updateInfo.asset_name}
                             <div>
                                 <dt class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                                    Matching Asset
+                                    {translateUI("Matching Asset")}
                                 </dt>
                                 <dd class="mt-1 font-mono text-xs text-text break-all">
                                     {updateInfo.asset_name}
@@ -481,7 +482,7 @@
                     {#if releaseNotesItems.length > 0}
                         <div class="space-y-2">
                             <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                                Release Notes Preview
+                                {translateUI("Release Notes Preview")}
                             </p>
                             <ul class="space-y-2 text-xs text-text-muted">
                                 {#each releaseNotesItems as item, index (`${item}-${index}`)}
@@ -500,13 +501,13 @@
                             rel="noreferrer"
                             class="inline-flex items-center text-xs font-medium text-primary hover:underline"
                         >
-                            View full release details
+                            {translateUI("View full release details")}
                         </a>
                     {/if}
                 </aside>
             </div>
         {:else}
-            <Button variant="outline" onclick={checkUpdate}>Check for Updates</Button>
+            <Button variant="outline" onclick={checkUpdate}>{translateUI("Check for Updates")}</Button>
         {/if}
 
         {#if updateMsg}
@@ -534,7 +535,7 @@
         <APITokenManagerComponent onAuditRefresh={refreshAuditLogs} />
     {:catch}
         <section class="card settings-section-compact settings-banner-danger text-sm">
-            Token management failed to load. Refresh the page to try again.
+            {translateUI("Token management failed to load. Refresh the page to try again.")}
         </section>
     {/await}
 
@@ -548,14 +549,14 @@
         <AuditLogBrowserComponent refreshVersion={auditRefreshVersion} />
     {:catch}
         <section class="card settings-section-compact settings-banner-danger text-sm">
-            Audit history failed to load. Refresh the page to try again.
+            {translateUI("Audit history failed to load. Refresh the page to try again.")}
         </section>
     {/await}
 
     <ConfirmActionDialog
         bind:open={updateConfirmOpen}
-        title="Apply Update"
-        description="The current updu process will download the selected release, replace the running binary, and restart. Use this when a brief reconnect is acceptable."
+        title={translateUI("Apply Update")}
+        description={translateUI("The current updu process will download the selected release, replace the running binary, and restart. Use this when a brief reconnect is acceptable.")}
         confirmLabel="Update & Restart"
         confirmVariant="default"
         loading={updateApplying}
@@ -564,7 +565,7 @@
         <div class="grid gap-3 text-sm sm:grid-cols-2">
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Current
+                    {translateUI("Current")}
                 </p>
                 <p class="mt-1 font-mono text-text break-all">
                     {updateInfo?.current_version || 'unknown'}
@@ -572,7 +573,7 @@
             </div>
             <div>
                 <p class="text-[10px] uppercase tracking-[0.18em] text-text-subtle font-bold">
-                    Update To
+                    {translateUI("Update To")}
                 </p>
                 <p class="mt-1 font-mono text-text break-all">
                     {updateInfo?.latest_version || 'unknown'}

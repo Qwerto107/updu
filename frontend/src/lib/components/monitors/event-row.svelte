@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	// Single event row, used by both detail page (recent) and events sub-page.
 	import Badge from "$lib/components/ui/badge.svelte";
 	import { Clock } from "lucide-svelte";
@@ -49,8 +50,8 @@
 		</div>
 		<div class="min-w-0">
 			<p class="text-sm font-medium text-text">
-				Status changed to
-				<span class={statusTextClass(event.status)}>{event.status}</span>
+				{translateUI("Status changed to")}
+				<span class={statusTextClass(event.status)}>{translateUI(event.status ?? '')}</span>
 			</p>
 			{#if event.message}
 				<p class="mt-0.5 line-clamp-2 text-xs text-text-muted">

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import {
         Globe,
         Network,
@@ -511,8 +512,8 @@
     {#if formReady}
         <div class="sr-only" aria-live="polite">
             {mode === "create"
-                ? "Create monitor form ready."
-                : "Edit monitor form ready."}
+                ? translateUI("Create monitor form ready.")
+                : translateUI("Edit monitor form ready.")}
         </div>
         <form onsubmit={handleSubmit} class="space-y-4">
             {#if errorMsg}
@@ -520,7 +521,7 @@
                     class="p-3 text-sm text-danger bg-danger/10 border border-danger/20 rounded-lg"
                     role="alert"
                 >
-                    {errorMsg}
+                    {translateUI(errorMsg ?? '')}
                 </div>
             {/if}
 
@@ -534,19 +535,19 @@
 
             <!-- Name + Groups -->
             <div class="grid grid-cols-2 gap-3">
-                <Field id="{idPrefix}-name" label="Name" required>
+                <Field id="{idPrefix}-name" label={translateUI("Name")} required>
                     {#snippet children({ id })}
                         <input
                             {id}
                             required
                             bind:value={name}
-                            placeholder="e.g. Nextcloud UI"
+                            placeholder={translateUI("e.g. Nextcloud UI")}
                             class="input-base"
                         />
                     {/snippet}
                 </Field>
                 <div class="space-y-1.5 col-span-2">
-                    <span class="text-sm font-medium text-text-muted">Groups</span>
+                    <span class="text-sm font-medium text-text-muted">{translateUI("Groups")}</span>
                     <div class="space-y-2">
                         <div
                             class="flex flex-wrap gap-1.5 min-h-[36px] p-1.5 bg-surface-elevated/50 border border-border rounded-lg"
@@ -571,7 +572,7 @@
                                 placeholder={groups.length === 0
                                     ? "Add groups..."
                                     : ""}
-                                aria-label="Add group"
+                                aria-label={translateUI("Add group")}
                                 onkeydown={(e) => {
                                     if (e.key === "Enter") {
                                         e.preventDefault();
@@ -603,7 +604,7 @@
 
             <!-- Type selector -->
             <div class="space-y-1.5">
-                <p class="text-sm font-medium text-text-muted">Monitor Type</p>
+                <p class="text-sm font-medium text-text-muted">{translateUI("Monitor Type")}</p>
                 <TypeSelector
                     value={type}
                     groups={typeGroups}
@@ -620,7 +621,7 @@
                                 {id}
                                 required
                                 bind:value={token}
-                                placeholder="Secret check-in token"
+                                placeholder={translateUI("Secret check-in token")}
                                 class="input-base font-mono text-xs"
                             />
                             <Button
@@ -631,7 +632,7 @@
                                 class="shrink-0"
                             >
                                 <Zap class="size-3.5 mr-1.5" />
-                                Regenerate
+                                {translateUI("Regenerate")}
                             </Button>
                         </div>
                         {#if pushCheckInUrl}
@@ -642,8 +643,8 @@
                                     class="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-text-muted"
                                 >
                                     {mode === "create"
-                                        ? "Check-in URL Preview"
-                                        : "Check-in URL"}
+                                        ? translateUI("Check-in URL Preview")
+                                        : translateUI("Check-in URL")}
                                 </p>
                                 <div class="flex items-center gap-2">
                                     <code
@@ -655,16 +656,16 @@
                                         type="button"
                                         class="rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface-elevated hover:text-text"
                                         onclick={copyCheckInUrl}
-                                        title="Copy to clipboard"
-                                        aria-label="Copy check-in URL"
+                                        title={translateUI("Copy to clipboard")}
+                                        aria-label={translateUI("Copy check-in URL")}
                                     >
                                         <Copy class="size-3.5" />
                                     </button>
                                 </div>
                                 <p class="mt-2 text-[10px] italic text-text-subtle">
                                     {mode === "create"
-                                        ? "This URL becomes active after you save the monitor."
-                                        : "Recommended endpoint for jobs, containers, and cron tasks. GET, POST, and PUT all work."}
+                                        ? translateUI("This URL becomes active after you save the monitor.")
+                                        : translateUI("Recommended endpoint for jobs, containers, and cron tasks. GET, POST, and PUT all work.")}
                                 </p>
                             </div>
                         {/if}
@@ -685,7 +686,7 @@
                 <div class="space-y-3 pl-4 border-l-2 border-primary/20 py-1">
                     <Field
                         id="{idPrefix}-push-grace"
-                        label="Late Check-in Tolerance"
+                        label={translateUI("Late Check-in Tolerance")}
                         hint={pushGracePeriodError
                             ? undefined
                             : `Extra time after the expected cadence before updu marks this monitor down. Leave blank to use the default ${formatDurationSeconds(defaultPushGracePeriodS) ?? `${defaultPushGracePeriodS}s`} buffer.`}
@@ -715,14 +716,13 @@
                         <p
                             class="text-[11px] font-medium uppercase tracking-wider text-text-muted"
                         >
-                            Passive Behavior
+                            {translateUI("Passive Behavior")}
                         </p>
                         <p class="mt-1 text-xs text-text-muted">
-                            updu waits for a check-in every
+                            {translateUI("updu waits for a check-in every")}
                             {formatDurationSeconds(intervalS) ?? `${intervalS}s`}
-                            and currently gives it {pushGracePeriodLabel} of
-                            extra time. This monitor goes down after
-                            {pushDownAfterLabel} without a request.
+                            {translateUI("and currently gives it")} {pushGracePeriodLabel} {translateUI("of extra time. This monitor goes down after")}
+                            {pushDownAfterLabel} {translateUI("without a request.")}
                         </p>
                     </div>
                 </div>
@@ -734,7 +734,7 @@
                     class="space-y-3 pl-4 border-l-2 border-primary/20 py-1"
                 >
                     <div class="grid grid-cols-2 gap-3">
-                        <Field id="{idPrefix}-method" label="HTTP Method">
+                        <Field id="{idPrefix}-method" label={translateUI("HTTP Method")}>
                             {#snippet children({ id })}
                                 <Select
                                     {id}
@@ -743,7 +743,7 @@
                                 />
                             {/snippet}
                         </Field>
-                        <Field id="{idPrefix}-status" label="Expected Status">
+                        <Field id="{idPrefix}-status" label={translateUI("Expected Status")}>
                             {#snippet children({ id })}
                                 <input
                                     {id}
@@ -756,17 +756,17 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <Field id="{idPrefix}-expected-body" label="Body Contains (optional)">
+                        <Field id="{idPrefix}-expected-body" label={translateUI("Body Contains (optional)")}>
                             {#snippet children({ id })}
                                 <input
                                     {id}
                                     bind:value={expectedBody}
-                                    placeholder="e.g. healthy or Example Domain"
+                                    placeholder={translateUI("e.g. healthy or Example Domain")}
                                     class="input-base"
                                 />
                             {/snippet}
                         </Field>
-                        <Field id="{idPrefix}-warndays" label="TLS Warning Threshold (days)">
+                        <Field id="{idPrefix}-warndays" label={translateUI("TLS Warning Threshold (days)")}>
                             {#snippet children({ id })}
                                 <input
                                     {id}
@@ -783,7 +783,7 @@
                     <Switch
                         id="{idPrefix}-skip-tls"
                         bind:checked={skipTLSVerify}
-                        label="Skip TLS Verification"
+                        label={translateUI("Skip TLS Verification")}
                     />
                 </div>
             {/if}
@@ -793,7 +793,7 @@
                 <div
                     class="pl-4 border-l-2 border-primary/20 py-1 space-y-3"
                 >
-                    <Field id="{idPrefix}-port" label="Port" required>
+                    <Field id="{idPrefix}-port" label={translateUI("Port")} required>
                         {#snippet children({ id })}
                             <input
                                 {id}
@@ -813,7 +813,7 @@
                 <div
                     class="grid grid-cols-3 gap-3 pl-4 border-l-2 border-primary/20 py-1"
                 >
-                    <Field id="{idPrefix}-record" label="Record Type">
+                    <Field id="{idPrefix}-record" label={translateUI("Record Type")}>
                         {#snippet children({ id })}
                             <Select
                                 {id}
@@ -822,7 +822,7 @@
                             />
                         {/snippet}
                     </Field>
-                    <Field id="{idPrefix}-resolver" label="Resolver (optional)">
+                    <Field id="{idPrefix}-resolver" label={translateUI("Resolver (optional)")}>
                         {#snippet children({ id })}
                             <input
                                 {id}
@@ -834,7 +834,7 @@
                     </Field>
                     <Field
                         id="{idPrefix}-expected"
-                        label="Expected IP / Text (optional)"
+                        label={translateUI("Expected IP / Text (optional)")}
                     >
                         {#snippet children({ id })}
                             <input
@@ -854,7 +854,7 @@
                     <label
                         for="{idPrefix}-interval"
                         class="text-sm font-medium text-text-muted"
-                        >Check Interval</label
+                        >{translateUI("Check Interval")}</label
                     >
                     <span
                         class="text-xs font-mono bg-surface-elevated px-2 py-0.5 rounded-md border border-border text-text"
@@ -882,8 +882,8 @@
                     <Switch
                         id="{idPrefix}-start-enabled"
                         bind:checked={startEnabled}
-                        label="Enable checks after creation"
-                        description="Leave paused while reviewing recipients, thresholds, and initial history."
+                        label={translateUI("Enable checks after creation")}
+                        description={translateUI("Leave paused while reviewing recipients, thresholds, and initial history.")}
                     />
                 </div>
             {/if}
@@ -920,7 +920,7 @@
             <!-- Actions -->
             <div class="flex gap-2 justify-end pt-2">
                 <Button type="button" variant="outline" onclick={handleCancel}
-                    >Cancel</Button
+                    >{translateUI("Cancel")}</Button
                 >
                 {#if mode === "create"}
                     <Button
@@ -931,10 +931,10 @@
                         onclick={handleTest}
                     >
                         <Zap class="size-3.5" />
-                        {testing ? "Testing..." : "Test"}
+                        {testing ? translateUI("Testing...") : "Test"}
                     </Button>
                     <Button type="submit" {loading} disabled={Boolean(pushGracePeriodError) || loading}>
-                        {loading ? "Creating..." : "Create Monitor"}
+                        {loading ? translateUI("Creating...") : translateUI("Create Monitor")}
                     </Button>
                 {:else}
                     <Button
@@ -942,7 +942,7 @@
                         {loading}
                         disabled={Boolean(pushGracePeriodError) || (!isDirty && !loading)}
                     >
-                        {loading ? "Saving..." : "Update Monitor"}
+                        {loading ? translateUI("Saving...") : translateUI("Update Monitor")}
                     </Button>
                 {/if}
             </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { resolve } from "$app/paths";
     import { page } from "$app/stores";
@@ -126,7 +127,7 @@
 </script>
 
 <svelte:head>
-    <title>{monitor?.name ? monitor.name + " History" : "State History"} – updu</title>
+    <title>{monitor?.name ? monitor.name + " History" : translateUI("State History")} – updu</title>
 </svelte:head>
 
 <div class="max-w-5xl space-y-5">
@@ -160,7 +161,7 @@
         </div>
     {:else if error}
         <div class="card border-danger/30 bg-danger/5 p-5 text-sm text-danger">
-            {error}
+            {translateUI(error ?? '')}
         </div>
     {:else if monitor}
         <!-- Header -->
@@ -172,7 +173,7 @@
                     {monitor.name}
                 </h1>
                 <p class="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                    State transition history
+                    {translateUI("State transition history")}
                     <Badge
                         status={!monitor.enabled ? "paused" : monitor.status}
                         size="sm"
@@ -184,19 +185,19 @@
         <!-- Summary tiles -->
         <div class="grid grid-cols-3 gap-3">
             <Stat
-                label="Down events"
+                label={translateUI("Down events")}
                 value={String(counts.down)}
                 icon={AlertCircle}
                 tone={counts.down > 0 ? "danger" : "neutral"}
             />
             <Stat
-                label="Recovery events"
+                label={translateUI("Recovery events")}
                 value={String(counts.up)}
                 icon={ArrowUp}
                 tone={counts.up > 0 ? "success" : "neutral"}
             />
             <Stat
-                label="Other events"
+                label={translateUI("Other events")}
                 value={String(counts.other)}
                 icon={Activity}
                 tone="neutral"
@@ -207,7 +208,7 @@
         <div
             class="flex items-center gap-1 rounded-lg border border-border bg-surface-elevated/40 p-0.5 w-fit"
             role="tablist"
-            aria-label="Filter events by status"
+            aria-label={translateUI("Filter events by status")}
         >
             {#each filterChips as chip (chip.value)}
                 {@const active = statusFilter === chip.value}
@@ -224,7 +225,7 @@
                             : "text-text-muted hover:text-text",
                     )}
                 >
-                    <span>{chip.label}</span>
+                    <span>{translateUI(chip.label ?? '')}</span>
                     <span
                         class={cn(
                             "rounded px-1 text-[10px] font-semibold",
@@ -245,7 +246,7 @@
                 class="flex items-center gap-2 border-b border-border bg-surface/30 px-4 py-3"
             >
                 <History class="size-4 text-text-subtle" />
-                <h2 class="text-sm font-semibold text-text">All Events</h2>
+                <h2 class="text-sm font-semibold text-text">{translateUI("All Events")}</h2>
             </div>
             {#if filtered.length === 0}
                 <EmptyState
@@ -253,14 +254,14 @@
                     title={statusFilter === "all"
                         ? "No events recorded for this monitor."
                         : `No ${statusFilter} events.`}
-                    description="Status changes appear here as they happen."
+                    description={translateUI("Status changes appear here as they happen.")}
                 />
             {:else}
                 {#each grouped as group (group.label)}
                     <div
                         class="sticky top-0 z-10 border-y border-border bg-surface/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-subtle backdrop-blur"
                     >
-                        {group.label}
+                        {translateUI(group.label ?? '')}
                         <span class="text-text-subtle/60">
                             · {group.events.length}
                         </span>
@@ -279,7 +280,7 @@
                             disabled={loadingMore}
                             class="text-xs font-medium text-primary hover:underline disabled:opacity-60"
                         >
-                            {loadingMore ? "Loading..." : "Load more"}
+                            {loadingMore ? "Loading..." : translateUI("Load more")}
                         </button>
                     </div>
                 {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import type { NetworkTopology, Service, ServiceEndpoint } from "$lib/api/services";
 	import {
 		Grid3X3,
@@ -115,7 +116,7 @@
 			<input
 				type="text"
 				bind:value={searchQuery}
-				placeholder="Filter services by name, zone, or HA group..."
+				placeholder={translateUI("Filter services by name, zone, or HA group...")}
 				class="bg-transparent border-none text-slate-200 placeholder-slate-500 focus:outline-none w-full text-xs"
 			/>
 		</div>
@@ -131,7 +132,7 @@
 							: "text-slate-400 hover:text-slate-200"
 					}`}
 				>
-					All Services
+					{translateUI("All Services")}
 				</button>
 				<button
 					type="button"
@@ -143,7 +144,7 @@
 					}`}
 				>
 					<ShieldAlert class="w-3 h-3 text-amber-400" />
-					Asymmetric Reachability
+					{translateUI("Asymmetric Reachability")}
 				</button>
 				<button
 					type="button"
@@ -154,7 +155,7 @@
 							: "text-slate-400 hover:text-slate-200"
 					}`}
 				>
-					Degraded Only
+					{translateUI("Degraded Only")}
 				</button>
 			</div>
 		</div>
@@ -166,9 +167,9 @@
 			<table class="w-full text-left border-collapse text-xs">
 				<thead>
 					<tr class="border-b border-slate-800 bg-slate-900/90 text-slate-400 uppercase tracking-wider text-[10px] font-mono">
-						<th class="py-3.5 px-4 font-bold min-w-[220px]">Monitored Service</th>
-						<th class="py-3.5 px-4 font-bold min-w-[110px]">Zone</th>
-						<th class="py-3.5 px-4 font-bold min-w-[120px]">Overall</th>
+						<th class="py-3.5 px-4 font-bold min-w-[220px]">{translateUI("Monitored Service")}</th>
+						<th class="py-3.5 px-4 font-bold min-w-[110px]">{translateUI("Zone")}</th>
+						<th class="py-3.5 px-4 font-bold min-w-[120px]">{translateUI("Overall")}</th>
 						{#each scopes as sc (sc.id)}
 							<th class="py-3.5 px-4 font-bold min-w-[180px]">
 								<div class="flex items-center gap-1.5">
@@ -182,7 +183,7 @@
 								</div>
 							</th>
 						{/each}
-						<th class="py-3.5 px-4 font-bold text-right min-w-[100px]">Actions</th>
+						<th class="py-3.5 px-4 font-bold text-right min-w-[100px]">{translateUI("Actions")}</th>
 					</tr>
 				</thead>
 
@@ -190,7 +191,7 @@
 					{#if filteredServices.length === 0}
 						<tr>
 							<td colspan={scopes.length + 4} class="py-12 text-center text-slate-500">
-								No services match your active search or filters.
+								{translateUI("No services match your active search or filters.")}
 							</td>
 						</tr>
 					{:else}
@@ -227,7 +228,7 @@
 											<span>•</span>
 											<span class="text-amber-400 font-semibold flex items-center gap-0.5">
 												<ShieldAlert class="w-2.5 h-2.5" />
-												Asymmetric
+												{translateUI("Asymmetric")}
 											</span>
 										{/if}
 									</div>
@@ -270,11 +271,11 @@
 															<span class="truncate max-w-[90px]">{ep.name}</span>
 														</div>
 														<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">
-															Isolated
+															{translateUI("Isolated")}
 														</span>
 													</div>
 													<div class="mt-1 text-[9px] text-slate-500 font-mono truncate">
-														Not reachable by design
+														{translateUI("Not reachable by design")}
 													</div>
 												</button>
 											{:else}
@@ -305,7 +306,7 @@
 
 													{#if failingHop}
 														<div class="mt-1 inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-950 border border-rose-800/80 text-[9px] font-mono text-rose-400 font-bold">
-															<span>HOP: {failingHop}</span>
+															<span>{translateUI("HOP:")} {failingHop}</span>
 														</div>
 													{:else if ep.last_status_code}
 														<div class="mt-1 text-[10px] font-mono text-slate-400">
@@ -323,7 +324,7 @@
 													title={`Add probe endpoint for ${sc.id}`}
 												>
 													<Plus class="w-3 h-3 shrink-0" />
-													<span>Add {sc.id}</span>
+													<span>{translateUI("Add")} {sc.id}</span>
 												</button>
 												{#if onMarkIsolated}
 													<button
@@ -334,7 +335,7 @@
 														aria-label={`Mark ${sc.id} as Isolated`}
 													>
 														<Shield class="w-3 h-3" />
-														<span class="hidden 2xl:inline">Isolate</span>
+														<span class="hidden 2xl:inline">{translateUI("Isolate")}</span>
 													</button>
 												{/if}
 											</div>
@@ -350,8 +351,8 @@
 											onclick={() => onRunProbe(svc.id)}
 											disabled={probingId === svc.id}
 											class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-all disabled:opacity-50"
-											title="Run Probe"
-											aria-label="Run Probe"
+											title={translateUI("Run Probe")}
+											aria-label={translateUI("Run Probe")}
 										>
 											<RefreshCw class={`w-3.5 h-3.5 ${probingId === svc.id ? "animate-spin text-emerald-400" : ""}`} />
 										</button>
@@ -360,8 +361,8 @@
 											type="button"
 											onclick={() => onSelectService(svc)}
 											class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
-											title="Inspect Hop Trace"
-											aria-label="Inspect Hop Trace"
+											title={translateUI("Inspect Hop Trace")}
+											aria-label={translateUI("Inspect Hop Trace")}
 										>
 											<ArrowUpRight class="w-3.5 h-3.5 text-emerald-400" />
 										</button>

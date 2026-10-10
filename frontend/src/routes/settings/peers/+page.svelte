@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from 'svelte';
     import {
         Activity,
@@ -140,7 +141,7 @@
 </script>
 
 <svelte:head>
-    <title>Settings / Peers – updu</title>
+    <title>{translateUI("Settings / Peers – updu")}</title>
 </svelte:head>
 
 <div class="space-y-6">
@@ -150,19 +151,19 @@
             <div>
                 <div class="flex items-center gap-2">
                     <Radio class="size-5 text-primary animate-pulse" />
-                    <h2 class="text-lg font-semibold text-text">Local Node Identity</h2>
+                    <h2 class="text-lg font-semibold text-text">{translateUI("Local Node Identity")}</h2>
                     <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
                         <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                        UDP 3001 Active
+                        {translateUI("UDP 3001 Active")}
                     </span>
                 </div>
                 <p class="mt-1 text-sm text-text-muted">
-                    This node advertises itself to nearby updu instances and authenticates peering proposals using Ed25519.
+                    {translateUI("This node advertises itself to nearby updu instances and authenticates peering proposals using Ed25519.")}
                 </p>
             </div>
             <Button variant="outline" size="sm" onclick={loadData} disabled={loading}>
                 <RefreshCw class="size-4 mr-1.5 {loading ? 'animate-spin' : ''}" />
-                Refresh
+                {translateUI("Refresh")}
             </Button>
         </div>
 
@@ -175,14 +176,14 @@
         {:else if local}
             <div class="mt-4 grid gap-4 sm:grid-cols-3">
                 <div class="rounded-md border border-border/50 bg-background/50 p-3">
-                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">Node ID</p>
+                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">{translateUI("Node ID")}</p>
                     <div class="mt-1 flex items-center justify-between">
                         <span class="font-mono text-base font-bold text-text">{local.node_id}</span>
                         <button
                             type="button"
                             class="text-text-muted hover:text-text transition-colors"
                             onclick={() => copyToClipboard(local?.node_id ?? '', 'id')}
-                            title="Copy Node ID"
+                            title={translateUI("Copy Node ID")}
                         >
                             {#if copiedID}
                                 <Check class="size-4 text-emerald-500" />
@@ -194,7 +195,7 @@
                 </div>
 
                 <div class="rounded-md border border-border/50 bg-background/50 p-3">
-                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">Node Name</p>
+                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">{translateUI("Node Name")}</p>
                     <div class="mt-1 flex items-center justify-between">
                         <span class="text-base font-semibold text-text truncate">{local.name}</span>
                         <Server class="size-4 text-text-muted shrink-0" />
@@ -202,7 +203,7 @@
                 </div>
 
                 <div class="rounded-md border border-border/50 bg-background/50 p-3">
-                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">Public Key</p>
+                    <p class="text-xs font-medium uppercase tracking-wider text-text-muted">{translateUI("Public Key")}</p>
                     <div class="mt-1 flex items-center justify-between">
                         <span class="font-mono text-xs text-text-muted truncate max-w-[180px]">
                             {local.public_key.slice(0, 16)}...{local.public_key.slice(-8)}
@@ -211,7 +212,7 @@
                             type="button"
                             class="text-text-muted hover:text-text transition-colors"
                             onclick={() => copyToClipboard(local?.public_key ?? '', 'key')}
-                            title="Copy Full Public Key"
+                            title={translateUI("Copy Full Public Key")}
                         >
                             {#if copiedKey}
                                 <Check class="size-4 text-emerald-500" />
@@ -230,10 +231,10 @@
         <div class="rounded-lg border border-amber-500/30 bg-amber-500/5 p-6">
             <div class="flex items-center gap-2 mb-4">
                 <span class="size-2 rounded-full bg-amber-500 animate-ping"></span>
-                <h3 class="text-base font-semibold text-text">Pending Pairing Proposals ({pendingPeers.length})</h3>
+                <h3 class="text-base font-semibold text-text">{translateUI("Pending Pairing Proposals (")}{pendingPeers.length})</h3>
             </div>
             <p class="text-sm text-text-muted mb-4">
-                These nodes have requested to federate with your updu instance. Approving them will establish a mutual monitoring feed.
+                {translateUI("These nodes have requested to federate with your updu instance. Approving them will establish a mutual monitoring feed.")}
             </p>
 
             <div class="grid gap-3">
@@ -246,7 +247,7 @@
                                 <span class="text-xs text-text-muted">({peer.address})</span>
                             </div>
                             <p class="mt-1 font-mono text-xs text-text-muted truncate max-w-md">
-                                Public Key: {peer.public_key}
+                                {translateUI("Public Key:")} {peer.public_key}
                             </p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -257,7 +258,7 @@
                                 disabled={actionLoading === peer.id}
                             >
                                 <UserCheck class="size-4 mr-1.5" />
-                                Approve
+                                {translateUI("Approve")}
                             </Button>
                             <Button
                                 size="sm"
@@ -267,7 +268,7 @@
                                 disabled={actionLoading === peer.id}
                             >
                                 <UserX class="size-4 mr-1.5" />
-                                Reject
+                                {translateUI("Reject")}
                             </Button>
                         </div>
                     </div>
@@ -280,15 +281,15 @@
     <div class="rounded-lg border border-border bg-card p-6">
         <div class="flex items-center gap-2 mb-1">
             <Network class="size-5 text-primary" />
-            <h3 class="text-base font-semibold text-text">Connect Remote / Tailnet Peer</h3>
+            <h3 class="text-base font-semibold text-text">{translateUI("Connect Remote / Tailnet Peer")}</h3>
         </div>
         <p class="text-sm text-text-muted mb-4">
-            Connect to a peer node via Tailscale mesh IP (e.g. <code class="text-xs bg-muted px-1 py-0.5 rounded">100.x.y.z:3000</code>), private LAN, or public host. Tailnet and private LAN nodes communicate via direct HTTP (secured transparently by Tailscale WireGuard).
+            {translateUI("Connect to a peer node via Tailscale mesh IP (e.g.")} <code class="text-xs bg-muted px-1 py-0.5 rounded">100.x.y.z:3000</code>{translateUI("), private LAN, or public host. Tailnet and private LAN nodes communicate via direct HTTP (secured transparently by Tailscale WireGuard).")}
         </p>
 
         <form onsubmit={handleConnect} class="grid gap-4 sm:grid-cols-3 items-end">
             <div class="sm:col-span-1">
-                <label for="peer-address" class="block text-xs font-medium text-text-muted mb-1">Peer Address *</label>
+                <label for="peer-address" class="block text-xs font-medium text-text-muted mb-1">{translateUI("Peer Address *")}</label>
                 <input
                     id="peer-address"
                     type="text"
@@ -299,12 +300,12 @@
                 />
             </div>
             <div class="sm:col-span-1">
-                <label for="peer-name" class="block text-xs font-medium text-text-muted mb-1">Display Name (Optional)</label>
+                <label for="peer-name" class="block text-xs font-medium text-text-muted mb-1">{translateUI("Display Name (Optional)")}</label>
                 <input
                     id="peer-name"
                     type="text"
                     bind:value={connectName}
-                    placeholder="Offsite-Agent"
+                    placeholder={translateUI("Offsite-Agent")}
                     class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
                 />
             </div>
@@ -312,10 +313,10 @@
                 <Button type="submit" class="w-full" disabled={connectLoading}>
                     {#if connectLoading}
                         <RefreshCw class="size-4 mr-1.5 animate-spin" />
-                        Connecting...
+                        {translateUI("Connecting...")}
                     {:else}
                         <Network class="size-4 mr-1.5" />
-                        Connect Peer
+                        {translateUI("Connect Peer")}
                     {/if}
                 </Button>
             </div>
@@ -334,14 +335,14 @@
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 <Wifi class="size-5 text-primary" />
-                <h3 class="text-base font-semibold text-text">Discovered LAN & Tailnet Peers</h3>
+                <h3 class="text-base font-semibold text-text">{translateUI("Discovered LAN & Tailnet Peers")}</h3>
                 <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-text-muted">{discovered.length}</span>
             </div>
         </div>
 
         {#if discovered.length === 0}
             <div class="rounded-md border border-dashed border-border/70 p-6 text-center text-sm text-text-muted">
-                Listening for UDP beacons on port 3001... Other updu instances on this LAN or Tailnet will automatically appear here.
+                {translateUI("Listening for UDP beacons on port 3001... Other updu instances on this LAN or Tailnet will automatically appear here.")}
             </div>
         {:else}
             <div class="grid gap-3">
@@ -363,7 +364,7 @@
                             {#if actionLoading === d.node_id}
                                 <RefreshCw class="size-3.5 mr-1 animate-spin" />
                             {/if}
-                            Pair
+                            {translateUI("Pair")}
                         </Button>
                     </div>
                 {/each}
@@ -376,14 +377,14 @@
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 <Server class="size-5 text-primary" />
-                <h3 class="text-base font-semibold text-text">Paired & Federated Nodes</h3>
+                <h3 class="text-base font-semibold text-text">{translateUI("Paired & Federated Nodes")}</h3>
                 <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-text-muted">{approvedPeers.length}</span>
             </div>
         </div>
 
         {#if approvedPeers.length === 0}
             <div class="rounded-md border border-dashed border-border/70 p-8 text-center text-sm text-text-muted">
-                No paired peers configured yet. Connect a Tailnet host or pair with a discovered node above to begin federating monitor status.
+                {translateUI("No paired peers configured yet. Connect a Tailnet host or pair with a discovered node above to begin federating monitor status.")}
             </div>
         {:else}
             <div class="grid gap-4">
@@ -396,12 +397,12 @@
                                     <Badge dot={false} icon={false} class="font-mono text-xs">{peer.id}</Badge>
                                     {#if peer.status === 'disconnected'}
                                         <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-xs font-medium text-rose-500">
-                                            Disconnected
+                                            {translateUI("Disconnected")}
                                         </span>
                                     {:else}
                                         <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
                                             <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                                            Online
+                                            {translateUI("Online")}
                                         </span>
                                     {/if}
                                 </div>
@@ -417,7 +418,7 @@
                                     disabled={actionLoading === peer.id}
                                 >
                                     <Trash2 class="size-3.5 mr-1" />
-                                    Unpair
+                                    {translateUI("Unpair")}
                                 </Button>
                             </div>
                         </div>
@@ -427,22 +428,22 @@
                             <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-border/40 text-xs">
                                 {#if peer.metadata.tailnet_ip}
                                     <div>
-                                        <span class="text-text-muted">Tailnet:</span>
+                                        <span class="text-text-muted">{translateUI("Tailnet:")}</span>
                                         <span class="font-mono ml-1 text-text">{peer.metadata.tailnet_ip}</span>
                                     </div>
                                 {/if}
                                 {#if peer.metadata.public_ip}
                                     <div>
-                                        <span class="text-text-muted">WAN:</span>
+                                        <span class="text-text-muted">{translateUI("WAN:")}</span>
                                         <span class="font-mono ml-1 text-text">{peer.metadata.public_ip}</span>
                                     </div>
                                 {/if}
                                 <div>
-                                    <span class="text-text-muted">RAM:</span>
+                                    <span class="text-text-muted">{translateUI("RAM:")}</span>
                                     <span class="font-mono ml-1 text-text">{peer.metadata.mem_pct?.toFixed(1)}%</span>
                                 </div>
                                 <div>
-                                    <span class="text-text-muted">CPU:</span>
+                                    <span class="text-text-muted">{translateUI("CPU:")}</span>
                                     <span class="font-mono ml-1 text-text">{peer.metadata.cpu_pct?.toFixed(1)}%</span>
                                 </div>
                             </div>
@@ -452,7 +453,7 @@
                         {#if peer.triage}
                             <div class="mt-3 rounded bg-rose-500/10 border border-rose-500/20 p-2.5 text-xs">
                                 <div class="font-semibold text-rose-500">
-                                    Survivor Triage: {peer.triage.probable_cause}
+                                    {translateUI("Survivor Triage:")} {peer.triage.probable_cause}
                                 </div>
                                 {#if peer.triage.notes}
                                     <p class="mt-1 text-rose-400/90">{peer.triage.notes}</p>

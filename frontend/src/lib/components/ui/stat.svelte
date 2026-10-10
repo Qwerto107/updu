@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Reusable stat tile. Replaces ad-hoc card-with-icon-and-number patterns.
     import { cn } from "$lib/utils";
     import type { ComponentType, Snippet, SvelteComponent } from "svelte";
@@ -65,7 +66,7 @@
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0 flex-1">
             <p class="type-kicker text-text-subtle">
-                {label}
+                {translateUI(label ?? '')}
             </p>
             <p
                 class={cn(
@@ -93,7 +94,7 @@
                     </span>
                     {Math.abs(trend.delta).toFixed(1)}%
                     {#if trend.label}
-                        <span class="text-text-subtle">{trend.label}</span>
+                        <span class="text-text-subtle">{translateUI(trend.label ?? '')}</span>
                     {/if}
                 </p>
             {/if}

@@ -13,6 +13,8 @@
     } from '$lib/api/settings';
     import { settingsStore } from '$lib/stores/settings.svelte';
     import { authStore } from '$lib/stores/auth.svelte';
+    import { languageStore, t as translateUI } from '$lib/i18n/index.svelte';
+    import { locales, normalizeLocale } from '$lib/i18n/locales';
 
     const themeOptions = [
         { value: 'dark', label: 'Dark' },
@@ -32,6 +34,7 @@
 
     function syncSettings(source: SettingsMap) {
         const nextSettings = { ...source };
+        nextSettings.default_language = normalizeLocale(nextSettings.default_language);
 
         if (!nextSettings.theme) {
             nextSettings.theme = 'dark';
@@ -113,6 +116,8 @@
             await updateSettings(buildSettingsPayload());
             await settingsStore.refresh();
             await loadSettings();
+            // 保存成功后采用新的默认语言；失败时保留原有浏览器偏好。
+            languageStore.setDefault(settings.default_language);
             settingsMsg = 'Settings saved successfully.';
             setTimeout(() => (settingsMsg = ''), 3000);
         } catch (error) {
@@ -167,7 +172,7 @@
             ]}
             aria-live="polite"
         >
-            {settingsMsg}
+            {translateUI(settingsMsg ?? '')}
         </div>
     {/if}
 
@@ -177,20 +182,20 @@
                 <Globe class="size-4 text-primary" />
             </div>
             <div>
-                <h2 class="text-base font-semibold text-text">Instance Profile</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("Instance Profile")}</h2>
                 <p class="text-[11px] text-text-subtle mt-0.5">
-                    Define the public identity and core URLs for this updu instance.
+                    {translateUI("Define the public identity and core URLs for this updu instance.")}
                 </p>
                 {#if !settingsLoading}
                     <div class="settings-meta-row">
                         <span class="settings-pill settings-pill-primary">
-                            {selectedThemeLabel()} theme
+                            {translateUI(selectedThemeLabel())} {translateUI("theme")}
                         </span>
                         <span class="settings-pill settings-pill-muted">
-                            {instanceVisibilityLabel()}
+                            {translateUI(instanceVisibilityLabel())}
                         </span>
                         <span class="settings-pill settings-pill-muted">
-                            {booleanSetting('enable_custom_css') ? 'Custom CSS enabled' : 'Default styling'}
+                            {booleanSetting('enable_custom_css') ? translateUI("Custom CSS enabled") : translateUI("Default styling")}
                         </span>
                     </div>
                 {/if}
@@ -210,7 +215,7 @@
             <div class="grid gap-4 lg:grid-cols-2">
                 <div class="space-y-1.5 lg:col-span-2">
                     <label class="text-sm font-medium text-text-muted" for="site-name">
-                        Site Name
+                        {translateUI("Site Name")}
                     </label>
                     <input
                         id="site-name"
@@ -232,14 +237,14 @@
                         class="text-sm font-medium text-text-muted"
                         for="site-description"
                     >
-                        Site Description
+                        {translateUI("Site Description")}
                     </label>
                     <textarea
                         id="site-description"
                         name="site_description"
                         class="input-base min-h-28 resize-y"
                         value={settingValue('site_description')}
-                        placeholder="Describe who this instance serves and what it monitors."
+                        placeholder={translateUI("Describe who this instance serves and what it monitors.")}
                         oninput={(event) =>
                             updateSetting(
                                 'site_description',
@@ -250,7 +255,7 @@
 
                 <div class="space-y-1.5 lg:col-span-2">
                     <label class="text-sm font-medium text-text-muted" for="base-url">
-                        Base URL
+                        {translateUI("Base URL")}
                     </label>
                     <input
                         id="base-url"
@@ -266,7 +271,7 @@
                         placeholder="https://status.example.com"
                     />
                     <p class="text-[11px] text-text-subtle">
-                        Used in exported links, notifications, and status page references.
+                        {translateUI("Used in exported links, notifications, and status page references.")}
                     </p>
                 </div>
             </div>
@@ -279,9 +284,9 @@
                 <Image class="size-4 text-primary" />
             </div>
             <div>
-                <h2 class="text-base font-semibold text-text">Branding & Appearance</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("Branding & Appearance")}</h2>
                 <p class="text-[11px] text-text-subtle mt-0.5">
-                    Configure branding assets and the default UI theme for new sessions.
+                    {translateUI("Configure branding assets and the default UI theme for new sessions.")}
                 </p>
             </div>
         </div>
@@ -299,7 +304,7 @@
             <div class="grid gap-4 lg:grid-cols-2">
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="logo-url">
-                        Logo URL
+                        {translateUI("Logo URL")}
                     </label>
                     <input
                         id="logo-url"
@@ -320,7 +325,7 @@
                         class="text-sm font-medium text-text-muted"
                         for="favicon-url"
                     >
-                        Favicon URL
+                        {translateUI("Favicon URL")}
                     </label>
                     <input
                         id="favicon-url"
@@ -338,7 +343,7 @@
 
                 <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="theme">
-                        Default Theme
+                        {translateUI("Default Theme")}
                     </label>
                     <select
                         id="theme"
@@ -351,14 +356,31 @@
                             )}
                     >
                         {#each themeOptions as option (option.value)}
-                            <option value={option.value}>{option.label}</option>
+                            <option value={option.value}>{translateUI(option.label ?? '')}</option>
                         {/each}
                     </select>
                 </div>
 
                 <div class="space-y-1.5">
+                    <label class="text-sm font-medium text-text-muted" for="default-language">
+                        {translateUI('Default Language')}
+                    </label>
+                    <select id="default-language" class="input-base text-sm"
+                        value={settingValue('default_language')}
+                        onchange={(event) => updateSetting('default_language', event.currentTarget.value)}
+                    >
+                        {#each locales as locale (locale.code)}
+                            <option value={locale.code}>{locale.name}</option>
+                        {/each}
+                    </select>
+                    <p class="text-[11px] text-text-subtle">
+                        {translateUI('Used on the login page and for visitors without a personal language preference.')}
+                    </p>
+                </div>
+
+                <div class="space-y-1.5">
                     <label class="text-sm font-medium text-text-muted" for="timezone">
-                        Timezone
+                        {translateUI("Timezone")}
                     </label>
                     <input
                         id="timezone"
@@ -376,7 +398,7 @@
 
                 <div class="space-y-1.5 lg:col-span-2">
                     <label class="text-sm font-medium text-text-muted" for="date-format">
-                        Date Format
+                        {translateUI("Date Format")}
                     </label>
                     <input
                         id="date-format"
@@ -391,7 +413,7 @@
                         placeholder="2006-01-02 15:04"
                     />
                     <p class="text-[11px] text-text-subtle">
-                        Keep this readable and consistent with the timezone above.
+                        {translateUI("Keep this readable and consistent with the timezone above.")}
                     </p>
                 </div>
             </div>
@@ -404,9 +426,9 @@
                 <Bell class="size-4 text-primary" />
             </div>
             <div>
-                <h2 class="text-base font-semibold text-text">Access & Alerts</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("Access & Alerts")}</h2>
                 <p class="text-[11px] text-text-subtle mt-0.5">
-                    Control public visibility, maintenance mode, and default notification behavior.
+                    {translateUI("Control public visibility, maintenance mode, and default notification behavior.")}
                 </p>
             </div>
         </div>
@@ -427,9 +449,9 @@
             <div class="grid gap-3 lg:grid-cols-2">
                 <label class="settings-toggle-card">
                     <div>
-                        <p class="text-sm font-medium text-text">Enable Public Access</p>
+                        <p class="text-sm font-medium text-text">{translateUI("Enable Public Access")}</p>
                         <p class="text-[11px] text-text-subtle mt-1">
-                            Allow public-facing pages and links to surface this instance.
+                            {translateUI("Allow public-facing pages and links to surface this instance.")}
                         </p>
                     </div>
                     <input
@@ -446,9 +468,9 @@
 
                 <label class="settings-toggle-card">
                     <div>
-                        <p class="text-sm font-medium text-text">Maintenance Mode</p>
+                        <p class="text-sm font-medium text-text">{translateUI("Maintenance Mode")}</p>
                         <p class="text-[11px] text-text-subtle mt-1">
-                            Temporarily suppress normal operations during planned work.
+                            {translateUI("Temporarily suppress normal operations during planned work.")}
                         </p>
                     </div>
                     <input
@@ -465,9 +487,9 @@
 
                 <label class="settings-toggle-card">
                     <div>
-                        <p class="text-sm font-medium text-text">Notify on Down</p>
+                        <p class="text-sm font-medium text-text">{translateUI("Notify on Down")}</p>
                         <p class="text-[11px] text-text-subtle mt-1">
-                            Emit a notification the moment a monitor enters a failing state.
+                            {translateUI("Emit a notification the moment a monitor enters a failing state.")}
                         </p>
                     </div>
                     <input
@@ -484,9 +506,9 @@
 
                 <label class="settings-toggle-card">
                     <div>
-                        <p class="text-sm font-medium text-text">Notify on Recovery</p>
+                        <p class="text-sm font-medium text-text">{translateUI("Notify on Recovery")}</p>
                         <p class="text-[11px] text-text-subtle mt-1">
-                            Emit a notification when a monitor returns to a healthy state.
+                            {translateUI("Emit a notification when a monitor returns to a healthy state.")}
                         </p>
                     </div>
                     <input
@@ -504,7 +526,7 @@
 
             <div class="flex justify-end">
                 <Button loading={settingsSaving} onclick={saveSettings}>
-                    {settingsSaving ? 'Saving...' : 'Save Settings'}
+                    {settingsSaving ? translateUI("Saving...") : translateUI("Save Settings")}
                 </Button>
             </div>
         {/if}
@@ -516,9 +538,9 @@
                 <Palette class="size-4 text-primary" />
             </div>
             <div>
-                <h2 class="text-base font-semibold text-text">Custom CSS</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("Custom CSS")}</h2>
                 <p class="text-[11px] text-text-subtle mt-0.5">
-                    Apply global visual overrides for your embedded frontend.
+                    {translateUI("Apply global visual overrides for your embedded frontend.")}
                 </p>
             </div>
         </div>
@@ -531,9 +553,9 @@
         {:else}
             <label class="settings-toggle-card">
                 <div>
-                    <p class="text-sm font-medium text-text">Enable Custom CSS</p>
+                    <p class="text-sm font-medium text-text">{translateUI("Enable Custom CSS")}</p>
                     <p class="text-[11px] text-text-subtle mt-1">
-                        The backend still sanitizes CSS before serving it to the app shell.
+                        {translateUI("The backend still sanitizes CSS before serving it to the app shell.")}
                     </p>
                 </div>
                 <input
@@ -550,7 +572,7 @@
 
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-text-muted" for="custom-css-editor">
-                    CSS Overrides
+                    {translateUI("CSS Overrides")}
                 </label>
                 <textarea
                     id="custom-css-editor"
@@ -565,13 +587,13 @@
                         )}
                 ></textarea>
                 <p class="text-[11px] text-text-subtle">
-                    Saved CSS is available at <span class="font-mono text-primary/80">/api/v1/custom.css</span>.
+                    {translateUI("Saved CSS is available at")} <span class="font-mono text-primary/80">/api/v1/custom.css</span>.
                 </p>
             </div>
 
             <div class="flex justify-end">
                 <Button variant="outline" loading={settingsSaving} onclick={saveSettings}>
-                    {settingsSaving ? 'Saving...' : 'Save CSS'}
+                    {settingsSaving ? translateUI("Saving...") : translateUI("Save CSS")}
                 </Button>
             </div>
         {/if}
@@ -585,9 +607,9 @@
                 <Lock class="size-4 text-primary" />
             </div>
             <div>
-                <h2 class="text-base font-semibold text-text">Change Password</h2>
+                <h2 class="text-base font-semibold text-text">{translateUI("Change Password")}</h2>
                 <p class="text-[11px] text-text-subtle mt-0.5">
-                    Update the current administrator password for this session login.
+                    {translateUI("Update the current administrator password for this session login.")}
                 </p>
             </div>
         </div>
@@ -602,14 +624,14 @@
                 ]}
                 aria-live="polite"
             >
-                {pwMsg}
+                {translateUI(pwMsg ?? '')}
             </div>
         {/if}
 
         <div class="grid gap-4 lg:grid-cols-3">
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-text-muted" for="pw-current">
-                    Current Password
+                    {translateUI("Current Password")}
                 </label>
                 <input
                     id="pw-current"
@@ -621,20 +643,20 @@
 
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-text-muted" for="pw-new">
-                    New Password
+                    {translateUI("New Password")}
                 </label>
                 <input
                     id="pw-new"
                     type="password"
                     bind:value={pwNew}
                     class="input-base"
-                    placeholder="Must satisfy the server policy"
+                    placeholder={translateUI("Must satisfy the server policy")}
                 />
             </div>
 
             <div class="space-y-1.5">
                 <label class="text-sm font-medium text-text-muted" for="pw-confirm">
-                    Confirm Password
+                    {translateUI("Confirm Password")}
                 </label>
                 <input
                     id="pw-confirm"
@@ -647,7 +669,7 @@
 
         <div class="flex justify-end">
             <Button loading={pwSaving} onclick={changePassword}>
-                {pwSaving ? 'Saving...' : 'Change Password'}
+                {pwSaving ? translateUI("Saving...") : translateUI("Change Password")}
             </Button>
         </div>
     </section>

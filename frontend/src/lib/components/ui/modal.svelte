@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Themed Dialog wrapper. Use Modal.Root/Trigger/Body composition for consistent styling.
     import { Dialog } from "bits-ui";
     import { X } from "lucide-svelte";
@@ -65,7 +66,7 @@
                     </div>
                     <Dialog.Close
                         class="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface hover:text-text"
-                        aria-label="Close dialog"
+                        aria-label={translateUI("Close dialog")}
                     >
                         <X class="size-4" />
                     </Dialog.Close>

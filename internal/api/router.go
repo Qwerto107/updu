@@ -1316,7 +1316,6 @@ func (s *Server) handleUpdateStatusPage(w http.ResponseWriter, r *http.Request) 
 	jsonOK(w, existing)
 }
 
-
 func (s *Server) handleDeleteStatusPage(w http.ResponseWriter, r *http.Request) {
 	user := auth.UserFromContext(r.Context())
 	if user.Role != models.RoleAdmin {
@@ -1499,6 +1498,15 @@ func sanitizeCSS(css string) string {
 
 func (s *Server) handleSetupCheck(w http.ResponseWriter, r *http.Request) {
 	policy := config.NormalizePasswordPolicy(s.config.PasswordPolicy)
+	// 登录页需要实例默认语言；公开接口不返回其他管理员配置。
+	language, err := s.db.GetSetting(r.Context(), "default_language")
+	if err != nil {
+		jsonError(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	if !isSupportedLanguage(language) {
+		language = "en"
+	}
 
 	// If request arrives from a trusted proxy with valid forward-auth identity, setup is not required
 	if s.auth.IsForwardAuthConfigured() && auth.ExtractForwardAuth(s.config, r) != nil {
@@ -1506,6 +1514,7 @@ func (s *Server) handleSetupCheck(w http.ResponseWriter, r *http.Request) {
 			"setup_required":       false,
 			"password_policy":      policy,
 			"password_policy_hint": auth.PasswordPolicyHint(policy),
+			"default_language":     language,
 		})
 		return
 	}
@@ -1519,6 +1528,7 @@ func (s *Server) handleSetupCheck(w http.ResponseWriter, r *http.Request) {
 		"setup_required":       count == 0,
 		"password_policy":      policy,
 		"password_policy_hint": auth.PasswordPolicyHint(policy),
+		"default_language":     language,
 	})
 }
 

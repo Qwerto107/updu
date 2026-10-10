@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { onMount } from "svelte";
     import { fetchAPI } from "$lib/api/client";
     import {
@@ -282,8 +283,8 @@
                 label: "Service outage",
                 sub:
                     downCount > 0
-                        ? `${downCount} of ${monitorTotal} services down`
-                        : `${criticalIncidents} critical incident${criticalIncidents === 1 ? "" : "s"}`,
+                        ? translateUI('Services down: {count} / {total}', { count: downCount, total: monitorTotal })
+                        : translateUI('Critical incidents: {count}', { count: criticalIncidents }),
                 tone: "danger",
                 icon: ShieldX,
             };
@@ -292,7 +293,7 @@
             return {
                 key: "degraded",
                 label: "Degraded",
-                sub: `${activeIncidents.length} active incident${activeIncidents.length === 1 ? "" : "s"}`,
+                sub: translateUI('Active incidents: {count}', { count: activeIncidents.length }),
                 tone: "warning",
                 icon: ShieldAlert,
             };
@@ -302,7 +303,7 @@
             label: "All systems operational",
             sub:
                 monitorTotal > 0
-                    ? `${monitorTotal} service${monitorTotal === 1 ? "" : "s"} reporting healthy`
+                    ? translateUI('Healthy services: {count}', { count: monitorTotal })
                     : "No services configured",
             tone: "success",
             icon: ShieldCheck,
@@ -401,7 +402,7 @@
 </script>
 
 <svelte:head>
-    <title>Analytics – updu</title>
+    <title>{translateUI("Analytics – updu")}</title>
 </svelte:head>
 
 <div class="stats-page-shell" data-testid="stats-page">
@@ -424,25 +425,25 @@
                     <p
                         class="text-[10px] uppercase tracking-widest text-text-subtle"
                     >
-                        System status
+                        {translateUI("System status")}
                     </p>
                     <p
                         class="text-lg font-bold leading-tight {verdictIconClass[verdict.tone]}"
                     >
-                        {verdict.label}
+                        {translateUI(verdict.label ?? '')}
                     </p>
-                    <p class="text-xs text-text-muted">{verdict.sub}</p>
+                    <p class="text-xs text-text-muted">{translateUI(verdict.sub)}</p>
                 </div>
             </div>
             <dl
                 class="grid w-full grid-cols-2 gap-3 text-left sm:w-auto sm:grid-cols-3 sm:gap-8 sm:text-right"
-                aria-label="Key operational metrics"
+                aria-label={translateUI("Key operational metrics")}
             >
                 <div>
                     <dt
                         class="text-[10px] uppercase tracking-widest text-text-subtle"
                     >
-                        Down
+                        {translateUI("Down")}
                     </dt>
                     <dd
                         class="font-mono text-2xl font-bold tabular-nums {downCount > 0 ? 'text-danger' : 'text-text'}"
@@ -457,7 +458,7 @@
                     <dt
                         class="text-[10px] uppercase tracking-widest text-text-subtle"
                     >
-                        Active incidents
+                        {translateUI("Active incidents")}
                     </dt>
                     <dd
                         class="font-mono text-2xl font-bold tabular-nums {activeIncidents.length > 0 ? 'text-warning' : 'text-text'}"
@@ -469,7 +470,7 @@
                     <dt
                         class="text-[10px] uppercase tracking-widest text-text-subtle"
                     >
-                        Avg latency 24h
+                        {translateUI("Avg latency 24h")}
                     </dt>
                     <dd class="font-mono text-2xl font-bold tabular-nums text-text">
                         {stats.summary?.avg_latency_24h != null
@@ -491,7 +492,7 @@
     {:else if error}
         <div class="card p-8 text-center text-danger">
             <TriangleAlert class="size-8 mx-auto mb-2 opacity-60" />
-            <p>{error}</p>
+            <p>{translateUI(error ?? '')}</p>
         </div>
     {:else if stats}
         <!-- Persistent active-incident banner (visible on every tab when present) -->
@@ -507,14 +508,14 @@
                 <TriangleAlert class="size-5 shrink-0 text-danger" />
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-danger">
-                        {activeIncidents.length} active incident{activeIncidents.length === 1 ? "" : "s"}
+                        {translateUI('Active incidents: {count}', { count: activeIncidents.length })}
                         {#if criticalIncidents > 0}
-                            — {criticalIncidents} critical
+                            — {criticalIncidents} {translateUI("critical")}
                         {/if}
                     </p>
                     <p class="truncate text-xs text-text-muted">
-                        Latest: <span class="text-text">{top.title}</span>
-                        <span class="text-text-subtle">· {topSev.label} · started {relativeTime(top.started_at)}</span>
+                        {translateUI("Latest:")} <span class="text-text">{top.title}</span>
+                        <span class="text-text-subtle">· {translateUI(topSev.label ?? '')} {translateUI("· started")} {relativeTime(top.started_at)}</span>
                     </p>
                 </div>
                 <ArrowRight class="size-4 shrink-0 text-text-muted" />
@@ -524,7 +525,7 @@
         <div
             class="stats-tabs flex min-h-11 items-center gap-1 overflow-x-auto border-b border-border py-1"
             role="tablist"
-            aria-label="Analytics sections"
+            aria-label={translateUI("Analytics sections")}
         >
             {#each tabs as t (t.value)}
                 {@const Icon = t.icon}
@@ -549,7 +550,7 @@
                         : 'border-transparent text-text-muted hover:text-text'}"
                 >
                     <Icon class="size-4" />
-                    <span>{t.label}</span>
+                    <span>{translateUI(t.label ?? '')}</span>
                     {#if badge}
                         <span
                             class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold {t.value ===
@@ -594,14 +595,14 @@
                 <!-- Summary stat cards -->
                 <div class="stats-grid-auto" style="--d-stats-min: min(100%, 9rem);">
                     <Stat
-                        label="Checks (24h)"
+                        label={translateUI("Checks (24h)")}
                         value={stats.summary.total_checks_24h?.toLocaleString() ??
                             "0"}
                         icon={Zap}
                         tone="primary"
                     />
                     <Stat
-                        label="Avg Latency"
+                        label={translateUI("Avg Latency")}
                         value={stats.summary.avg_latency_24h != null
                             ? stats.summary.avg_latency_24h + "ms"
                             : "—"}
@@ -609,13 +610,13 @@
                         tone={latencyTone(stats.summary.avg_latency_24h)}
                     />
                     <Stat
-                        label="Services"
+                        label={translateUI("Services")}
                         value={stats.summary.monitor_count ?? 0}
                         icon={Server}
                         tone="neutral"
                     />
                     <Stat
-                        label="Active Incidents"
+                        label={translateUI("Active Incidents")}
                         value={stats.summary.active_incidents ?? 0}
                         icon={TriangleAlert}
                         tone={stats.summary.active_incidents > 0
@@ -632,7 +633,7 @@
                         <div class="flex items-center gap-2">
                             <Activity class="size-4 text-primary" />
                             <h2 class="text-sm font-semibold text-text">
-                                Check Volume (24h)
+                                {translateUI("Check Volume (24h)")}
                             </h2>
                         </div>
                         <div class="flex items-center gap-4 text-[10px]">
@@ -641,7 +642,7 @@
                                     class="size-2 rounded-full bg-success/70"
                                     aria-hidden="true"
                                 ></span>
-                                <span class="text-text-subtle">Up</span>
+                                <span class="text-text-subtle">{translateUI("Up")}</span>
                             </span>
                             <span class="flex items-center gap-1.5">
                                 <span
@@ -649,7 +650,7 @@
                                     style="background-image: {downStripe};"
                                     aria-hidden="true"
                                 ></span>
-                                <span class="text-text-subtle">Down</span>
+                                <span class="text-text-subtle">{translateUI("Down")}</span>
                             </span>
                         </div>
                     </div>
@@ -734,7 +735,7 @@
                         <div class="flex items-center gap-2 mb-4">
                             <Clock class="size-4 text-primary" />
                             <h2 class="text-sm font-semibold text-text">
-                                Latency Distribution (24h)
+                                {translateUI("Latency Distribution (24h)")}
                             </h2>
                         </div>
                         <div class="space-y-2.5">
@@ -748,7 +749,7 @@
                                     >
                                         <span
                                             class="text-text-muted font-mono text-[11px]"
-                                            >{bucket.label}</span
+                                            >{translateUI(bucket.label ?? '')}</span
                                         >
                                         <span
                                             class="text-text-subtle font-mono tabular-nums text-[11px]"
@@ -780,12 +781,12 @@
                                 <h2
                                     class="text-sm font-semibold text-text flex items-center gap-2"
                                 >
-                                    <Server class="size-4 text-text-muted" /> Checks by Type
+                                    <Server class="size-4 text-text-muted" /> {translateUI("Checks by Type")}
                                 </h2>
                                 <span
                                     class="text-[10px] uppercase tracking-widest text-text-subtle font-mono tabular-nums"
                                 >
-                                    {typeTotal.toLocaleString()} total
+                                    {typeTotal.toLocaleString()} {translateUI("total")}
                                 </span>
                             </div>
                             <div
@@ -820,7 +821,7 @@
                                             ></span>
                                             <span
                                                 class="truncate uppercase tracking-wider font-bold text-[10px]"
-                                                >{formatTypeLabel(t.type)}</span
+                                                >{translateUI(formatTypeLabel(t.type) ?? '')}</span
                                             >
                                         </span>
                                         <span
@@ -847,18 +848,18 @@
                                     class="text-sm font-semibold text-text flex items-center gap-2"
                                 >
                                     <TrendingUp class="size-4 text-text-muted" />
-                                    HTTP Status Codes
+                                    {translateUI("HTTP Status Codes")}
                                 </h2>
                                 <span
                                     class="text-[10px] uppercase tracking-widest text-text-subtle font-mono tabular-nums"
                                 >
-                                    {codeTotal.toLocaleString()} responses
+                                    {codeTotal.toLocaleString()} {translateUI("responses")}
                                 </span>
                             </div>
                             <div
                                 class="flex h-6 w-full overflow-hidden rounded-md border border-border bg-surface-elevated"
                                 role="img"
-                                aria-label="HTTP response code distribution"
+                                aria-label={translateUI("HTTP response code distribution")}
                             >
                                 {#each stats.response_codes as c (c.code)}
                                     {@const w = codeTotal > 0 ? (c.count / codeTotal) * 100 : 0}
@@ -929,21 +930,20 @@
                             <h2
                                 class="text-sm font-semibold text-text flex items-center gap-2"
                             >
-                                <TriangleAlert class="size-4 text-warning" /> Slowest
-                                (P95, 24h)
+                                <TriangleAlert class="size-4 text-warning" /> {translateUI("Slowest (P95, 24h)")}
                             </h2>
                             {#if fleetP95.median != null}
                                 <span
                                     class="text-[10px] uppercase tracking-widest text-text-subtle font-mono tabular-nums"
-                                    title="Median P95 across the fleet"
+                                    title={translateUI("Median P95 across the fleet")}
                                 >
-                                    fleet median {fleetP95.median}ms
+                                    {translateUI("fleet median")} {fleetP95.median}ms
                                 </span>
                             {/if}
                         </div>
                         {#if byP95.length === 0}
                             <p class="text-xs text-text-subtle">
-                                No latency data yet.
+                                {translateUI("No latency data yet.")}
                             </p>
                         {:else}
                             <ul class="space-y-2.5">
@@ -999,21 +999,20 @@
                             <h2
                                 class="text-sm font-semibold text-text flex items-center gap-2"
                             >
-                                <Zap class="size-4 text-success" /> Fastest
-                                (Avg, 24h)
+                                <Zap class="size-4 text-success" /> {translateUI("Fastest (Avg, 24h)")}
                             </h2>
                             {#if fleetAvg.median != null}
                                 <span
                                     class="text-[10px] uppercase tracking-widest text-text-subtle font-mono tabular-nums"
-                                    title="Median average latency across the fleet"
+                                    title={translateUI("Median average latency across the fleet")}
                                 >
-                                    fleet median {fleetAvg.median}ms
+                                    {translateUI("fleet median")} {fleetAvg.median}ms
                                 </span>
                             {/if}
                         </div>
                         {#if byAvg.length === 0}
                             <p class="text-xs text-text-subtle">
-                                No latency data yet.
+                                {translateUI("No latency data yet.")}
                             </p>
                         {:else}
                             <ul class="space-y-2.5">
@@ -1080,7 +1079,7 @@
                 {#if !stats.monitors?.length}
                 <div class="card p-8 text-center text-text-muted">
                     <Server class="size-8 mx-auto mb-2 opacity-60" />
-                    <p>No services yet.</p>
+                    <p>{translateUI("No services yet.")}</p>
                 </div>
             {:else}
                 <div class="card overflow-hidden" style="padding: 0;">
@@ -1091,12 +1090,12 @@
                         <div class="flex items-center gap-2">
                             <TrendingUp class="size-4 text-primary" />
                             <h2 class="text-sm font-semibold text-text">
-                                Service Leaderboard
+                                {translateUI("Service Leaderboard")}
                             </h2>
                             <span
                                 class="text-[10px] text-text-subtle uppercase tracking-wider"
                             >
-                                24h • {sortedMonitors.length} of {stats.monitors
+                                24h • {sortedMonitors.length} {translateUI("of")} {stats.monitors
                                     .length}
                             </span>
                         </div>
@@ -1108,8 +1107,8 @@
                                 <input
                                     type="text"
                                     bind:value={monitorFilter}
-                                    aria-label="Filter services"
-                                    placeholder="Filter services…"
+                                    aria-label={translateUI("Filter services")}
+                                    placeholder={translateUI("Filter services…")}
                                     class="w-full rounded-md border border-border bg-surface-elevated py-1.5 pl-8 pr-3 text-xs text-text placeholder:text-text-subtle focus:outline-none focus:border-primary/60 sm:w-56"
                                 />
                             </div>
@@ -1200,8 +1199,7 @@
                                             colspan="8"
                                             class="px-5 py-10 text-center text-text-subtle"
                                         >
-                                            No services match the current
-                                            filters.
+                                            {translateUI("No services match the current filters.")}
                                         </td>
                                     </tr>
                                 {/if}
@@ -1230,9 +1228,9 @@
                                                     <p
                                                         class="text-[10px] text-text-subtle"
                                                     >
-                                                        {formatTypeLabel(
+                                                        {translateUI(formatTypeLabel(
                                                             m.type,
-                                                        )}{#if m.group}
+                                                        ) ?? '')}{#if m.group}
                                                             • {m.group}{/if}
                                                     </p>
                                                     <p
@@ -1240,7 +1238,7 @@
                                                     >
                                                         P95 {m.p95_latency != null
                                                             ? m.p95_latency + "ms"
-                                                            : "—"} · {m.total_checks.toLocaleString()} checks
+                                                            : "—"} · {m.total_checks.toLocaleString()} {translateUI("checks")}
                                                     </p>
                                                 </div>
                                             </div>
@@ -1256,7 +1254,7 @@
                                                 />
                                                 <span
                                                     class="uppercase font-bold tracking-wider text-[10px]"
-                                                    >{statusLabel(m.status)}</span
+                                                    >{translateUI(statusLabel(m.status) ?? '')}</span
                                                 >
                                             </span>
                                         </td>
@@ -1337,19 +1335,19 @@
             >
                 <div class="stats-grid-auto" style="--d-stats-min: min(100%, 14rem);">
                 <Stat
-                    label="Active"
+                    label={translateUI("Active")}
                     value={activeIncidents.length}
                     icon={TriangleAlert}
                     tone={activeIncidents.length > 0 ? "danger" : "neutral"}
                 />
                 <Stat
-                    label="Critical"
+                    label={translateUI("Critical")}
                     value={criticalIncidents}
                     icon={AlertCircle}
                     tone={criticalIncidents > 0 ? "danger" : "neutral"}
                 />
                 <Stat
-                    label="Resolved (recent)"
+                    label={translateUI("Resolved (recent)")}
                     value={resolvedIncidents.length}
                     icon={CheckCircle2}
                     tone="neutral"
@@ -1365,7 +1363,7 @@
                         <div class="flex items-center gap-2">
                             <TriangleAlert class="size-4 text-danger" />
                             <h2 class="text-sm font-semibold text-text">
-                                Active Incidents
+                                {translateUI("Active Incidents")}
                             </h2>
                         </div>
                         <button
@@ -1373,7 +1371,7 @@
                             class="text-[10px] text-primary uppercase tracking-wider hover:underline"
                             onclick={() => goto(resolve("/incidents"))}
                         >
-                            Manage →
+                            {translateUI("Manage →")}
                         </button>
                     </div>
                     {#if activeIncidents.length === 0}
@@ -1381,7 +1379,7 @@
                             <CheckCircle2
                                 class="size-8 mx-auto mb-2 text-success/70"
                             />
-                            <p class="text-sm">All systems operational.</p>
+                            <p class="text-sm">{translateUI("All systems operational.")}</p>
                         </div>
                     {:else}
                         <ul class="divide-y divide-border/60">
@@ -1398,7 +1396,7 @@
                                     <span
                                         class="mt-0.5 inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border {sev.ring} {sev.tone}"
                                     >
-                                        {sev.label}
+                                        {translateUI(sev.label ?? '')}
                                     </span>
                                     <div class="min-w-0 flex-1">
                                         <p class="text-sm font-medium text-text">
@@ -1414,15 +1412,15 @@
                                         <p
                                             class="text-[10px] text-text-subtle mt-1 flex flex-wrap items-center gap-x-3 gap-y-1"
                                         >
-                                            <span class={st.tone}>{st.label}</span>
+                                            <span class={st.tone}>{translateUI(st.label ?? '')}</span>
                                             <span>
-                                                Started {relativeTime(
+                                                {translateUI("Started")} {relativeTime(
                                                     inc.started_at,
                                                 )}
                                             </span>
                                             {#if inc.monitor_ids?.length}
                                                 <span
-                                                    >• {inc.monitor_ids.length} service{inc
+                                                    >• {inc.monitor_ids.length} {translateUI("service")}{inc
                                                         .monitor_ids.length === 1
                                                         ? ""
                                                         : "s"}</span
@@ -1444,7 +1442,7 @@
                         >
                             <CheckCircle2 class="size-4 text-success" />
                             <h2 class="text-sm font-semibold text-text">
-                                Recently Resolved
+                                {translateUI("Recently Resolved")}
                             </h2>
                         </div>
                         <ul class="divide-y divide-border/60">
@@ -1458,13 +1456,13 @@
                                     <span
                                         class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border border-border bg-surface-elevated text-text-muted"
                                     >
-                                        {sev.label}
+                                        {translateUI(sev.label ?? '')}
                                     </span>
                                     <span class="flex-1 truncate text-text"
                                         >{inc.title}</span
                                     >
                                     <span class="text-text-subtle"
-                                        >resolved {relativeTime(
+                                        >{translateUI("resolved")} {relativeTime(
                                             inc.resolved_at,
                                         )}</span
                                     >
@@ -1502,7 +1500,7 @@
                 ? 'text-primary'
                 : ''} {align === 'right' ? 'flex-row-reverse' : ''}"
         >
-            <span>{label}</span>
+            <span>{translateUI(label ?? '')}</span>
             {#if isActive}
                 {#if sortDir === "asc"}
                     <ArrowUp class="size-3" />

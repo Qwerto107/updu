@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Tabs built on bits-ui Tabs primitive. Supports horizontal (default) + vertical.
     import { Tabs } from "bits-ui";
     import { cn } from "$lib/utils";
@@ -61,7 +62,7 @@
                 {#if item.icon}
                     {@render item.icon()}
                 {/if}
-                <span>{item.label}</span>
+                <span>{translateUI(item.label ?? '')}</span>
                 {#if item.badge}
                     <span
                         class="rounded-full bg-surface-elevated px-1.5 py-0.5 text-[10px] font-semibold text-text-muted"

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { cn } from "$lib/utils";
 
     interface Props {
@@ -50,7 +51,7 @@
 <div class={cn("min-w-0 space-y-2", className)} role="img" aria-label={ariaLabel}>
     <div class="flex items-baseline justify-between gap-3">
         <p class="type-kicker truncate text-text-subtle">
-            {label}
+            {translateUI(label ?? '')}
         </p>
         <p class={cn("type-numeric shrink-0 text-sm font-bold", valueTextClass)}>
             {valueText}
@@ -79,7 +80,7 @@
 
     <div class="type-numeric type-micro flex items-center justify-between text-text-subtle">
         <span>0</span>
-        <span>target {target}{unit}</span>
+        <span>{translateUI("target")} {target}{unit}</span>
         <span>{domainMax}{unit}</span>
     </div>
 </div>

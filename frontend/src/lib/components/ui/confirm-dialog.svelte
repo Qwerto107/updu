@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     // Global confirmation dialog. Mount once in root layout; driven by confirmStore.
     import { Dialog } from 'bits-ui';
     import { AlertOctagon, Info, X } from 'lucide-svelte';
@@ -71,19 +72,19 @@
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <Dialog.Title class="text-base font-semibold text-text">
-                                    {current.title}
+                                    {translateUI(current.title ?? '')}
                                 </Dialog.Title>
                                 <Dialog.Description
                                     class="mt-1.5 text-xs leading-relaxed text-text-muted"
                                 >
-                                    {current.description}
+                                    {translateUI(current.description ?? '')}
                                 </Dialog.Description>
                             </div>
                             <button
                                 type="button"
                                 class="inline-flex size-7 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface hover:text-text"
                                 onclick={() => confirmStore.cancel()}
-                                aria-label="Close dialog"
+                                aria-label={translateUI("Close dialog")}
                             >
                                 <X class="size-4" />
                             </button>
@@ -92,13 +93,13 @@
                         {#if requiredText}
                             <div class="mt-5 rounded-xl border border-danger/20 bg-danger/5 p-3">
                                 <p class="mb-2 inline-flex items-center rounded-full border border-danger/20 bg-danger/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-danger">
-                                    Danger zone
+                                    {translateUI("Danger zone")}
                                 </p>
                                 <label
                                     for="confirm-required-text"
                                     class="text-xs font-medium text-text"
                                 >
-                                    Type <span class="font-mono font-bold text-danger">{requiredText}</span> to confirm
+                                    {translateUI("Type")} <span class="font-mono font-bold text-danger">{requiredText}</span> {translateUI("to confirm")}
                                 </label>
                                 <input
                                     id="confirm-required-text"
@@ -113,14 +114,14 @@
                                 <p id="confirm-required-help" class="mt-2 text-[11px] text-text-muted">
                                     {remainingSeconds > 0
                                         ? `Available in ${remainingSeconds}s.`
-                                        : 'This extra step prevents accidental destructive actions.'}
+                                        : translateUI("This extra step prevents accidental destructive actions.")}
                                 </p>
                             </div>
                         {/if}
 
                         <div class="mt-6 flex justify-end gap-2">
                             <Button variant="outline" onclick={() => confirmStore.cancel()}>
-                                {current.cancelLabel ?? 'Cancel'}
+                                {current.cancelLabel ?? translateUI("Cancel")}
                             </Button>
                             <Button
                                 variant={isDestructive ? 'destructive' : 'default'}
@@ -130,7 +131,7 @@
                             >
                                 {remainingSeconds > 0
                                     ? `Wait ${remainingSeconds}s`
-                                    : current.confirmLabel ?? 'Confirm'}
+                                    : current.confirmLabel ?? translateUI("Confirm")}
                             </Button>
                         </div>
                     </div>

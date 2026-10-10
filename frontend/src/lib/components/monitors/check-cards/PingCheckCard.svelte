@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import {
         parseMonitorConfig,
         readNumber,
@@ -20,14 +21,14 @@
 
 <CheckCardShell
     typeLabel="Ping"
-    description="updu sends ICMP echo requests to confirm the host is reachable."
+    description={translateUI("updu sends ICMP echo requests to confirm the host is reachable.")}
     hasDetails
 >
     {#snippet basics()}
-        <FieldTile label="Host" value={host} monospace />
-        <FieldTile label="Pings" value={count} />
+        <FieldTile label={translateUI("Host")} value={host} monospace />
+        <FieldTile label={translateUI("Pings")} value={count} />
         <FieldTile
-            label="Cadence"
+            label={translateUI("Cadence")}
             value={cadence ? `Every ${cadence}s` : undefined}
         />
     {/snippet}
@@ -41,14 +42,14 @@
     {/snippet}
 
     {#snippet details()}
-        <DetailSection title="Configuration">
+        <DetailSection title={translateUI("Configuration")}>
             <FieldTile
-                label="Host"
+                label={translateUI("Host")}
                 value={host}
                 monospace
                 copyable={Boolean(host)}
             />
-            <FieldTile label="Ping Count" value={count} />
+            <FieldTile label={translateUI("Ping Count")} value={count} />
         </DetailSection>
     {/snippet}
 </CheckCardShell>

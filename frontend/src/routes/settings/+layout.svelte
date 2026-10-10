@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import { page } from '$app/stores';
     import {
         Bell,
@@ -66,13 +67,13 @@
 <div class="settings-shell">
     <header class="settings-page-header">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-text mb-1">Settings</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-text mb-1">{translateUI("Settings")}</h1>
             <p class="text-sm text-text-muted max-w-2xl">
-                Configure this updu instance by section. Each area now has its own URL, so you can deep link directly to the workflow you need.
+                {translateUI("Configure this updu instance by section. Each area now has its own URL, so you can deep link directly to the workflow you need.")}
             </p>
         </div>
 
-        <nav aria-label="Settings sections">
+        <nav aria-label={translateUI("Settings sections")}>
             <div class="settings-nav-grid">
                 {#each items as item (item.href)}
                     {@const active = isActive(item.href)}
@@ -92,12 +93,12 @@
                                 <item.icon class="size-4" />
                             </div>
                             <div class="min-w-0">
-                                <p class="text-sm font-semibold leading-none">{item.label}</p>
+                                <p class="text-sm font-semibold leading-none">{translateUI(item.label ?? '')}</p>
                                 <p class={[
                                     'settings-nav-description',
                                     active && 'settings-nav-description-active',
                                 ]}>
-                                    {item.description}
+                                    {translateUI(item.description ?? '')}
                                 </p>
                             </div>
                         </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
 	import { onMount, onDestroy } from "svelte";
 	import {
 		Activity,
@@ -180,7 +181,7 @@
 		if (downServices.length > 0) {
 			return {
 				tone: "outage",
-				title: `${downServices.length} Service${downServices.length === 1 ? "" : "s"} Experiencing Outage`,
+				title: translateUI('Service outages: {count}', { count: downServices.length }),
 				description: downServices.map((s) => s.name).join(", "),
 				subtext: "Our automated monitoring detected an interruption. Administrators have been notified.",
 			};
@@ -188,7 +189,7 @@
 		if (degradedServices.length > 0) {
 			return {
 				tone: "degraded",
-				title: `${degradedServices.length} Service${degradedServices.length === 1 ? "" : "s"} Degraded`,
+				title: translateUI('Degraded services: {count}', { count: degradedServices.length }),
 				description: degradedServices.map((s) => s.name).join(", "),
 				subtext: "Performance may be slower than usual while systems recover.",
 			};
@@ -196,7 +197,7 @@
 		return {
 			tone: "operational",
 			title: "All Systems Operational",
-			description: `All ${services.length} accessible homelab services are running smoothly.`,
+			description: translateUI('All {count} accessible homelab services are running smoothly.', { count: services.length }),
 			subtext: "Everything is monitored and verified in real-time.",
 		};
 	});
@@ -232,7 +233,7 @@
 		<div>
 			<div class="flex items-center gap-2">
 				<h1 class="text-2xl font-bold tracking-tight text-text">
-					Homelab Service Portal
+					{translateUI("Homelab Service Portal")}
 				</h1>
 				{#if authStore.user?.groups?.length}
 					<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
@@ -241,7 +242,7 @@
 				{/if}
 			</div>
 			<p class="text-sm text-text-subtle mt-1">
-				Welcome, <strong class="text-text font-medium">{authStore.user?.username || "Guest"}</strong>. Real-time availability of your homelab applications.
+				{translateUI("Welcome,")} <strong class="text-text font-medium">{authStore.user?.username || "Guest"}</strong>{translateUI(". Real-time availability of your homelab applications.")}
 			</p>
 		</div>
 
@@ -254,7 +255,7 @@
 				class="flex items-center gap-1.5"
 			>
 				<RefreshCw class="size-3.5 {refreshing ? 'animate-spin' : ''}" />
-				<span>Refresh</span>
+				<span>{translateUI("Refresh")}</span>
 			</Button>
 		</div>
 	</div>
@@ -298,7 +299,7 @@
 					<div class="space-y-1">
 						<div class="flex items-center gap-2">
 							<h2 class="text-xl font-bold tracking-tight text-text">
-								{systemStatus.title}
+								{translateUI(systemStatus.title)}
 							</h2>
 							<span
 								class="size-2 rounded-full animate-ping {systemStatus.tone === 'operational'
@@ -312,7 +313,7 @@
 							{systemStatus.description}
 						</p>
 						<p class="text-xs text-text-subtle">
-							{systemStatus.subtext}
+							{translateUI(systemStatus.subtext)}
 						</p>
 					</div>
 				</div>
@@ -325,7 +326,7 @@
 		<div class="space-y-3">
 			<h3 class="text-xs font-semibold uppercase tracking-wider text-warning flex items-center gap-1.5">
 				<Wrench class="size-3.5" />
-				<span>Ongoing Scheduled Maintenance</span>
+				<span>{translateUI("Ongoing Scheduled Maintenance")}</span>
 			</h3>
 			<div class="grid gap-3">
 				{#each activeMaintenance as mw (mw.id)}
@@ -334,7 +335,7 @@
 							<div class="flex items-center gap-2">
 								<span class="text-sm font-semibold text-text">{mw.title}</span>
 								<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-warning/20 text-warning border border-warning/30">
-									In Progress
+									{translateUI("In Progress")}
 								</span>
 							</div>
 							<p class="text-xs text-text-subtle flex items-center gap-2">
@@ -343,7 +344,7 @@
 							</p>
 						</div>
 						<div class="text-xs text-text-muted">
-							Planned downtime. No action required.
+							{translateUI("Planned downtime. No action required.")}
 						</div>
 					</div>
 				{/each}
@@ -360,14 +361,14 @@
 				</div>
 				<div>
 					<p class="text-xs font-semibold text-text">
-						Upcoming Maintenance: {upcomingMaintenance[0].title}
+						{translateUI("Upcoming Maintenance:")} {upcomingMaintenance[0].title}
 					</p>
 					<p class="text-[11px] text-text-subtle">
-						Scheduled for {formatDateTime(upcomingMaintenance[0].starts_at)}
+						{translateUI("Scheduled for")} {formatDateTime(upcomingMaintenance[0].starts_at)}
 					</p>
 				</div>
 			</div>
-			<span class="text-xs text-primary font-medium">Scheduled</span>
+			<span class="text-xs text-primary font-medium">{translateUI("Scheduled")}</span>
 		</div>
 	{/if}
 
@@ -375,9 +376,9 @@
 	<div class="space-y-4">
 		<div class="flex items-center justify-between">
 			<div>
-				<h3 class="text-lg font-bold text-text">Your Homelab Services</h3>
+				<h3 class="text-lg font-bold text-text">{translateUI("Your Homelab Services")}</h3>
 				<p class="text-xs text-text-subtle">
-					Services provisioned for your account group ({services.length} available)
+					{translateUI("Services provisioned for your account group (")}{services.length} {translateUI("available)")}
 				</p>
 			</div>
 		</div>
@@ -394,9 +395,9 @@
 		{:else if services.length === 0}
 			<div class="p-8 rounded-2xl border border-border bg-surface text-center space-y-2">
 				<ShieldCheck class="size-8 text-text-muted mx-auto" />
-				<p class="text-sm font-semibold text-text">No services assigned</p>
+				<p class="text-sm font-semibold text-text">{translateUI("No services assigned")}</p>
 				<p class="text-xs text-text-subtle">
-					Your account does not have access to any specific service groups yet. Contact your administrator.
+					{translateUI("Your account does not have access to any specific service groups yet. Contact your administrator.")}
 				</p>
 			</div>
 		{:else}
@@ -415,7 +416,7 @@
 										{svc.name}
 									</h4>
 									<p class="text-[11px] text-text-subtle capitalize mt-0.5">
-										{svc.type || "Web Application"}
+										{svc.type || translateUI("Web Application")}
 									</p>
 								</div>
 
@@ -423,17 +424,17 @@
 								{#if isDown}
 									<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-danger/10 text-danger border border-danger/20">
 										<span class="size-1.5 rounded-full bg-danger"></span>
-										Outage
+										{translateUI("Outage")}
 									</span>
 								{:else if isDegraded}
 									<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-warning/10 text-warning border border-warning/20">
 										<span class="size-1.5 rounded-full bg-warning"></span>
-										Degraded
+										{translateUI("Degraded")}
 									</span>
 								{:else}
 									<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-success/10 text-success border border-success/20">
 										<span class="size-1.5 rounded-full bg-success"></span>
-										Operational
+										{translateUI("Operational")}
 									</span>
 								{/if}
 							</div>
@@ -446,7 +447,7 @@
 
 							{#if svc.primary_latency_ms !== undefined}
 								<div class="text-[11px] text-text-subtle">
-									Response time: <strong class="text-text font-medium">{svc.primary_latency_ms}ms</strong>
+									{translateUI("Response time:")} <strong class="text-text font-medium">{svc.primary_latency_ms}ms</strong>
 								</div>
 							{/if}
 						</div>
@@ -460,11 +461,11 @@
 									rel="noopener noreferrer"
 									class="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
 								>
-									<span>Open Service</span>
+									<span>{translateUI("Open Service")}</span>
 									<ExternalLink class="size-3" />
 								</a>
 							{:else}
-								<span class="text-[11px] text-text-subtle">Internal network</span>
+								<span class="text-[11px] text-text-subtle">{translateUI("Internal network")}</span>
 							{/if}
 						</div>
 					</div>

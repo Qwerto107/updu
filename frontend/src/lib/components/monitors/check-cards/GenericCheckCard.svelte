@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t as translateUI } from '$lib/i18n/index.svelte';
     import CheckCardShell from "./_shared/CheckCardShell.svelte";
     import DetailSection from "./_shared/DetailSection.svelte";
     import FieldTile from "./_shared/FieldTile.svelte";
@@ -64,7 +65,7 @@
         {/each}
 
         {#if description.steps.length > 0}
-            <DetailSection title="Transaction Steps">
+            <DetailSection title={translateUI("Transaction Steps")}>
                 {#each description.steps as step (step.id)}
                     <div
                         data-testid={step.id}
@@ -72,7 +73,7 @@
                     >
                         <div class="space-y-1">
                             <p class="text-sm font-semibold text-text">
-                                {step.title}
+                                {translateUI(step.title ?? '')}
                             </p>
                             <p class="text-sm text-text-muted break-all">
                                 {step.summary}
