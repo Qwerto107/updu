@@ -71,7 +71,12 @@ func (c *PingChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 		}, nil
 	}
 
-	timeout := time.Duration(monitor.TimeoutS) * time.Second
+	// 直接调用探测器时也使用与监控创建接口一致的默认超时。
+	timeoutS := monitor.TimeoutS
+	if timeoutS <= 0 {
+		timeoutS = 10
+	}
+	timeout := time.Duration(timeoutS) * time.Second
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -86,7 +91,7 @@ func (c *PingChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 	if runtime.GOOS == "windows" && os.Getenv("SystemRoot") != "" {
 		command = filepath.Join(os.Getenv("SystemRoot"), "System32", "PING.EXE")
 	}
-	output, err := commander.CombinedOutput(ctx, command, pingArgs(runtime.GOOS, count, monitor.TimeoutS, cfg.Host)...)
+	output, err := commander.CombinedOutput(ctx, command, pingArgs(runtime.GOOS, count, timeoutS, cfg.Host)...)
 	totalTime := int(time.Since(start).Milliseconds())
 
 	result := &models.CheckResult{

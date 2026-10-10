@@ -336,6 +336,12 @@ func (s *Scheduler) runCheck(ctx context.Context, m *models.Monitor) {
 
 	defer func() { <-s.sem }()
 
+	// 兼容已有的缺省超时配置；复制后补默认值，避免修改共享监控对象。
+	if m.TimeoutS <= 0 {
+		monitor := *m
+		monitor.TimeoutS = 10
+		m = &monitor
+	}
 	checkCtx, cancel := context.WithTimeout(ctx, time.Duration(m.TimeoutS)*time.Second)
 	defer cancel()
 
