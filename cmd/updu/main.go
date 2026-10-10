@@ -85,6 +85,7 @@ func main() {
 
 	// 3.6 Initialize Checkers Registry
 	reg := checker.NewRegistry(cfg.AllowLocalhost)
+	reg.RestrictTargets = cfg.RestrictMonitorTargets
 
 	// 3.5 GitOps: Sync monitors if updu.conf is present
 	if cfg.ConfigPath != "" {

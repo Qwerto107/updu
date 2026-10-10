@@ -225,6 +225,7 @@ func TestTLSCertificateSSRFBlocked(t *testing.T) {
 	srv, _, cleanup := setupAPITest(t)
 	defer cleanup()
 	srv.config.AllowLocalhost = false
+	srv.config.RestrictMonitorTargets = true
 
 	// Spin up a test TLS server on localhost
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -304,5 +305,3 @@ func TestEmptyEndpointsAndCertificatesJSON(t *testing.T) {
 		}
 	}
 }
-
-

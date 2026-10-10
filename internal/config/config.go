@@ -65,9 +65,10 @@ type Config struct {
 	ConfigPath string
 	GitOps     GitOpsConfig
 
-	EnableCustomCSS   bool
-	AllowLocalhost    bool
-	TrustedProxyCIDRs []string
+	EnableCustomCSS        bool
+	AllowLocalhost         bool
+	RestrictMonitorTargets bool
+	TrustedProxyCIDRs      []string
 
 	// Metrics
 	MetricsToken string
@@ -115,9 +116,11 @@ func Load() *Config {
 		ConfURL:  os.Getenv("UPDU_CONF_URL"),
 		ConfPath: os.Getenv("UPDU_CONF_PATH"),
 
-		EnableCustomCSS:   envBool("UPDU_ENABLE_CUSTOM_CSS", false),
-		AllowLocalhost:    envBool("UPDU_ALLOW_LOCALHOST", false),
-		TrustedProxyCIDRs: envCSV("UPDU_TRUSTED_PROXY_CIDRS"),
+		EnableCustomCSS: envBool("UPDU_ENABLE_CUSTOM_CSS", false),
+		AllowLocalhost:  envBool("UPDU_ALLOW_LOCALHOST", false),
+		// 监控默认允许任意目标；通知的地址防护仍由上面的旧开关独立控制。
+		RestrictMonitorTargets: envBool("UPDU_RESTRICT_MONITOR_TARGETS", false),
+		TrustedProxyCIDRs:      envCSV("UPDU_TRUSTED_PROXY_CIDRS"),
 
 		MetricsToken: envOr("UPDU_METRICS_TOKEN", ""),
 		Headless:     envBool("UPDU_HEADLESS", false),

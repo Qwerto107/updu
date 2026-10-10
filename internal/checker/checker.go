@@ -12,8 +12,15 @@ import (
 type contextKey string
 
 const (
-	AllowLocalhostKey contextKey = "allow_localhost"
+	AllowLocalhostKey  contextKey = "allow_localhost"
+	RestrictTargetsKey contextKey = "restrict_monitor_targets"
 )
+
+// WithTargetPolicy 只设置监控使用的上下文键，不向通知客户端传递放行权限。
+func WithTargetPolicy(ctx context.Context, restrict, allowLocalhost bool) context.Context {
+	ctx = context.WithValue(ctx, RestrictTargetsKey, restrict)
+	return context.WithValue(ctx, AllowLocalhostKey, allowLocalhost)
+}
 
 // Resolver defines the interface for DNS lookups.
 type Resolver interface {
@@ -36,7 +43,6 @@ func (c *defaultCommander) CombinedOutput(ctx context.Context, name string, arg 
 	return exec.CommandContext(ctx, name, arg...).CombinedOutput() // #nosec G204
 }
 
-
 // Checker defines the interface for all monitoring probe types.
 type Checker interface {
 	// Type returns the monitor type string (e.g., "http", "tcp", "ping").
@@ -51,8 +57,9 @@ type Checker interface {
 
 // Registry maps monitor type strings to their Checker implementations.
 type Registry struct {
-	checkers       map[string]Checker
-	AllowLocalhost bool
+	checkers        map[string]Checker
+	AllowLocalhost  bool
+	RestrictTargets bool
 }
 
 // NewRegistry creates a registry with all core built-in checkers.

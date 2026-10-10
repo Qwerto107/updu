@@ -315,9 +315,11 @@ func (s *Server) handleToolCall(ctx context.Context, req *JSONRPCRequest) {
 		}
 		if host == "" {
 			err = fmt.Errorf("host argument is required")
+		} else if policyErr := checker.CheckHostSSRF(ctx, host); policyErr != nil {
+			err = policyErr
 		} else {
 			addr := net.JoinHostPort(host, strconv.Itoa(port))
-			dialer := &net.Dialer{Timeout: 5 * time.Second}
+			dialer := &net.Dialer{Timeout: 5 * time.Second, Control: checker.SafeDialer(ctx)}
 			conn, dialErr := tls.DialWithDialer(dialer, "tcp", addr, &tls.Config{
 				ServerName: host,
 			})

@@ -328,7 +328,7 @@ func (s *Server) handleProbeService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(s.withLocalhostContext(r.Context()), 15*time.Second)
+	ctx, cancel := context.WithTimeout(s.withMonitorContext(r.Context()), 15*time.Second)
 	defer cancel()
 
 	var wg sync.WaitGroup
@@ -537,7 +537,7 @@ func (s *Server) handleTestTLSCertificate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	tlsCtx := s.withLocalhostContext(r.Context())
+	tlsCtx := s.withMonitorContext(r.Context())
 
 	// SSRF protection
 	if err := checker.CheckHostSSRF(tlsCtx, host); err != nil {

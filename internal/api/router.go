@@ -605,9 +605,16 @@ func (s *Server) handleCreateMonitor(w http.ResponseWriter, r *http.Request) {
 	jsonOK(w, m)
 }
 
-func (s *Server) withLocalhostContext(ctx context.Context) context.Context {
+// 监控策略独立于通知策略，避免内网监控顺带放开 Webhook 等通知目标。
+func (s *Server) withMonitorContext(ctx context.Context) context.Context {
+	if s.config == nil {
+		return checker.WithTargetPolicy(ctx, false, false)
+	}
+	return checker.WithTargetPolicy(ctx, s.config.RestrictMonitorTargets, s.config.AllowLocalhost)
+}
+
+func (s *Server) withNotificationContext(ctx context.Context) context.Context {
 	if s.config != nil && s.config.AllowLocalhost {
-		ctx = context.WithValue(ctx, checker.AllowLocalhostKey, true)
 		ctx = context.WithValue(ctx, channels.AllowLocalhostKey, true)
 	}
 	return ctx
@@ -635,7 +642,7 @@ func (s *Server) handleTestMonitor(w http.ResponseWriter, r *http.Request) {
 		m.TimeoutS = 10
 	}
 
-	ctx, cancel := context.WithTimeout(s.withLocalhostContext(r.Context()), 15*time.Second)
+	ctx, cancel := context.WithTimeout(s.withMonitorContext(r.Context()), 15*time.Second)
 	defer cancel()
 
 	result, err := c.Check(ctx, &m)

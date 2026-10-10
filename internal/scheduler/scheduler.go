@@ -70,7 +70,7 @@ func New(db *storage.DB, registry *checker.Registry, sse *realtime.Hub, n *notif
 		sse:            sse,
 		notifier:       n,
 		poolSize:       poolSize,
-		allowLocalhost: registry.AllowLocalhost, // Assuming we add it to Registry
+		allowLocalhost: registry.AllowLocalhost,
 		sem:            make(chan struct{}, poolSize),
 		monitors:       make(map[string]*monitorState),
 		randFloat64:    rand.Float64,
@@ -339,9 +339,7 @@ func (s *Scheduler) runCheck(ctx context.Context, m *models.Monitor) {
 	checkCtx, cancel := context.WithTimeout(ctx, time.Duration(m.TimeoutS)*time.Second)
 	defer cancel()
 
-	if s.allowLocalhost {
-		checkCtx = context.WithValue(checkCtx, checker.AllowLocalhostKey, true)
-	}
+	checkCtx = checker.WithTargetPolicy(checkCtx, s.registry.RestrictTargets, s.allowLocalhost)
 
 	var result *models.CheckResult
 	retries := m.Retries
@@ -530,10 +528,7 @@ func (s *Scheduler) probeServiceEndpoints(ctx context.Context, m *models.Monitor
 			IntervalS: interval,
 		}
 
-		epCtx := ctx
-		if s.allowLocalhost {
-			epCtx = context.WithValue(epCtx, checker.AllowLocalhostKey, true)
-		}
+		epCtx := checker.WithTargetPolicy(ctx, s.registry.RestrictTargets, s.allowLocalhost)
 		epCtx, epCancel := context.WithTimeout(epCtx, time.Duration(timeout)*time.Second)
 
 		start := time.Now()
@@ -595,4 +590,3 @@ func (s *Scheduler) probeServiceEndpoints(ctx context.Context, m *models.Monitor
 
 	return diag
 }
-

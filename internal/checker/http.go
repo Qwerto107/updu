@@ -35,7 +35,7 @@ func (c *HTTPChecker) Validate(config json.RawMessage) error {
 	return nil
 }
 
-// SafeDialer returns a Control function for net.Dialer that blocks private/loopback IPs.
+// SafeDialer 在建立连接时应用监控地址策略，限制模式下拦截非公网目标。
 func SafeDialer(ctx context.Context) func(network, address string, c syscall.RawConn) error {
 	return func(network, address string, c syscall.RawConn) error {
 		host, _, err := net.SplitHostPort(address)
@@ -56,6 +56,11 @@ func SafeDialer(ctx context.Context) func(network, address string, c syscall.Raw
 }
 
 func isBlocked(ctx context.Context, ip net.IP) bool {
+	// 自托管监控默认允许公网、内网和链路本地目标，限制模式需显式开启。
+	if restrict, _ := ctx.Value(RestrictTargetsKey).(bool); !restrict {
+		return false
+	}
+
 	if ip.IsLoopback() {
 		// Allow loopback if specifically allowed in context (e.g. for testing)
 		if allow, _ := ctx.Value(AllowLocalhostKey).(bool); allow {
@@ -86,8 +91,7 @@ func isBlocked(ctx context.Context, ip net.IP) bool {
 	return false
 }
 
-// CheckHostSSRF resolves a hostname and checks all resulting IPs against the SSRF blocklist.
-// Returns an error if any resolved IP is blocked.
+// CheckHostSSRF 解析主机名，并按当前监控策略检查地址；默认允许所有目标。
 func CheckHostSSRF(ctx context.Context, host string) error {
 	// If it's already an IP, check directly
 	if ip := net.ParseIP(host); ip != nil {

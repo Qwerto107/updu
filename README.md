@@ -96,7 +96,8 @@ updu uses a three-tier config: defaults → YAML → environment variables (high
 | `UPDU_PASSWORD_POLICY` | `default` | Password rules: `off`/`default` = min 8 chars, `strong` = min 10 + upper/lower/number, `very_secure` = min 12 + upper/lower/number/special |
 | `UPDU_WORKER_POOL_SIZE` | `0` (auto) | Concurrent check workers (auto = CPU×4, clamped 4–50) |
 | `UPDU_MIN_INTERVAL_S` | `30` | Minimum allowed check interval |
-| `UPDU_ALLOW_LOCALHOST` | `false` | Allow monitors to target `127.0.0.1` / `localhost` |
+| `UPDU_RESTRICT_MONITOR_TARGETS` | `false` | Monitor probes allow all target addresses by default, including private, loopback and link-local networks. Set `true` to enable probe address restrictions. Does not change notification access. |
+| `UPDU_ALLOW_LOCALHOST` | `false` | Legacy opt-in: allow notification channels to reach non-public addresses, and allow private/loopback probes when monitor address restrictions are enabled. Leave unset to retain notification SSRF protection. |
 | `UPDU_ENABLE_CUSTOM_CSS` | `false` | Allow custom CSS on status pages |
 | `UPDU_UPDATE_TEMP_DIR` | *(unset)* | Custom directory for staging binary self-updates (defaults to executable directory) |
 

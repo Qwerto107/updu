@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	updu "github.com/updu/updu"
+	"github.com/updu/updu/internal/checker"
 	"github.com/updu/updu/internal/config"
 	"github.com/updu/updu/internal/mcp"
 	"github.com/updu/updu/internal/storage"
@@ -452,6 +453,7 @@ Usage:
 Environment Variables:
   UPDU_HOST           Listen address (default: 0.0.0.0)
   UPDU_PORT           Listen port (default: 3000)
+  UPDU_RESTRICT_MONITOR_TARGETS Restrict non-public probe targets (default: false)
   UPDU_DB_PATH        Database file path (default: ./updu.db)
   UPDU_HEADLESS       Run in headless prober mode without web UI (default: false)
   UPDU_AGENT          Run as probe agent (default: false)
@@ -585,7 +587,8 @@ func handleMCP() {
 	}
 
 	server := mcp.NewServer(db, os.Stdin, os.Stdout)
-	if err := server.Run(context.Background()); err != nil {
+	probeCtx := checker.WithTargetPolicy(context.Background(), cfg.RestrictMonitorTargets, cfg.AllowLocalhost)
+	if err := server.Run(probeCtx); err != nil {
 		fmt.Fprintf(os.Stderr, "mcp server terminated: %v\n", err)
 		osExit(1)
 	}

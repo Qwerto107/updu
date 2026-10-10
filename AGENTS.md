@@ -13,5 +13,5 @@
 - **Sequential Scan Rule**: Never execute queries or database transactions while an `sql.Rows` iterator is open. Always read all rows into memory, call `rows.Close()`, and only then perform subsequent queries.
 
 ## 4. Safe HTTP Clients & SSRF Guardrails
-- **Outbound HTTP Probing**: Outbound checkers and notifiers block loopback/localhost (`127.0.0.1`, `::1`) by default for SSRF defense.
+- **Outbound HTTP Probing**: Monitors allow all target addresses by default. `UPDU_RESTRICT_MONITOR_TARGETS=true` opts into probe address restrictions. Notification clients retain SSRF protection by default; never propagate monitor permissions into notification contexts. The legacy `UPDU_ALLOW_LOCALHOST` remains an explicit opt-in.
 - **Testing Guardrail**: When testing checkers or notifier channels against local `httptest.Server` instances, always inject `context.WithValue(ctx, channels.AllowLocalhostKey, true)`.
