@@ -56,7 +56,8 @@ test.describe('language preferences', () => {
             await expect(login.getByRole('heading', { name: '登录 updu' })).toBeVisible();
             await expect(login.locator('html')).toHaveAttribute('lang', 'zh-CN');
         } finally { await visitor.close(); }
-        await page.getByRole('button', { name: 'Use instance default', exact: true }).click();
+        // 顶栏仅保留语言切换；重新保存常规设置后，当前浏览器采用实例默认语言。
+        await page.getByRole('button', { name: 'Save Settings', exact: true }).click();
         await expect(page.getByRole('heading', { name: '设置', exact: true })).toBeVisible();
     });
 
