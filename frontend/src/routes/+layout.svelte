@@ -325,17 +325,18 @@
 							class="absolute -bottom-0.5 -right-0.5 size-2.5 bg-success rounded-full border-2 border-surface shadow-[0_0_6px_hsl(142_71%_45%/0.7)]"
 						></span>
 					</div>
-					<div class="flex items-baseline gap-2">
+					<div class="hidden sm:flex items-baseline gap-2">
 						<span class="text-base font-bold tracking-tight text-text">updu</span>
 						<span class="text-xs text-text-subtle font-medium">{translateUI("Service Portal")}</span>
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3">
+				<!-- 窄屏保留语言、密度、主题和退出操作，辅助状态在宽屏展示。 -->
+				<div class="flex min-w-0 items-center gap-1 sm:gap-3">
 					<LanguageSelect />
 					<!-- Live indicator -->
 					<div
-						class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
+						class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
 					>
 						<Radio class="size-3.5" />
 						<span class="hidden sm:inline">{translateUI("Live")}</span>
@@ -375,10 +376,10 @@
 						{/if}
 					</button>
 
-					<div class="w-px h-5 bg-border"></div>
+					<div class="hidden sm:block w-px h-5 bg-border"></div>
 
 					<!-- User profile -->
-					<div class="flex items-center gap-2">
+					<div class="hidden sm:flex items-center gap-2">
 						<div
 							class="size-7 rounded-lg bg-primary/15 flex items-center justify-center shrink-0"
 						>
@@ -549,17 +550,18 @@
 				</div>
 
 				<!-- Right side -->
-				<div class="flex items-center gap-2 ml-auto">
+				<!-- 避免语言选择器挤出手机页头，关键操作始终可见。 -->
+				<div class="flex min-w-0 items-center gap-1 sm:gap-2 ml-auto">
 					<LanguageSelect />
 					<!-- Live indicator -->
 					<div
-						class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
+						class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20 text-success text-xs font-medium"
 					>
 						<Radio class="size-3.5" />
 						<span class="hidden sm:inline">{translateUI("Live")}</span>
 					</div>
 
-					<div class="w-px h-5 bg-border"></div>
+					<div class="hidden sm:block w-px h-5 bg-border"></div>
 
 					<!-- Density cycle -->
 					<button
@@ -596,7 +598,7 @@
 					</button>
 
 					<!-- User -->
-					<div class="flex items-center gap-2">
+					<div class="hidden sm:flex items-center gap-2">
 						<div
 							class="size-7 rounded-lg bg-primary/15 flex items-center justify-center shrink-0"
 						>
@@ -618,7 +620,7 @@
 						</div>
 					</div>
 
-					<div class="w-px h-5 bg-border"></div>
+					<div class="hidden sm:block w-px h-5 bg-border"></div>
 
 					{#if authStore.user.auth_provider !== 'forward-auth'}
 						<button

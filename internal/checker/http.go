@@ -134,6 +134,7 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 		serverName = parsedURL.Hostname()
 	}
 
+	var tlsMu sync.Mutex
 	var capturedTLS *tls.ConnectionState
 	var capturedVerified bool
 
@@ -146,9 +147,15 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 		tlsConfig.InsecureSkipVerify = true
 		tlsConfig.VerifyConnection = func(cs tls.ConnectionState) error {
 			copyState := cs
-			capturedTLS = &copyState
+			verified := false
+			// 请求取消后，握手回调可能仍在运行；仅发布已构建完成的只读快照。
+			defer func() {
+				tlsMu.Lock()
+				capturedTLS = &copyState
+				capturedVerified = verified
+				tlsMu.Unlock()
+			}()
 			if cfg.SkipTLSVerify {
-				capturedVerified = false
 				return nil
 			}
 			opts := x509.VerifyOptions{
@@ -165,8 +172,7 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 				return err
 			}
 			copyState.VerifiedChains = chains
-			capturedTLS = &copyState
-			capturedVerified = true
+			verified = true
 			return nil
 		}
 	} else {
@@ -281,6 +287,10 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 	start := time.Now()
 	resp, err := client.Do(req)
 	latency := int(time.Since(start).Milliseconds())
+	// 与后台握手同步读取，后续证书元数据始终使用这份不可变快照。
+	tlsMu.Lock()
+	tlsSnapshot, tlsVerified := capturedTLS, capturedVerified
+	tlsMu.Unlock()
 
 	var transferStart, transferDone time.Time
 
@@ -315,16 +325,16 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 			CheckedAt: time.Now(),
 		}
 		var certMeta json.RawMessage
-		if capturedTLS != nil && len(capturedTLS.PeerCertificates) > 0 {
+		if tlsSnapshot != nil && len(tlsSnapshot.PeerCertificates) > 0 {
 			warnDays := cfg.WarnDays
 			if warnDays == 0 {
 				warnDays = 14
 			}
-			cert := capturedTLS.PeerCertificates[0]
+			cert := tlsSnapshot.PeerCertificates[0]
 			certMeta = buildCertificateMetadata(cert, warnDays, certificateMetadataOptions{
-				PeerCertificates: certificateChainForMetadata(capturedTLS),
+				PeerCertificates: certificateChainForMetadata(tlsSnapshot),
 				VerificationMode: tlsVerificationMode(cfg.SkipTLSVerify),
-				Verified:         capturedVerified,
+				Verified:         tlsVerified,
 			})
 		}
 		res.Metadata = mergeHopTraceMetadata(certMeta, hopTrace)
@@ -375,13 +385,16 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 	// Inspect TLS certificate if connection was over TLS
 	tlsState := resp.TLS
 	if tlsState == nil {
-		tlsState = capturedTLS
+		tlsState = tlsSnapshot
 	}
 	var certMeta json.RawMessage
 	if tlsState != nil && len(tlsState.PeerCertificates) > 0 {
 		if tlsState.Version != 0 {
+			// Trace 回调也会更新这两个字段，保持同一把锁保护所有写入。
+			traceMu.Lock()
 			capturedTLSVersion = tlsVersionString(tlsState.Version)
 			capturedTLSCipher = tls.CipherSuiteName(tlsState.CipherSuite)
+			traceMu.Unlock()
 		}
 		warnDays := cfg.WarnDays
 		if warnDays == 0 {
@@ -391,7 +404,7 @@ func (c *HTTPChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 		certMeta = buildCertificateMetadata(cert, warnDays, certificateMetadataOptions{
 			PeerCertificates: certificateChainForMetadata(tlsState),
 			VerificationMode: tlsVerificationMode(cfg.SkipTLSVerify),
-			Verified:         !cfg.SkipTLSVerify && (len(tlsState.VerifiedChains) > 0 || capturedVerified),
+			Verified:         !cfg.SkipTLSVerify && (len(tlsState.VerifiedChains) > 0 || tlsVerified),
 		})
 		if result.Status == models.StatusUp {
 			remaining := time.Until(cert.NotAfter)

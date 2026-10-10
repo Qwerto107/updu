@@ -1,6 +1,6 @@
 module github.com/updu/updu
 
-go 1.26.1
+go 1.26.9
 
 require (
 	golang.org/x/crypto v0.48.0

@@ -10,7 +10,8 @@ import { fixtureBaseUrl } from './helpers/env';
 
 const scrollableMonitorCount = 14;
 const layoutWidths = [320, 768, 1440, 1920];
-const statsTabs = ['Overview', 'Performance', 'Monitors', 'Incidents'];
+// 统计页以服务为单位展示监控，标签与当前界面保持一致。
+const statsTabs = ['Overview', 'Performance', 'Services', 'Incidents'];
 
 async function seedScrollableStats(): Promise<void> {
     const api = await createAuthenticatedRequestContext();
@@ -63,9 +64,9 @@ test.describe('stats page layout', () => {
         });
         await expect(tablist).toBeVisible();
 
-        await page.getByRole('tab', { name: /Monitors/ }).click();
+        await page.getByRole('tab', { name: /Services/ }).click();
         await expect(
-            page.getByRole('tab', { name: /Monitors/, selected: true }),
+            page.getByRole('tab', { name: /Services/, selected: true }),
         ).toBeVisible();
 
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

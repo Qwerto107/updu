@@ -5,6 +5,7 @@ import {
     clearMonitors,
     clearStatusPages,
     createMonitor,
+    listMonitors,
 } from './helpers/api';
 import { appBaseUrl, fixtureBaseUrl } from './helpers/env';
 
@@ -106,20 +107,20 @@ test.describe('monitors', () => {
         });
         await page.goto('/monitors');
         await expect(
-            page.getByRole('heading', { name: 'Monitors', level: 1 }),
+            page.getByRole('heading', { name: 'Services', level: 1 }),
         ).toBeVisible();
         await expect(monitorRows(page)).toHaveCount(3);
 
-        await page.getByTestId('search-monitors').fill('bravo');
+        await page.getByTestId('search-services').fill('bravo');
         await expect(monitorRows(page)).toHaveCount(1);
         await expect(monitorRows(page).first()).toContainText('Bravo Slow');
 
-        await page.getByTestId('search-monitors').fill('missing-monitor');
-        await expect(page.getByTestId('monitors-empty-state')).toContainText(
-            'No monitors matching "missing-monitor"',
+        await page.getByTestId('search-services').fill('missing-monitor');
+        await expect(page.getByTestId('services-empty-state')).toContainText(
+            'No services matching "missing-monitor"',
         );
 
-        await page.getByTestId('search-monitors').fill('');
+        await page.getByTestId('search-services').fill('');
         await expect(monitorRows(page)).toHaveCount(3);
 
         await page.getByTestId('sort-name').click();
@@ -156,7 +157,7 @@ test.describe('monitors', () => {
         await loginThroughUI(page);
         await page.goto('/monitors');
 
-        await page.getByRole('button', { name: 'New Monitor' }).click();
+        await page.getByRole('button', { name: 'New Service' }).click();
         const createDialog = page.getByRole('dialog', {
             name: 'Add New Monitor',
         });
@@ -222,9 +223,10 @@ test.describe('monitors', () => {
         );
         await updatedRow.locator('[data-testid^="monitor-actions-"]').click();
         await page.getByRole('menuitem', { name: 'Delete' }).click();
-        const deleteDialog = page.getByRole('dialog', { name: 'Delete monitor?' });
+        // 服务列表使用统一确认弹窗，仍须确认后才能删除。
+        const deleteDialog = page.getByRole('dialog', { name: 'Delete service?' });
         await deleteDialog.getByLabel('Type DELETE to confirm').fill('DELETE');
-        await deleteDialog.getByRole('button', { name: 'Delete monitor' }).click();
+        await deleteDialog.getByRole('button', { name: 'Delete service' }).click();
         const deleteResponse = await deleteResponsePromise;
         expect(deleteResponse.ok()).toBeTruthy();
         await expect(updatedRow).toHaveCount(0);
@@ -234,7 +236,7 @@ test.describe('monitors', () => {
         await loginThroughUI(page);
         await page.goto('/monitors');
 
-        await page.getByRole('button', { name: 'New Monitor' }).click();
+        await page.getByRole('button', { name: 'New Service' }).click();
         const createDialog = page.getByRole('dialog', {
             name: 'Add New Monitor',
         });
@@ -279,22 +281,13 @@ test.describe('monitors', () => {
                 expected_status: 200,
             },
         });
-        const transactionMonitor = await createMonitor(api, {
-            name: 'Transaction Detail Monitor',
-            type: 'transaction',
+        // 只测试当前支持的核心类型，TCP 与 HTTP 都需展示实际配置。
+        const tcpMonitor = await createMonitor(api, {
+            name: 'TCP Detail Monitor',
+            type: 'tcp',
             config: {
-                steps: [
-                    {
-                        url: `${fixtureBaseUrl}/ok`,
-                        method: 'GET',
-                        expected_status: 200,
-                    },
-                    {
-                        url: `${fixtureBaseUrl}/slow`,
-                        method: 'GET',
-                        expected_status: 200,
-                    },
-                ],
+                host: '127.0.0.1',
+                port: Number(new URL(fixtureBaseUrl).port),
             },
         });
         await api.dispose();
@@ -312,27 +305,25 @@ test.describe('monitors', () => {
 
         await page.getByRole('button', { name: /detailed config/i }).click();
         const httpDetails = page.getByTestId('monitor-check-details');
-        await expect(httpDetails).toContainText('Request URL');
+        await expect(httpDetails).toContainText('URL');
         await expect(httpDetails).toContainText(`${fixtureBaseUrl}/ok`);
 
-        await page.goto(`/monitors/${transactionMonitor.id}`);
+        await page.goto(`/monitors/${tcpMonitor.id}`);
         await expect(
             page.getByRole('heading', {
-                name: 'Transaction Detail Monitor',
+                name: 'TCP Detail Monitor',
                 level: 1,
             }),
         ).toBeVisible();
-        const transactionSummary = page.getByTestId('monitor-check-summary');
-        await expect(transactionSummary).toContainText('2 steps');
-        await expect(transactionSummary).toContainText(`${fixtureBaseUrl}/ok`);
+        const tcpSummary = page.getByTestId('monitor-check-summary');
+        await expect(tcpSummary).toContainText(`127.0.0.1:${new URL(fixtureBaseUrl).port}`);
 
         await page.getByRole('button', { name: /detailed config/i }).click();
-        await expect(page.getByTestId('monitor-detail-transaction-step-1')).toContainText(
-            `${fixtureBaseUrl}/ok`,
-        );
-        await expect(page.getByTestId('monitor-detail-transaction-step-2')).toContainText(
-            `${fixtureBaseUrl}/slow`,
-        );
+        const tcpDetails = page.getByTestId('monitor-check-details');
+        await expect(tcpDetails).toContainText('Host');
+        await expect(tcpDetails).toContainText('127.0.0.1');
+        await expect(tcpDetails).toContainText('Port');
+        await expect(tcpDetails).toContainText(new URL(fixtureBaseUrl).port);
     });
 
     test('monitor details surface latest HTTPS certificate basics', async ({ page }) => {
@@ -435,17 +426,17 @@ test.describe('monitors', () => {
         ).toBeVisible();
 
         const basics = page.getByTestId('monitor-current-basics');
-        await expect(basics).toContainText('Certificate Expires');
+        await expect(basics).toContainText('Cert Expires');
         await expect(page.getByTestId('monitor-basic-certificate-expires')).toContainText(
             '2026-04-27',
         );
         await expect(page.getByTestId('monitor-basic-days-left')).toContainText('9');
-        await expect(basics).toContainText('Verification');
-        await expect(basics).toContainText('Skipped');
-
         await page.getByRole('button', { name: /detailed config/i }).click();
         const details = page.getByTestId('monitor-check-details');
-        await expect(details).toContainText('Latest Certificate');
+        // 验证方式位于展开后的 TLS 详情，基本信息只展示到期时间。
+        await expect(details).toContainText('TLS Certificate');
+        await expect(details).toContainText('Verification');
+        await expect(details).toContainText('Skipped');
         await expect(details).toContainText('CN=secure.example.test');
         await expect(details).toContainText('CN=Acme Root');
         await expect(details).toContainText('RSA');
@@ -609,38 +600,21 @@ test.describe('monitors', () => {
         ).toBeVisible();
     });
 
-    test('composite monitor links to child monitors', async ({ page }) => {
+    test('removed monitor types are rejected without creating records', async () => {
         const api = await createAuthenticatedRequestContext();
-        const child = await createMonitor(api, {
-            name: 'Composite Child Monitor',
-            type: 'http',
-            config: {
-                url: `${fixtureBaseUrl}/ok`,
-                method: 'GET',
-                expected_status: 200,
-            },
-        });
-        const composite = await createMonitor(api, {
-            name: 'Composite Detail Monitor',
-            type: 'composite',
-            config: {
-                mode: 'all_up',
-                monitor_ids: [child.id],
-            },
-        });
-        await api.dispose();
-
-        await loginThroughUI(page);
-        await page.goto(`/monitors/${composite.id}`);
-        await expect(
-            page.getByRole('heading', { name: 'Composite Detail Monitor', level: 1 }),
-        ).toBeVisible();
-
-        const members = page.getByTestId('monitor-composite-members');
-        await expect(members).toBeVisible();
-        await expect(
-            members.getByRole('link', { name: child.id }),
-        ).toHaveAttribute('href', `/monitors/${child.id}`);
+        try {
+            // 删除的类型应返回明确错误，不能静默创建不可执行的监控。
+            for (const type of ['transaction', 'composite']) {
+                const response = await api.post('/api/v1/monitors', {
+                    data: { name: `Unsupported ${type}`, type, interval_s: 10, config: {} },
+                });
+                expect(response.status()).toBe(400);
+                expect(await response.json()).toEqual({ error: `unknown monitor type: ${type}` });
+            }
+            expect(await listMonitors(api)).toEqual([]);
+        } finally {
+            await api.dispose();
+        }
     });
 
     test('edit failures surface a user-visible error', async ({ page }) => {
