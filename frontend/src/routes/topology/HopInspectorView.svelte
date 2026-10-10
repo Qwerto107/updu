@@ -71,7 +71,7 @@
 			case "up":
 				return "bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border-emerald-500/20";
 			case "degraded":
-				return "bg-amber-500/10 text-amber-400 light:text-amber-700 border-amber-500/20";
+				return "bg-amber-500/10 text-amber-400 light:text-amber-800 border-amber-500/20";
 			case "down":
 				return "bg-rose-500/10 text-rose-400 light:text-rose-700 border-rose-500/20";
 			case "isolated":
@@ -209,17 +209,17 @@
 			<div class="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 shadow-[var(--shadow-card)] space-y-3 animate-fade-in">
 				<div class="flex items-start justify-between gap-3">
 					<div class="flex items-start gap-3">
-						<div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 light:text-amber-700 shrink-0 mt-0.5">
+						<div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 light:text-amber-800 shrink-0 mt-0.5">
 							<ShieldAlert class="w-6 h-6" />
 						</div>
 						<div>
 							<h3 class="font-bold text-text text-base">{translateUI("Diagnostic Autopsy:")} {service.name}</h3>
-							<p class="text-xs text-amber-300 light:text-amber-700 font-medium mt-0.5">
+							<p class="text-xs text-amber-300 light:text-amber-800 font-medium mt-0.5">
 								{service.diagnosis || translateUI("Probe discrepancy detected across reachability scopes.")}
 							</p>
 						</div>
 					</div>
-					<span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/25 text-amber-400 light:text-amber-700">
+					<span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/25 text-amber-400 light:text-amber-800">
 						{translateUI("Differential Root-Cause")}
 					</span>
 				</div>

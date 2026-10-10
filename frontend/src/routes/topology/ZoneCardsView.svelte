@@ -58,7 +58,7 @@
 			case "up":
 				return "bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border-emerald-500/20";
 			case "degraded":
-				return "bg-amber-500/10 text-amber-400 light:text-amber-700 border-amber-500/20";
+				return "bg-amber-500/10 text-amber-400 light:text-amber-800 border-amber-500/20";
 			case "down":
 				return "bg-rose-500/10 text-rose-400 light:text-rose-700 border-rose-500/20";
 			default:
@@ -170,7 +170,7 @@
 							<span class="text-emerald-400 light:text-emerald-700 font-bold">{upCount} {translateUI("Up")}</span>
 							{#if degradedCount > 0}
 								<span class="text-text-muted">•</span>
-								<span class="text-amber-400 light:text-amber-700 font-bold">{degradedCount} {translateUI("Degraded")}</span>
+								<span class="text-amber-400 light:text-amber-800 font-bold">{degradedCount} {translateUI("Degraded")}</span>
 							{/if}
 							{#if downCount > 0}
 								<span class="text-text-muted">•</span>
@@ -294,8 +294,8 @@
 								<!-- Diagnostic Alert if Degraded/Down -->
 								{#if svc.status === "degraded" || svc.status === "down"}
 									<div class="mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
-										<ShieldAlert class="w-4 h-4 text-amber-400 light:text-amber-700 shrink-0 mt-0.5" />
-										<div class="text-[11px] text-amber-300 light:text-amber-700 leading-tight">
+										<ShieldAlert class="w-4 h-4 text-amber-400 light:text-amber-800 shrink-0 mt-0.5" />
+										<div class="text-[11px] text-amber-300 light:text-amber-800 leading-tight">
 											<span class="font-semibold">{translateUI("Diagnosis:")}</span> {svc.diagnosis || translateUI("Probe failure detected")}
 										</div>
 									</div>

@@ -59,7 +59,7 @@
 			case "up":
 				return "bg-emerald-500/10 text-emerald-400 light:text-emerald-700 border-emerald-500/20";
 			case "degraded":
-				return "bg-amber-500/10 text-amber-400 light:text-amber-700 border-amber-500/20";
+				return "bg-amber-500/10 text-amber-400 light:text-amber-800 border-amber-500/20";
 			case "down":
 				return "bg-rose-500/10 text-rose-400 light:text-rose-700 border-rose-500/20";
 			case "isolated":
@@ -139,11 +139,11 @@
 					onclick={() => (filterMode = "asymmetric")}
 					class={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1 ${
 						filterMode === "asymmetric"
-							? "bg-amber-500/20 text-amber-300 light:text-amber-700 font-bold border border-amber-500/30"
+							? "bg-amber-500/20 text-amber-300 light:text-amber-800 font-bold border border-amber-500/30"
 							: "text-text-muted hover:text-text"
 					}`}
 				>
-					<ShieldAlert class="w-3 h-3 text-amber-400 light:text-amber-700" />
+					<ShieldAlert class="w-3 h-3 text-amber-400 light:text-amber-800" />
 					{translateUI("Asymmetric Reachability")}
 				</button>
 				<button
@@ -226,7 +226,7 @@
 										{/if}
 										{#if isAsymm}
 											<span>•</span>
-											<span class="text-amber-400 light:text-amber-700 font-semibold flex items-center gap-0.5">
+											<span class="text-amber-400 light:text-amber-800 font-semibold flex items-center gap-0.5">
 												<ShieldAlert class="w-2.5 h-2.5" />
 												{translateUI("Asymmetric")}
 											</span>
@@ -330,7 +330,7 @@
 													<button
 														type="button"
 														onclick={() => onMarkIsolated(svc, sc.id)}
-														class="py-2 px-2 rounded-xl border border-dashed border-border hover:border-amber-500/50 hover:bg-amber-500/10 text-text-muted hover:text-amber-400 light:hover:text-amber-700 text-[10px] flex items-center justify-center gap-1 transition-all shrink-0"
+														class="py-2 px-2 rounded-xl border border-dashed border-border hover:border-amber-500/50 hover:bg-amber-500/10 text-text-muted hover:text-amber-400 light:hover:text-amber-800 text-[10px] flex items-center justify-center gap-1 transition-all shrink-0"
 														title={`Mark ${sc.id} as Isolated / Not Reachable`}
 														aria-label={`Mark ${sc.id} as Isolated`}
 													>

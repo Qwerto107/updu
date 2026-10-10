@@ -810,7 +810,7 @@
 						class="rounded border-border bg-surface-elevated text-amber-500 focus:ring-amber-500"
 					/>
 					<label for="ep-isolated" class="text-xs font-semibold text-text cursor-pointer flex items-center gap-1.5">
-						<Shield class="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
+						<Shield class="w-3.5 h-3.5 text-amber-400 light:text-amber-800" />
 						{translateUI("Mark as Isolated / Not Reachable in this scope")}
 					</label>
 				</div>
