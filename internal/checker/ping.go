@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +36,14 @@ func (c *PingChecker) Validate(config json.RawMessage) error {
 }
 
 var pingTimeRegex = regexp.MustCompile(`time[=<]\s*([\d.]+)\s*ms`)
+
+// Windows 使用 -n 指定次数、-w 指定毫秒；Linux 的 -W 使用秒。
+func pingArgs(goos string, count, timeoutS int, host string) []string {
+	if goos == "windows" {
+		return []string{"-n", strconv.Itoa(count), "-w", strconv.FormatInt(int64(timeoutS)*1000, 10), host}
+	}
+	return []string{"-c", strconv.Itoa(count), "-W", strconv.Itoa(timeoutS), host}
+}
 
 func (c *PingChecker) Check(ctx context.Context, monitor *models.Monitor) (*models.CheckResult, error) {
 	var cfg models.PingMonitorConfig
@@ -70,8 +81,12 @@ func (c *PingChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 	}
 
 	start := time.Now()
-	output, err := commander.CombinedOutput(ctx, "ping", "-c", strconv.Itoa(count), "-W",
-		strconv.Itoa(monitor.TimeoutS), cfg.Host)
+	command := "ping"
+	// 后台服务的 PATH 可能不包含系统目录，Windows 直接使用系统自带的程序。
+	if runtime.GOOS == "windows" && os.Getenv("SystemRoot") != "" {
+		command = filepath.Join(os.Getenv("SystemRoot"), "System32", "PING.EXE")
+	}
+	output, err := commander.CombinedOutput(ctx, command, pingArgs(runtime.GOOS, count, monitor.TimeoutS, cfg.Host)...)
 	totalTime := int(time.Since(start).Milliseconds())
 
 	result := &models.CheckResult{
@@ -81,7 +96,15 @@ func (c *PingChecker) Check(ctx context.Context, monitor *models.Monitor) (*mode
 
 	if err != nil {
 		result.Status = models.StatusDown
-		result.Message = fmt.Sprintf("ping failed: %s", strings.TrimSpace(string(output)))
+		// 启动失败和超时可能没有输出，必须保留实际执行错误作为诊断依据。
+		cause := err
+		if ctx.Err() != nil {
+			cause = ctx.Err()
+		}
+		result.Message = "ping failed: " + cause.Error()
+		if detail := strings.TrimSpace(string(output)); detail != "" {
+			result.Message += ": " + detail
+		}
 		result.LatencyMs = &totalTime
 		return result, nil
 	}
