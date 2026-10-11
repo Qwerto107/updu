@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -385,6 +386,23 @@ func (db *DB) ListScopes(ctx context.Context) ([]*models.Scope, error) {
 
 // UpsertTLSCertificate inserts or updates a discovered TLS certificate.
 func (db *DB) UpsertTLSCertificate(ctx context.Context, cert *models.TLSCertificate) error {
+	// 端点采集与独立手动检查使用不同主键，避免同域名互相覆盖或冒用服务关联。
+	if cert.AssociatedEndpointID != nil && *cert.AssociatedEndpointID != "" {
+		key := sha256.Sum256([]byte(*cert.AssociatedEndpointID + "\x00" + cert.Domain))
+		cert.ID = fmt.Sprintf("endpoint-cert-%x", key)
+		var existingID string
+		err := db.QueryRowContext(ctx, `SELECT id FROM tls_certificates WHERE associated_endpoint_id = ? AND domain = ? LIMIT 1`,
+			*cert.AssociatedEndpointID, cert.Domain).Scan(&existingID)
+		if err == nil {
+			// 迁移过的旧证书沿用其 ID，重探测时只更新而不新增一份。
+			cert.ID = existingID
+		} else if err != sql.ErrNoRows {
+			return err
+		}
+	} else {
+		cert.AssociatedEndpointID = nil
+		cert.ID = "cert-" + cert.Domain
+	}
 	sansJSON, err := json.Marshal(cert.SANs)
 	if err != nil {
 		sansJSON = []byte("[]")
@@ -410,7 +428,7 @@ func (db *DB) UpsertTLSCertificate(ctx context.Context, cert *models.TLSCertific
 			signature_algorithm = excluded.signature_algorithm,
 			ocsp_status = excluded.ocsp_status,
 			last_verified_at = excluded.last_verified_at,
-			associated_endpoint_id = COALESCE(excluded.associated_endpoint_id, tls_certificates.associated_endpoint_id)
+			associated_endpoint_id = excluded.associated_endpoint_id
 	`, cert.ID, cert.Domain, cert.Issuer, cert.Subject, string(sansJSON), cert.ValidFrom, cert.ValidUntil,
 		cert.DaysRemaining, cert.SerialNumber, cert.SignatureAlgorithm, cert.OCSPStatus,
 		cert.LastVerifiedAt, cert.AssociatedEndpointID)

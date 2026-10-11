@@ -175,6 +175,13 @@ test('visitor layout choice persists per page without changing the server defaul
     });
     await page.goto('/status/layout-demo');
     const controls = page.getByRole('group', { name: 'Display layout', exact: true });
+    // 图标按钮保留可访问名称和悬停提示，同时移除占宽的可见文字。
+    for (const name of ['Lightweight cards', 'Operations table']) {
+        const button = controls.getByRole('button', { name, exact: true });
+        await expect(button).toHaveAttribute('title', name);
+        await expect(button).toHaveText('');
+        await expect(button.locator('svg')).toBeVisible();
+    }
     await expect(controls.getByRole('button', { name: 'Lightweight cards', exact: true })).toHaveAttribute('aria-pressed', 'true');
     await controls.getByRole('button', { name: 'Operations table', exact: true }).click();
     await expect(controls.getByRole('button', { name: 'Operations table', exact: true })).toHaveAttribute('aria-pressed', 'true');

@@ -42,7 +42,7 @@ test('light is the default and a deliberate dark preference survives reload', as
     await expect(page.locator('html')).not.toHaveClass(/light/);
 });
 
-// 固定有效期状态，避免真实证书随日期变化，也不会触发外部 TLS 探测。
+// 有效期相对测试开始时间生成，不能只伪造 days_remaining；不会触发外部 TLS 探测。
 const certificates: TLSCertificate[] = [
     { domain: 'valid.example.test', days_remaining: 60 },
     { domain: 'expiring.example.test', days_remaining: 20 },
@@ -53,13 +53,14 @@ const certificates: TLSCertificate[] = [
     issuer: 'Theme Test CA',
     subject: certificate.domain,
     sans: [certificate.domain],
-    valid_from: '2026-01-01T00:00:00Z',
-    valid_until: '2026-12-01T00:00:00Z',
-    last_verified_at: '2026-10-10T00:00:00Z',
+    valid_from: new Date(Date.now() - 90 * 86_400_000).toISOString(),
+    valid_until: new Date(Date.now() + certificate.days_remaining * 86_400_000).toISOString(),
+    last_verified_at: new Date(Date.now()).toISOString(),
+    ocsp_status: certificate.days_remaining < 0 ? 'expired' : 'verified',
     signature_algorithm: 'SHA256-RSA',
 }));
 
-test('certificate cards, expiry badges and audit dialog follow both themes', async ({ page }, testInfo) => {
+test('certificate risk table, expiry badges and audit dialog follow both themes', async ({ page }, testInfo) => {
     await page.route('**/api/v1/certificates', route => route.fulfill({ json: certificates }));
     let auditFailed = false;
     await page.route('**/api/v1/certificates/test', route => route.fulfill(auditFailed
@@ -76,8 +77,11 @@ test('certificate cards, expiry badges and audit dialog follow both themes', asy
             // 主题切换包含颜色过渡，等待最终配色后再检查，避免读到中间动画帧。
             await expect.poll(() => contrast(domain), { message: `${mode} certificate domain` }).toBeGreaterThanOrEqual(4.5);
         }
-        for (const badge of ['60 days', '20d (Expiring Soon)', 'Expired']) {
-            await expect.poll(() => contrast(page.getByText(badge, { exact: true })), { message: `${mode} ${badge}` }).toBeGreaterThanOrEqual(4.5);
+        for (const [index, badge] of ['60 days remaining', '20 days remaining', 'Expired'].entries()) {
+            const row = page.getByTestId('tls-certificate').filter({ hasText: certificates[index].domain });
+            const expiryBadge = row.locator('.expiry-badge');
+            await expect(expiryBadge).toHaveText(badge);
+            await expect.poll(() => contrast(expiryBadge), { message: `${mode} ${badge}` }).toBeGreaterThanOrEqual(4.5);
         }
         await page.screenshot({ path: testInfo.outputPath(`certificates-${mode}.png`), fullPage: true });
         await page.getByRole('button', { name: 'Test TLS Handshake', exact: true }).click();
@@ -108,7 +112,7 @@ test('certificate empty and error states remain readable in light mode', async (
         ? { status: 500, json: { error: 'Theme test certificate list failed' } }
         : { json: [] }));
     await page.goto('/certificates');
-    const empty = page.getByRole('heading', { name: 'No certificates discovered yet', exact: true });
+    const empty = page.getByText('No certificates discovered yet', { exact: true });
     await expect(empty).toBeVisible();
     expect(await contrast(empty)).toBeGreaterThanOrEqual(4.5);
     failed = true;

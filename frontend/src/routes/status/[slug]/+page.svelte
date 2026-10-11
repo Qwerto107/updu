@@ -15,6 +15,8 @@
     } from "lucide-svelte";
     import Button from "$lib/components/ui/button.svelte";
     import StatusMonitor from "$lib/components/StatusMonitor.svelte";
+    import TLSCertificateTable from "$lib/components/TLSCertificateTable.svelte";
+    import type { PublicTLSCertificate } from "$lib/tls-certificate";
     import { onMount } from "svelte";
     import type { StatusCategory } from "$lib/status-categories";
     import { normalizeStatusLayout, statusLayoutOptions, type StatusLayout } from '$lib/status-layout';
@@ -60,6 +62,7 @@
     let allMonitors = $derived(data.monitors || []);
     let incidents = $derived(data.incidents || []);
     let maintenance = $derived(data.maintenance || []);
+    let certificates = $derived<PublicTLSCertificate[]>(data.certificates || []);
     let locked = $derived(Boolean(data.locked));
     let pageSlug = $derived<string>(data.slug);
     let preference = $state<{ slug: string; layout: StatusLayout } | null>(null);
@@ -328,10 +331,10 @@
             <span class="text-xs text-text-muted">{translateUI('Last 24 hours')}</span>
             <div class="inline-flex rounded-lg border border-border bg-surface p-1 gap-1" role="group" aria-label={translateUI('Display layout')}>
                 {#each statusLayoutOptions as option}
-                    <button class={`inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary ${layout === option.value ? 'bg-primary/10 text-primary light:text-blue-700' : 'text-text-muted hover:bg-surface-elevated hover:text-text'}`}
+                    <button class={`inline-flex size-10 items-center justify-center rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-primary ${layout === option.value ? 'bg-primary/10 text-primary light:text-blue-700' : 'text-text-muted hover:bg-surface-elevated hover:text-text'}`}
+                        aria-label={translateUI(option.label)} title={translateUI(option.label)}
                         aria-pressed={layout === option.value} onclick={() => selectLayout(option.value)}>
-                        {#if option.value === 'cards'}<LayoutGrid class="size-3.5" />{:else}<Table2 class="size-3.5" />{/if}
-                        {translateUI(option.label)}
+                        {#if option.value === 'cards'}<LayoutGrid class="size-4" aria-hidden="true" />{:else}<Table2 class="size-4" aria-hidden="true" />{/if}
                     </button>
                 {/each}
             </div>
@@ -392,6 +395,16 @@
                 {/each}
             </div>
         </div>
+        {#if sp.show_certificates}
+            <!-- 证书范围由后端按本页服务筛选，公共组件只展示公开字段。 -->
+            <section class="space-y-3" aria-labelledby="status-certificates-title" data-testid="status-certificates">
+                <div class="space-y-1">
+                    <h2 id="status-certificates-title" class="text-sm font-semibold text-text">{translateUI('TLS Certificates')}</h2>
+                    <p class="text-xs text-text-muted">{translateUI('Certificate validity for services on this page.')}</p>
+                </div>
+                <TLSCertificateTable {certificates} publicView />
+            </section>
+        {/if}
     </div>
 {/if}
 

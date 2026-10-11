@@ -34,6 +34,7 @@ type StatusPage struct {
 	Layout            string               `json:"layout"`
 	Groups            []StatusPageGroup    `json:"groups"`
 	Categories        []StatusPageCategory `json:"categories"`
+	ShowCertificates  bool                 `json:"show_certificates"`
 	IsPublic          bool                 `json:"is_public"`
 	PasswordProtected bool                 `json:"password_protected,omitempty"`
 	Password          string               `json:"-"` // optional password, never serialized

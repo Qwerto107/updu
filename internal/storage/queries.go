@@ -516,16 +516,16 @@ func (db *DB) CreateStatusPage(ctx context.Context, sp *models.StatusPage) error
 	}
 	categoriesJSON, _ := json.Marshal(sp.Categories)
 	_, err := db.ExecContext(ctx,
-		`INSERT INTO status_pages (id, name, slug, description, groups, is_public, password, layout, categories)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		sp.ID, sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON),
+		`INSERT INTO status_pages (id, name, slug, description, groups, is_public, password, layout, categories, show_certificates)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		sp.ID, sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON), sp.ShowCertificates,
 	)
 	return err
 }
 
 func (db *DB) ListStatusPages(ctx context.Context) ([]*models.StatusPage, error) {
 	rows, err := db.QueryContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories, show_certificates
 		 FROM status_pages ORDER BY name`)
 	if err != nil {
 		return nil, err
@@ -536,7 +536,7 @@ func (db *DB) ListStatusPages(ctx context.Context) ([]*models.StatusPage, error)
 	for rows.Next() {
 		sp := &models.StatusPage{}
 		var groupsJSON, categoriesJSON string
-		if err := rows.Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON); err != nil {
+		if err := rows.Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON, &sp.ShowCertificates); err != nil {
 			return nil, err
 		}
 		if groupsJSON != "" {
@@ -554,9 +554,9 @@ func (db *DB) GetStatusPageBySlug(ctx context.Context, slug string) (*models.Sta
 	sp := &models.StatusPage{}
 	var groupsJSON, categoriesJSON string
 	err := db.QueryRowContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories, show_certificates
 		 FROM status_pages WHERE slug = ?`, slug,
-	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON)
+	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON, &sp.ShowCertificates)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -576,9 +576,9 @@ func (db *DB) GetStatusPageByID(ctx context.Context, id string) (*models.StatusP
 	sp := &models.StatusPage{}
 	var groupsJSON, categoriesJSON string
 	err := db.QueryRowContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories, show_certificates
 		 FROM status_pages WHERE id = ?`, id,
-	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON)
+	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON, &sp.ShowCertificates)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -604,9 +604,9 @@ func (db *DB) UpdateStatusPage(ctx context.Context, sp *models.StatusPage) error
 	}
 	categoriesJSON, _ := json.Marshal(sp.Categories)
 	_, err := db.ExecContext(ctx,
-		`UPDATE status_pages SET name=?, slug=?, description=?, groups=?, is_public=?, password=?, layout=?, categories=?
+		`UPDATE status_pages SET name=?, slug=?, description=?, groups=?, is_public=?, password=?, layout=?, categories=?, show_certificates=?
 		 WHERE id=?`,
-		sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON), sp.ID,
+		sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON), sp.ShowCertificates, sp.ID,
 	)
 	return err
 }

@@ -37,6 +37,7 @@
     let formSlug = $state("");
     let formDescription = $state("");
     let formLayout = $state<StatusLayout>("cards");
+    let formShowCertificates = $state(false);
     let formAccessMode = $state<AccessMode>("public");
     let formPassword = $state("");
     let formGroups = $state<string[]>([]);
@@ -105,6 +106,7 @@
         formSlug = "";
         formDescription = "";
         formLayout = "cards";
+        formShowCertificates = false;
         formAccessMode = "public";
         formPassword = "";
         formGroups = [];
@@ -120,6 +122,7 @@
         formSlug = p.slug;
         formDescription = p.description || "";
         formLayout = normalizeStatusLayout(p.layout);
+        formShowCertificates = Boolean(p.show_certificates);
         formAccessMode = p.password_protected
             ? "protected"
             : p.is_public
@@ -196,6 +199,7 @@
                 slug: formSlug,
                 description: formDescription,
                 layout: formLayout,
+                show_certificates: formShowCertificates,
                 is_public: formAccessMode !== "internal",
                 groups: compiledGroups,
                 categories: formCategories.map(category => ({
@@ -530,6 +534,14 @@
 					</div>
 					<p class="text-xs text-text-muted">{translateUI("Visitors can switch layouts on the status page.")}</p>
 				</fieldset>
+                <div class="rounded-xl border border-border bg-surface-elevated p-3 space-y-2">
+                    <label class="flex items-center gap-3 text-sm font-medium text-text cursor-pointer">
+                        <input type="checkbox" bind:checked={formShowCertificates}
+                            class="size-4 rounded border-border accent-primary" aria-describedby="sp-certificates-help" />
+                        {translateUI('Show TLS certificates')}
+                    </label>
+                    <p id="sp-certificates-help" class="text-xs text-text-muted leading-relaxed">{translateUI('Only certificates linked to services selected for this page are shown.')}</p>
+                </div>
                 <StatusCategoryEditor bind:categories={formCategories} {monitors} loading={monitorsLoading} />
                 <div class="space-y-4 pt-2 border-t border-border/50">
                     <div class="space-y-2">

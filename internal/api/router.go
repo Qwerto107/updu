@@ -985,15 +985,16 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 // --- Status Pages ---
 
 type statusPageUpsertRequest struct {
-	Layout        string                       `json:"layout"`
-	Name          string                       `json:"name"`
-	Slug          string                       `json:"slug"`
-	Description   string                       `json:"description"`
-	Groups        []models.StatusPageGroup     `json:"groups"`
-	Categories    *[]models.StatusPageCategory `json:"categories"`
-	IsPublic      bool                         `json:"is_public"`
-	Password      string                       `json:"password"`
-	ClearPassword bool                         `json:"clear_password"`
+	Layout           string                       `json:"layout"`
+	Name             string                       `json:"name"`
+	Slug             string                       `json:"slug"`
+	Description      string                       `json:"description"`
+	Groups           []models.StatusPageGroup     `json:"groups"`
+	Categories       *[]models.StatusPageCategory `json:"categories"`
+	ShowCertificates *bool                        `json:"show_certificates"`
+	IsPublic         bool                         `json:"is_public"`
+	Password         string                       `json:"password"`
+	ClearPassword    bool                         `json:"clear_password"`
 }
 
 type statusPageUnlockRequest struct {
@@ -1093,9 +1094,20 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	monitorIDSet := make(map[string]bool)
+	monitorIDs := make([]string, 0, len(filtered))
 	for _, sm := range filtered {
 		if idStr, ok := sm["id"].(string); ok {
 			monitorIDSet[idStr] = true
+			monitorIDs = append(monitorIDs, idStr)
+		}
+	}
+	// 鉴权和页面服务筛选都已完成，证书只能沿真实的端点关联进入公开响应。
+	certificates := []models.PublicTLSCertificate{}
+	if sp.ShowCertificates {
+		certificates, err = s.db.ListPublicTLSCertificates(r.Context(), monitorIDs)
+		if err != nil {
+			jsonError(w, "failed to load status certificates", http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -1146,10 +1158,11 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonOK(w, map[string]any{
-		"page":        sp,
-		"monitors":    filtered,
-		"incidents":   relevantIncidents,
-		"maintenance": activeMaintenance,
+		"page":         sp,
+		"monitors":     filtered,
+		"incidents":    relevantIncidents,
+		"maintenance":  activeMaintenance,
+		"certificates": certificates,
 	})
 }
 
@@ -1270,6 +1283,9 @@ func (s *Server) handleCreateStatusPage(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
+	if req.ShowCertificates != nil {
+		sp.ShowCertificates = *req.ShowCertificates
+	}
 
 	// Hash status page password if provided
 	if password != "" {
@@ -1328,6 +1344,10 @@ func (s *Server) handleUpdateStatusPage(w http.ResponseWriter, r *http.Request) 
 			jsonError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+	}
+	// 旧客户端省略开关时保留设置；显式 false 才关闭证书展示。
+	if update.ShowCertificates != nil {
+		existing.ShowCertificates = *update.ShowCertificates
 	}
 	password := strings.TrimSpace(update.Password)
 	if update.Password != "" && password == "" {
