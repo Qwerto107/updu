@@ -9,10 +9,12 @@
         Lock,
         Wrench,
         Info,
+        ChevronDown,
     } from "lucide-svelte";
     import Button from "$lib/components/ui/button.svelte";
     import StatusMonitor from "$lib/components/StatusMonitor.svelte";
     import { onMount } from "svelte";
+    import type { StatusCategory } from "$lib/status-categories";
 
     let refreshing = $state(false);
     let refreshFailed = $state(false);
@@ -58,41 +60,53 @@
             : ["Core"];
     }
 
-    // Filter monitors assigned to this page
-    let relevantMonitors = $derived(
-        allMonitors.filter((m: any) => {
-            if (!sp?.groups) return false;
-            return sp.groups.some((g: any) => {
-                if (g.name && monitorGroups(m).includes(g.name)) return true;
-                if (g.monitor_ids?.includes(m.id)) return true;
-                return false;
-            });
-        }),
-    );
+    // 服务范围与后端一致：沿用旧分组选择，并包含直接加入自定义分类的服务。
+    let relevantMonitors = $derived(allMonitors.filter((monitor: any) =>
+        (sp?.categories ?? []).some((category: StatusCategory) => category.monitor_ids.includes(monitor.id)) ||
+        (sp?.groups ?? []).some((group: any) =>
+            (group.name && monitorGroups(monitor).includes(group.name)) || group.monitor_ids?.includes(monitor.id),
+        ),
+    ));
 
-    let monitorBucketKeys = $state(new Map<string, string>());
-
-    $effect(() => {
-        const buckets = new Map<string, string>();
-
-        for (const monitor of relevantMonitors) {
-            const bucket = sp?.groups?.find(
-                (g: any) =>
-                    (g.name && monitorGroups(monitor).includes(g.name)) ||
-                    g.monitor_ids?.includes(monitor.id),
-            );
-            if (!bucket) {
-                continue;
+    type Section = { key: string; name: string; description: string; monitors: any[] };
+    let collapsed = $state(new Set<string>());
+    let sections = $derived.by<Section[]>(() => {
+        const assigned = new Set<string>();
+        const selected = new Map<string, any>(relevantMonitors.map((monitor: any) => [monitor.id, monitor]));
+        const result: Section[] = [];
+        if (sp?.categories?.length) {
+            for (const [index, category] of (sp.categories as StatusCategory[]).entries()) {
+                const members = category.monitor_ids.flatMap(id => {
+                    const monitor = selected.get(id);
+                    if (!monitor || assigned.has(id)) return [];
+                    assigned.add(id);
+                    return [monitor];
+                });
+                result.push({ key: `custom:${index}:${category.name}`, name: category.name, description: category.description ?? '', monitors: members });
             }
-
-            buckets.set(
-                monitor.id,
-                bucket.name ? `group:${bucket.name}` : "standalone",
-            );
+            const other = relevantMonitors.filter((monitor: any) => !assigned.has(monitor.id));
+            if (other.length) result.push({ key: 'other', name: translateUI('Other services'), description: '', monitors: other });
+        } else {
+            // 没有自定义分类的旧页面保持原来的分组与先后顺序。
+            for (const [index, group] of (sp?.groups ?? []).entries()) {
+                const members = relevantMonitors.filter((monitor: any) => {
+                    if (assigned.has(monitor.id)) return false;
+                    const matches = (group.name && monitorGroups(monitor).includes(group.name)) || group.monitor_ids?.includes(monitor.id);
+                    if (matches) assigned.add(monitor.id);
+                    return matches;
+                });
+                if (members.length) result.push({ key: `legacy:${index}`, name: group.name, description: '', monitors: members });
+            }
         }
-
-        monitorBucketKeys = buckets;
+        return result;
     });
+
+    function toggleSection(key: string) {
+        const next = new Set(collapsed);
+        if (next.has(key)) next.delete(key);
+        else next.add(key);
+        collapsed = next;
+    }
 
     let isAllUp = $derived(
         relevantMonitors.length > 0 &&
@@ -297,34 +311,37 @@
             {/each}
         </div>
         <div class="space-y-8">
-            {#if sp.groups}
-                {#each sp.groups as group}
-                    {@const nameStr = group.name}
-                    {@const isStandalone = !nameStr}
-                    {@const bucketKey = isStandalone ? 'standalone' : `group:${nameStr}`}
-                    {@const groupMonitors = relevantMonitors.filter(
-                        (m: any) => monitorBucketKeys.get(m.id) === bucketKey,
-                    )}
-
-                    {#if groupMonitors.length > 0}
-                        <div class="space-y-4">
-                            {#if !isStandalone}
-                                <h3
-                                    class="text-lg font-bold text-text border-b border-border/50 pb-2"
-                                >
-                                    {nameStr}
-                                </h3>
-                            {/if}
-
-                            <div class={sp.layout === "cards" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"} data-testid="status-layout" data-layout={sp.layout === "cards" ? "cards" : "list"}>
-                                {#each groupMonitors as m (m.id)}
-                                    <StatusMonitor monitor={m} cards={sp.layout === "cards"} />
-                                {/each}
-                            </div>
+            {#each sections as section, index (section.key)}
+                <section class="space-y-4" data-testid="status-category">
+                    {#if section.name}
+                        <div class="border-b border-border/50 pb-3">
+                            <h2>
+                                <button class="flex w-full items-center justify-between gap-3 text-left text-text rounded-lg focus-visible:outline-2 focus-visible:outline-primary"
+                                    aria-expanded={!collapsed.has(section.key)} aria-controls={`status-category-${index}`}
+                                    onclick={() => toggleSection(section.key)}>
+                                    <span class="text-lg font-bold break-words min-w-0">{section.name}</span>
+                                    <span class="inline-flex shrink-0 items-center gap-2 text-xs text-text-muted">
+                                        {translateUI('Operational: {up} / {total}', { up: section.monitors.filter(monitor => monitor.status === 'up').length, total: section.monitors.length })}
+                                        <ChevronDown class={`size-4 transition-transform ${collapsed.has(section.key) ? '-rotate-90' : ''}`} />
+                                    </span>
+                                </button>
+                            </h2>
+                            {#if section.description}<p class="mt-2 text-sm text-text-muted break-words">{section.description}</p>{/if}
                         </div>
                     {/if}
-                {/each}
-            {/if}
+                    <div id={`status-category-${index}`} hidden={collapsed.has(section.key)}>
+                        {#if section.monitors.length}
+                            <div class={sp.layout === "cards" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"} data-testid="status-layout" data-layout={sp.layout === "cards" ? "cards" : "list"}>
+                                {#each section.monitors as monitor (monitor.id)}
+                                    <StatusMonitor {monitor} cards={sp.layout === "cards"} />
+                                {/each}
+                            </div>
+                        {:else}
+                            <p class="rounded-xl border border-dashed border-border px-4 py-6 text-sm text-text-muted">{translateUI('No services in this category')}</p>
+                        {/if}
+                    </div>
+                </section>
+            {/each}
         </div>
     </div>
 {/if}

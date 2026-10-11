@@ -27,21 +27,29 @@ type Incident struct {
 
 // StatusPage represents a public/internal status page.
 type StatusPage struct {
-	ID                string            `json:"id"`
-	Name              string            `json:"name"`
-	Slug              string            `json:"slug"`
-	Description       string            `json:"description,omitempty"`
-	Layout            string            `json:"layout"`
-	Groups            []StatusPageGroup `json:"groups"`
-	IsPublic          bool              `json:"is_public"`
-	PasswordProtected bool              `json:"password_protected,omitempty"`
-	Password          string            `json:"-"` // optional password, never serialized
+	ID                string               `json:"id"`
+	Name              string               `json:"name"`
+	Slug              string               `json:"slug"`
+	Description       string               `json:"description,omitempty"`
+	Layout            string               `json:"layout"`
+	Groups            []StatusPageGroup    `json:"groups"`
+	Categories        []StatusPageCategory `json:"categories"`
+	IsPublic          bool                 `json:"is_public"`
+	PasswordProtected bool                 `json:"password_protected,omitempty"`
+	Password          string               `json:"-"` // optional password, never serialized
 }
 
 // StatusPageGroup organizes monitors on a status page.
 type StatusPageGroup struct {
 	Name       string   `json:"name"`
 	MonitorIDs []string `json:"monitor_ids"`
+}
+
+// StatusPageCategory 是页面独立的展示分类，顺序与监控分组无关。
+type StatusPageCategory struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description,omitempty"`
+	MonitorIDs  []string `json:"monitor_ids"`
 }
 
 // NotificationChannel represents a configured notification target.

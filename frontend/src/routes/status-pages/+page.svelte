@@ -20,6 +20,8 @@
     import { fetchAPI } from "$lib/api/client";
     import { onMount } from "svelte";
     import { monitorsStore } from "$lib/stores/monitors.svelte";
+    import StatusCategoryEditor from "$lib/components/StatusCategoryEditor.svelte";
+    import type { StatusCategory } from "$lib/status-categories";
 
     type AccessMode = "public" | "protected" | "internal";
 
@@ -38,6 +40,7 @@
     let formPassword = $state("");
     let formGroups = $state<string[]>([]);
     let formStandaloneMonitors = $state<string[]>([]);
+    let formCategories = $state<StatusCategory[]>([]);
     let formSaving = $state(false);
     let formError = $state("");
 
@@ -105,6 +108,7 @@
         formPassword = "";
         formGroups = [];
         formStandaloneMonitors = [];
+        formCategories = [];
         formError = "";
         dialogOpen = true;
     }
@@ -133,6 +137,10 @@
         }
         formGroups = groups;
         formStandaloneMonitors = standalone;
+        // 编辑草稿使用副本，取消弹窗时不影响已经保存的分类。
+        formCategories = (p.categories ?? []).map((category: StatusCategory) => ({
+            name: category.name, description: category.description ?? '', monitor_ids: [...category.monitor_ids],
+        }));
 
         formError = "";
         dialogOpen = true;
@@ -152,6 +160,17 @@
             return;
         }
         formSaving = true;
+        if (formCategories.some(category => !category.name.trim())) {
+            formError = "Category name is required";
+            formSaving = false;
+            return;
+        }
+        const names = formCategories.map(category => category.name.trim().toLowerCase());
+        if (new Set(names).size !== names.length) {
+            formError = "Category names must be unique";
+            formSaving = false;
+            return;
+        }
         formError = "";
         try {
             const standaloneMonitorIds =
@@ -178,6 +197,9 @@
 				layout: formLayout,
                 is_public: formAccessMode !== "internal",
                 groups: compiledGroups,
+                categories: formCategories.map(category => ({
+                    name: category.name.trim(), description: category.description.trim(), monitor_ids: category.monitor_ids,
+                })),
                 password:
                     formAccessMode === "protected"
                         ? formPassword.trim()
@@ -392,11 +414,11 @@
                         </p>
                     {/if}
 
-                    {#if p.groups?.length}
+                    {#if p.categories?.length || p.groups?.length}
                         <div
                             class="flex flex-wrap gap-1.5 pt-2 border-t border-border/50"
                         >
-                            {#each p.groups as group}
+                            {#each (p.categories?.length ? p.categories : p.groups) as group}
                                 <span
                                     class="px-2 py-0.5 rounded-full bg-surface-elevated border border-border text-[10px] font-semibold uppercase tracking-wider text-text-muted"
                                 >
@@ -506,6 +528,7 @@
 						{/each}
 					</div>
 				</fieldset>
+                <StatusCategoryEditor bind:categories={formCategories} {monitors} loading={monitorsLoading} />
                 <div class="space-y-4 pt-2 border-t border-border/50">
                     <div class="space-y-2">
                         <div>

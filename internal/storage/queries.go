@@ -510,17 +510,21 @@ func (db *DB) CreateStatusPage(ctx context.Context, sp *models.StatusPage) error
 		sp.Layout = "list"
 	}
 	groupsJSON, _ := json.Marshal(sp.Groups)
+	if sp.Categories == nil {
+		sp.Categories = []models.StatusPageCategory{}
+	}
+	categoriesJSON, _ := json.Marshal(sp.Categories)
 	_, err := db.ExecContext(ctx,
-		`INSERT INTO status_pages (id, name, slug, description, groups, is_public, password, layout)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		sp.ID, sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout,
+		`INSERT INTO status_pages (id, name, slug, description, groups, is_public, password, layout, categories)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		sp.ID, sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON),
 	)
 	return err
 }
 
 func (db *DB) ListStatusPages(ctx context.Context) ([]*models.StatusPage, error) {
 	rows, err := db.QueryContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
 		 FROM status_pages ORDER BY name`)
 	if err != nil {
 		return nil, err
@@ -530,13 +534,15 @@ func (db *DB) ListStatusPages(ctx context.Context) ([]*models.StatusPage, error)
 	var pages []*models.StatusPage
 	for rows.Next() {
 		sp := &models.StatusPage{}
-		var groupsJSON string
-		if err := rows.Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout); err != nil {
+		var groupsJSON, categoriesJSON string
+		if err := rows.Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON); err != nil {
 			return nil, err
 		}
 		if groupsJSON != "" {
 			_ = json.Unmarshal([]byte(groupsJSON), &sp.Groups)
 		}
+		sp.Categories = []models.StatusPageCategory{}
+		_ = json.Unmarshal([]byte(categoriesJSON), &sp.Categories)
 		sp.PasswordProtected = sp.Password != ""
 		pages = append(pages, sp)
 	}
@@ -545,11 +551,11 @@ func (db *DB) ListStatusPages(ctx context.Context) ([]*models.StatusPage, error)
 
 func (db *DB) GetStatusPageBySlug(ctx context.Context, slug string) (*models.StatusPage, error) {
 	sp := &models.StatusPage{}
-	var groupsJSON string
+	var groupsJSON, categoriesJSON string
 	err := db.QueryRowContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
 		 FROM status_pages WHERE slug = ?`, slug,
-	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout)
+	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -559,17 +565,19 @@ func (db *DB) GetStatusPageBySlug(ctx context.Context, slug string) (*models.Sta
 	if groupsJSON != "" {
 		_ = json.Unmarshal([]byte(groupsJSON), &sp.Groups)
 	}
+	sp.Categories = []models.StatusPageCategory{}
+	_ = json.Unmarshal([]byte(categoriesJSON), &sp.Categories)
 	sp.PasswordProtected = sp.Password != ""
 	return sp, nil
 }
 
 func (db *DB) GetStatusPageByID(ctx context.Context, id string) (*models.StatusPage, error) {
 	sp := &models.StatusPage{}
-	var groupsJSON string
+	var groupsJSON, categoriesJSON string
 	err := db.QueryRowContext(ctx,
-		`SELECT id, name, slug, description, groups, is_public, password, layout
+		`SELECT id, name, slug, description, groups, is_public, password, layout, categories
 		 FROM status_pages WHERE id = ?`, id,
-	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout)
+	).Scan(&sp.ID, &sp.Name, &sp.Slug, &sp.Description, &groupsJSON, &sp.IsPublic, &sp.Password, &sp.Layout, &categoriesJSON)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -579,6 +587,8 @@ func (db *DB) GetStatusPageByID(ctx context.Context, id string) (*models.StatusP
 	if groupsJSON != "" {
 		_ = json.Unmarshal([]byte(groupsJSON), &sp.Groups)
 	}
+	sp.Categories = []models.StatusPageCategory{}
+	_ = json.Unmarshal([]byte(categoriesJSON), &sp.Categories)
 	sp.PasswordProtected = sp.Password != ""
 	return sp, nil
 }
@@ -588,10 +598,14 @@ func (db *DB) UpdateStatusPage(ctx context.Context, sp *models.StatusPage) error
 		sp.Layout = "list"
 	}
 	groupsJSON, _ := json.Marshal(sp.Groups)
+	if sp.Categories == nil {
+		sp.Categories = []models.StatusPageCategory{}
+	}
+	categoriesJSON, _ := json.Marshal(sp.Categories)
 	_, err := db.ExecContext(ctx,
-		`UPDATE status_pages SET name=?, slug=?, description=?, groups=?, is_public=?, password=?, layout=?
+		`UPDATE status_pages SET name=?, slug=?, description=?, groups=?, is_public=?, password=?, layout=?, categories=?
 		 WHERE id=?`,
-		sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, sp.ID,
+		sp.Name, sp.Slug, sp.Description, string(groupsJSON), sp.IsPublic, sp.Password, sp.Layout, string(categoriesJSON), sp.ID,
 	)
 	return err
 }

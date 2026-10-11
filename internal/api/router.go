@@ -985,14 +985,15 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 // --- Status Pages ---
 
 type statusPageUpsertRequest struct {
-	Layout        string                   `json:"layout"`
-	Name          string                   `json:"name"`
-	Slug          string                   `json:"slug"`
-	Description   string                   `json:"description"`
-	Groups        []models.StatusPageGroup `json:"groups"`
-	IsPublic      bool                     `json:"is_public"`
-	Password      string                   `json:"password"`
-	ClearPassword bool                     `json:"clear_password"`
+	Layout        string                       `json:"layout"`
+	Name          string                       `json:"name"`
+	Slug          string                       `json:"slug"`
+	Description   string                       `json:"description"`
+	Groups        []models.StatusPageGroup     `json:"groups"`
+	Categories    *[]models.StatusPageCategory `json:"categories"`
+	IsPublic      bool                         `json:"is_public"`
+	Password      string                       `json:"password"`
+	ClearPassword bool                         `json:"clear_password"`
 }
 
 type statusPageUnlockRequest struct {
@@ -1033,6 +1034,13 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	historyNow := time.Now()
+	// 分类中的明确选择与旧分组共同决定页面可见范围，不修改监控本身的分组。
+	categoryMonitorIDs := make(map[string]bool)
+	for _, category := range sp.Categories {
+		for _, id := range category.MonitorIDs {
+			categoryMonitorIDs[id] = true
+		}
+	}
 
 	// Filter monitors to only include those in the groups or monitor_ids assigned to this status page
 	var filtered []map[string]any
@@ -1043,8 +1051,11 @@ func (s *Server) handleGetStatusPage(w http.ResponseWriter, r *http.Request) {
 		}
 		idStr, _ := sm["id"].(string)
 
-		matched := false
+		matched := categoryMonitorIDs[idStr]
 		for _, g := range sp.Groups {
+			if matched {
+				break
+			}
 			// Check if monitor is in the group
 			for _, mg := range monitorGroups {
 				if g.Name != "" && g.Name == mg {
@@ -1252,6 +1263,13 @@ func (s *Server) handleCreateStatusPage(w http.ResponseWriter, r *http.Request) 
 		Groups:      req.Groups,
 		IsPublic:    req.IsPublic,
 	}
+	if req.Categories != nil {
+		sp.Categories, err = normalizeStatusPageCategories(*req.Categories)
+		if err != nil {
+			jsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
 
 	// Hash status page password if provided
 	if password != "" {
@@ -1302,6 +1320,14 @@ func (s *Server) handleUpdateStatusPage(w http.ResponseWriter, r *http.Request) 
 	}
 	if update.Layout != "" {
 		existing.Layout = update.Layout
+	}
+	// 旧客户端没有 categories 字段时保留设置；明确传 [] 才清空分类。
+	if update.Categories != nil {
+		existing.Categories, err = normalizeStatusPageCategories(*update.Categories)
+		if err != nil {
+			jsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
 	password := strings.TrimSpace(update.Password)
 	if update.Password != "" && password == "" {
