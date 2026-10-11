@@ -3,12 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/updu/updu/internal/models"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/updu/updu/internal/models"
 )
 
 func TestStatusPageLayoutsAndHistoryAccess(t *testing.T) {
@@ -41,10 +42,10 @@ func TestStatusPageLayoutsAndHistoryAccess(t *testing.T) {
 	if err := json.Unmarshal(created.Body.Bytes(), &page); err != nil {
 		t.Fatal(err)
 	}
-	if page.Layout != "list" {
-		t.Fatal("missing layout must default to list")
+	if page.Layout != "cards" {
+		t.Fatal("missing layout must default to cards")
 	}
-	update := call("PUT", "/api/v1/status-pages/"+page.ID, `{"layout":"cards","is_public":true,"groups":[{"name":"visible"}]}`, true)
+	update := call("PUT", "/api/v1/status-pages/"+page.ID, `{"layout":"table","is_public":true,"groups":[{"name":"visible"}]}`, true)
 	if update.Code != http.StatusOK {
 		t.Fatal(update.Body.String())
 	}
@@ -56,7 +57,7 @@ func TestStatusPageLayoutsAndHistoryAccess(t *testing.T) {
 	if err := json.Unmarshal(public.Body.Bytes(), &response); err != nil {
 		t.Fatal(err)
 	}
-	if public.Code != 200 || response.Page.Layout != "cards" || len(response.Monitors) != 1 {
+	if public.Code != 200 || response.Page.Layout != "table" || len(response.Monitors) != 1 {
 		t.Fatal(public.Body.String())
 	}
 	history := response.Monitors[0]["history"].([]any)
@@ -78,9 +79,26 @@ func TestStatusPageLayoutsAndHistoryAccess(t *testing.T) {
 	if denied.Code != 403 || strings.Contains(denied.Body.String(), "history") {
 		t.Fatal("protected history exposed")
 	}
-	// 旧客户端不传布局字段时，已保存的卡片布局必须保留。
+	// 旧客户端不传布局字段时，已保存的表格布局必须保留。
 	saved, err := db.GetStatusPageByID(t.Context(), page.ID)
-	if err != nil || saved.Layout != "cards" {
+	if err != nil || saved.Layout != "table" {
 		t.Fatal("layout lost on legacy update")
+	}
+	// 创建入口同样接受新布局，并继续兼容旧客户端提交的 list。
+	for _, layout := range []string{"cards", "table", "list", "invalid"} {
+		result := call("POST", "/api/v1/status-pages", `{"name":"Layout","slug":"create-`+layout+`","layout":"`+layout+`"}`, true)
+		if layout == "invalid" {
+			if result.Code != http.StatusBadRequest {
+				t.Fatal("invalid create layout accepted")
+			}
+			continue
+		}
+		if result.Code != http.StatusCreated {
+			t.Fatalf("create %s layout: %s", layout, result.Body.String())
+		}
+		var createdPage models.StatusPage
+		if err := json.Unmarshal(result.Body.Bytes(), &createdPage); err != nil || createdPage.Layout != layout {
+			t.Fatalf("create %s layout was not preserved: %+v, %v", layout, createdPage, err)
+		}
 	}
 }

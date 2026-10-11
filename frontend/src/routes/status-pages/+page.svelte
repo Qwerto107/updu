@@ -22,6 +22,7 @@
     import { monitorsStore } from "$lib/stores/monitors.svelte";
     import StatusCategoryEditor from "$lib/components/StatusCategoryEditor.svelte";
     import type { StatusCategory } from "$lib/status-categories";
+    import { normalizeStatusLayout, statusLayoutOptions, type StatusLayout } from "$lib/status-layout";
 
     type AccessMode = "public" | "protected" | "internal";
 
@@ -35,7 +36,7 @@
     let formName = $state("");
     let formSlug = $state("");
     let formDescription = $state("");
-	let formLayout = $state("list");
+    let formLayout = $state<StatusLayout>("cards");
     let formAccessMode = $state<AccessMode>("public");
     let formPassword = $state("");
     let formGroups = $state<string[]>([]);
@@ -103,7 +104,7 @@
         formName = "";
         formSlug = "";
         formDescription = "";
-		formLayout = "list";
+        formLayout = "cards";
         formAccessMode = "public";
         formPassword = "";
         formGroups = [];
@@ -118,7 +119,7 @@
         formName = p.name;
         formSlug = p.slug;
         formDescription = p.description || "";
-		formLayout = p.layout === "cards" ? "cards" : "list";
+        formLayout = normalizeStatusLayout(p.layout);
         formAccessMode = p.password_protected
             ? "protected"
             : p.is_public
@@ -194,7 +195,7 @@
                 name: formName,
                 slug: formSlug,
                 description: formDescription,
-				layout: formLayout,
+                layout: formLayout,
                 is_public: formAccessMode !== "internal",
                 groups: compiledGroups,
                 categories: formCategories.map(category => ({
@@ -518,15 +519,16 @@
                 </div>
                 <!-- Service & Group Selection -->
 				<fieldset class="space-y-2">
-					<legend class="text-sm font-medium text-text">{translateUI("Display layout")}</legend>
+					<legend class="text-sm font-medium text-text">{translateUI("Default layout")}</legend>
 					<div class="grid grid-cols-2 gap-3">
-						{#each [{ value: "list", label: "Simple list" }, { value: "cards", label: "Card grid" }] as option}
+						{#each statusLayoutOptions as option}
 							<label class="flex items-center gap-2 rounded-xl border border-border bg-surface-elevated p-3 text-sm text-text cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/10">
 								<input type="radio" name="status-layout" value={option.value} bind:group={formLayout} />
 								{translateUI(option.label)}
 							</label>
 						{/each}
 					</div>
+					<p class="text-xs text-text-muted">{translateUI("Visitors can switch layouts on the status page.")}</p>
 				</fieldset>
                 <StatusCategoryEditor bind:categories={formCategories} {monitors} loading={monitorsLoading} />
                 <div class="space-y-4 pt-2 border-t border-border/50">

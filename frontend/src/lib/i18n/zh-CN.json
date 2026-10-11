@@ -36,6 +36,14 @@
   "Now": "现在",
   "Checks": "次探测",
   "Display layout": "展示布局",
+  "Default layout": "默认布局",
+  "Lightweight cards": "轻量卡片",
+  "Operations table": "运维表格",
+  "Visitors can switch layouts on the status page.": "访客可以在状态页切换展示布局。",
+  "Service details: {name}": "服务详情：{name}",
+  "Last 24 hours": "最近 24 小时",
+  "Availability": "可用率",
+  "Service type": "服务类型",
   "Simple list": "简洁列表",
   "Card grid": "卡片网格",
   "Availability · 24 hours": "24 小时可用率",
@@ -1161,5 +1169,6 @@
     "None": "无",
     "Today": "今天",
     "Yesterday": "昨天",
-    "Invalid username or password": "用户名或密码错误"
+    "Invalid username or password": "用户名或密码错误",
+    "Service": "服务"
 }

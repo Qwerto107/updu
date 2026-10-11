@@ -88,7 +88,7 @@ test('custom categories persist service membership and ordering without changing
 });
 
 test('public categories keep unassigned services visible and collapse in both layouts', async ({ page }, info) => {
-    let layout = 'list';
+    let layout = 'cards';
     await page.route('**/api/v1/status-pages/category-demo', route => route.fulfill({ json: {
         page: {
             name: '分类展示', slug: 'category-demo', layout, groups: [{ name: 'Legacy' }],
@@ -102,7 +102,7 @@ test('public categories keep unassigned services visible and collapse in both la
         ].map(monitor => ({ ...monitor, type: 'http', history: [], uptime_24h: null, last_latency_ms: null })),
     } }));
     await page.goto('/status/category-demo');
-    for (layout of ['list', 'cards']) {
+    for (layout of ['cards', 'table']) {
         await page.reload();
         const categories = page.getByTestId('status-category');
         await expect(categories).toHaveCount(2);

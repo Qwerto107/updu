@@ -1224,7 +1224,7 @@ func (s *Server) handleCreateStatusPage(w http.ResponseWriter, r *http.Request) 
 		jsonError(w, "password and clear_password cannot be combined", http.StatusBadRequest)
 		return
 	}
-	if req.Layout != "" && req.Layout != "list" && req.Layout != "cards" {
+	if req.Layout != "" && req.Layout != "list" && req.Layout != "cards" && req.Layout != "table" {
 		jsonError(w, "invalid status page layout", http.StatusBadRequest)
 		return
 	}
@@ -1314,7 +1314,7 @@ func (s *Server) handleUpdateStatusPage(w http.ResponseWriter, r *http.Request) 
 		jsonError(w, "password and clear_password cannot be combined", http.StatusBadRequest)
 		return
 	}
-	if update.Layout != "" && update.Layout != "list" && update.Layout != "cards" {
+	if update.Layout != "" && update.Layout != "list" && update.Layout != "cards" && update.Layout != "table" {
 		jsonError(w, "invalid status page layout", http.StatusBadRequest)
 		return
 	}

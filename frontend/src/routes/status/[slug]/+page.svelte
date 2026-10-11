@@ -10,11 +10,14 @@
         Wrench,
         Info,
         ChevronDown,
+        LayoutGrid,
+        Table2,
     } from "lucide-svelte";
     import Button from "$lib/components/ui/button.svelte";
     import StatusMonitor from "$lib/components/StatusMonitor.svelte";
     import { onMount } from "svelte";
     import type { StatusCategory } from "$lib/status-categories";
+    import { normalizeStatusLayout, statusLayoutOptions, type StatusLayout } from '$lib/status-layout';
 
     let refreshing = $state(false);
     let refreshFailed = $state(false);
@@ -23,21 +26,26 @@
         const controller = new AbortController();
         const timer = setInterval(async () => {
             if (document.hidden || refreshing) return;
+            const requestSlug = pageSlug;
             refreshing = true;
             try {
-                const response = await fetch(`/api/v1/status-pages/${encodeURIComponent(data.slug)}`, {
+                const response = await fetch(`/api/v1/status-pages/${encodeURIComponent(requestSlug)}`, {
                     cache: 'no-store', signal: controller.signal,
                 });
+                // 切换状态页后丢弃旧请求，避免把上一页的服务写入当前页面。
+                if (pageSlug !== requestSlug) return;
                 // 权限变化交给路由重新校验，临时网络故障则保留页面并在下轮重试。
                 if (response.status === 403 || response.status === 404) {
                     await invalidateAll();
                 } else {
                     if (!response.ok) throw new Error('refresh failed');
-                    data = { ...(await response.json()), slug: data.slug };
+                    const payload = await response.json();
+                    if (pageSlug !== requestSlug) return;
+                    data = { ...payload, slug: requestSlug };
                 }
                 refreshFailed = false;
             }
-            catch { refreshFailed = true; }
+            catch { if (pageSlug === requestSlug) refreshFailed = true; }
             finally { refreshing = false; }
         }, 30000);
         return () => { clearInterval(timer); controller.abort(); };
@@ -53,6 +61,25 @@
     let incidents = $derived(data.incidents || []);
     let maintenance = $derived(data.maintenance || []);
     let locked = $derived(Boolean(data.locked));
+    let pageSlug = $derived<string>(data.slug);
+    let preference = $state<{ slug: string; layout: StatusLayout } | null>(null);
+    let layout = $derived(preference && preference.slug === pageSlug ? preference.layout : normalizeStatusLayout(sp?.layout));
+
+    // 访客偏好按页面保存；不覆盖管理员设置，也不影响其他状态页。
+    $effect(() => {
+        const slug = pageSlug;
+        refreshFailed = false;
+        let stored: string | null = null;
+        try { stored = localStorage.getItem(`updu_status_layout:${slug}`); }
+        catch { /* 存储不可用时仍允许在当前页面切换。 */ }
+        preference = stored === 'cards' || stored === 'table' ? { slug, layout: stored } : null;
+    });
+
+    function selectLayout(value: StatusLayout) {
+        preference = { slug: data.slug, layout: value };
+        try { localStorage.setItem(`updu_status_layout:${data.slug}`, value); }
+        catch { /* 不因隐私模式或存储已满阻止界面切换。 */ }
+    }
 
     function monitorGroups(monitor: any): string[] {
         return monitor.groups && monitor.groups.length > 0
@@ -213,13 +240,13 @@
         </div>
     </div>
 {:else}
-    <div class="mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8" class:max-w-6xl={sp.layout === 'cards'} class:max-w-4xl={sp.layout !== 'cards'}>
-        <div class="text-center space-y-3 pt-6 pb-4 border-b border-border/50">
-            <h1 class="text-3xl font-extrabold tracking-tight text-text">
+    <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="space-y-2">
+            <h1 class="text-2xl font-semibold tracking-tight text-text break-words">
                 {sp.name}
             </h1>
             {#if sp.description}
-                <p class="text-sm text-text-muted max-w-2xl mx-auto">
+                <p class="text-sm text-text-muted max-w-2xl break-words">
                     {sp.description}
                 </p>
             {/if}
@@ -232,7 +259,7 @@
 
         {#if relevantMonitors.length === 0}
             <div
-                class="p-6 rounded-2xl bg-surface-elevated border border-border flex items-center justify-center gap-3"
+                class="p-4 rounded-xl bg-surface-elevated border border-border flex items-center gap-3"
             >
                 <Activity class="size-6 text-text-muted" />
                 <h2 class="text-lg font-medium text-text-muted">
@@ -241,11 +268,11 @@
             </div>
         {:else if humanState === "fixing"}
             <div
-                class="p-6 rounded-2xl bg-warning/10 border border-warning/30 flex items-start gap-4 text-warning light:text-amber-800 shadow-[0_0_24px_hsl(38_92%_50%/0.15)]"
+                class="p-4 rounded-xl bg-warning/10 border border-warning/20 flex items-start gap-3 text-warning light:text-amber-800"
             >
-                <AlertTriangle class="size-8 shrink-0 mt-0.5" />
+                <AlertTriangle class="size-5 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">{translateUI("Active Incident:")} {incidents[0]?.title || translateUI("Service Disturbance")}</h2>
+                    <h2 class="text-base font-medium">{translateUI("Active Incident:")} {incidents[0]?.title || translateUI("Service Disturbance")}</h2>
                     <p class="text-sm opacity-90">
                         {translateUI("We are aware of this issue and actively investigating / working on a fix (Status:")} {incidents[0]?.status || "investigating"}).
                     </p>
@@ -258,11 +285,11 @@
             </div>
         {:else if humanState === "maintenance"}
             <div
-                class="p-6 rounded-2xl bg-primary/10 border border-primary/30 flex items-start gap-4 text-primary light:text-blue-700 shadow-[0_0_24px_hsl(217_91%_60%/0.15)]"
+                class="p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-start gap-3 text-primary light:text-blue-700"
             >
-                <Wrench class="size-8 shrink-0 mt-0.5" />
+                <Wrench class="size-5 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">{translateUI("Scheduled Maintenance:")} {maintenance[0]?.title || translateUI("System Maintenance")}</h2>
+                    <h2 class="text-base font-medium">{translateUI("Scheduled Maintenance:")} {maintenance[0]?.title || translateUI("System Maintenance")}</h2>
                     <p class="text-sm opacity-90">
                         {translateUI("Scheduled maintenance is currently in progress. Affected services will resume nominal operation upon completion.")}
                     </p>
@@ -270,11 +297,11 @@
             </div>
         {:else if humanState === "unacknowledged"}
             <div
-                class="p-6 rounded-2xl bg-danger/10 border border-danger/30 flex items-start gap-4 text-danger light:text-red-700 shadow-[0_0_24px_hsl(0_84%_60%/0.15)]"
+                class="p-4 rounded-xl bg-danger/10 border border-danger/20 flex items-start gap-3 text-danger light:text-red-700"
             >
-                <XCircle class="size-8 shrink-0 mt-0.5" />
+                <XCircle class="size-5 shrink-0 mt-0.5" />
                 <div class="space-y-1">
-                    <h2 class="text-xl font-bold">{translateUI("Automated Alert: Service Outage Detected")}</h2>
+                    <h2 class="text-base font-medium">{translateUI("Automated Alert: Service Outage Detected")}</h2>
                     <p class="text-sm opacity-90">
                         {translateUI("Canary probes report reachability failures across one or more failure domains.")}
                     </p>
@@ -284,42 +311,41 @@
                 </div>
             </div>
         {:else if !isAllUp}
-            <div class="p-6 rounded-2xl bg-surface-elevated border border-border text-text flex items-center gap-3">
-                <Info class="size-6 text-text-muted" />
-                <h2 class="text-lg font-semibold">{translateUI("Some services are paused or awaiting checks")}</h2>
+            <div class="p-4 rounded-xl bg-surface-elevated border border-border text-text flex items-center gap-3">
+                <Info class="size-5 shrink-0 text-text-muted" />
+                <h2 class="text-base font-medium">{translateUI("Some services are paused or awaiting checks")}</h2>
             </div>
         {:else}
             <div
-                class="p-6 rounded-2xl bg-success/10 border border-success/20 flex items-start gap-4 text-success light:text-emerald-700 shadow-[0_0_24px_hsl(142_71%_45%/0.1)]"
+                class="p-4 rounded-xl bg-success/10 border border-success/20 flex items-center gap-3 text-success light:text-emerald-700"
             >
-                <CheckCircle2 class="size-8 shrink-0 mt-0.5" />
-                <div class="space-y-1">
-                    <h2 class="text-xl font-bold">{translateUI("All Systems Operational")}</h2>
-                    <p class="text-sm opacity-90">
-                        {translateUI("All monitored services are reachable from all server vantage points.")}
-                    </p>
-                    <p class="text-xs text-text-subtle mt-0.5">
-                        {translateUI("If a service is unreachable for you, verify your local network connection, Tailscale overlay daemon, or DNS.")}
-                    </p>
-                </div>
+                <CheckCircle2 class="size-5 shrink-0" />
+                <h2 class="text-base font-medium">{translateUI("All Systems Operational")}</h2>
             </div>
         {/if}
 
-        <div class="flex flex-wrap gap-4 text-xs text-text-muted" aria-label={translateUI("History legend")}>
-            {#each [{label: 'Operational', color: 'bg-emerald-500'}, {label: 'Outage', color: 'bg-red-500'}, {label: 'Degraded', color: 'bg-amber-500'}, {label: 'No data', color: 'bg-slate-600 light:bg-slate-300'}] as item}
-                <span class="inline-flex items-center gap-1.5"><span class={`size-2 rounded-sm ${item.color}`}></span>{translateUI(item.label)}</span>
-            {/each}
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs text-text-muted">{translateUI('Last 24 hours')}</span>
+            <div class="inline-flex rounded-lg border border-border bg-surface p-1 gap-1" role="group" aria-label={translateUI('Display layout')}>
+                {#each statusLayoutOptions as option}
+                    <button class={`inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary ${layout === option.value ? 'bg-primary/10 text-primary light:text-blue-700' : 'text-text-muted hover:bg-surface-elevated hover:text-text'}`}
+                        aria-pressed={layout === option.value} onclick={() => selectLayout(option.value)}>
+                        {#if option.value === 'cards'}<LayoutGrid class="size-3.5" />{:else}<Table2 class="size-3.5" />{/if}
+                        {translateUI(option.label)}
+                    </button>
+                {/each}
+            </div>
         </div>
-        <div class="space-y-8">
+        <div class="space-y-6">
             {#each sections as section, index (section.key)}
-                <section class="space-y-4" data-testid="status-category">
+                <section class="space-y-3" data-testid="status-category">
                     {#if section.name}
-                        <div class="border-b border-border/50 pb-3">
+                        <div>
                             <h2>
                                 <button class="flex w-full items-center justify-between gap-3 text-left text-text rounded-lg focus-visible:outline-2 focus-visible:outline-primary"
                                     aria-expanded={!collapsed.has(section.key)} aria-controls={`status-category-${index}`}
                                     onclick={() => toggleSection(section.key)}>
-                                    <span class="text-lg font-bold break-words min-w-0">{section.name}</span>
+                                    <span class="text-sm font-semibold break-words min-w-0">{section.name}</span>
                                     <span class="inline-flex shrink-0 items-center gap-2 text-xs text-text-muted">
                                         {translateUI('Operational: {up} / {total}', { up: section.monitors.filter(monitor => monitor.status === 'up').length, total: section.monitors.length })}
                                         <ChevronDown class={`size-4 transition-transform ${collapsed.has(section.key) ? '-rotate-90' : ''}`} />
@@ -331,11 +357,26 @@
                     {/if}
                     <div id={`status-category-${index}`} hidden={collapsed.has(section.key)}>
                         {#if section.monitors.length}
-                            <div class={sp.layout === "cards" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"} data-testid="status-layout" data-layout={sp.layout === "cards" ? "cards" : "list"}>
-                                {#each section.monitors as monitor (monitor.id)}
-                                    <StatusMonitor {monitor} cards={sp.layout === "cards"} />
-                                {/each}
-                            </div>
+                            {#if layout === 'table'}
+                                <div class="rounded-xl border border-border bg-surface overflow-hidden" data-testid="status-layout" data-layout="table">
+                                    <table class="status-table" aria-label={section.name || sp.name}>
+                                        <thead><tr>
+                                            <th scope="col" class="w-[26%]">{translateUI('Service')}</th>
+                                            <th scope="col" class="w-[14%]">{translateUI('Status')}</th>
+                                            <th scope="col" class="w-[15%] text-right">{translateUI('Availability · 24 hours')}</th>
+                                            <th scope="col" class="w-[12%] text-right">{translateUI('Latency')}</th>
+                                            <th scope="col" class="w-[33%]">{translateUI('Last 24 hours')}</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            {#each section.monitors as monitor (monitor.id)}<StatusMonitor {monitor} {layout} />{/each}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {:else}
+                                <div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="status-layout" data-layout="cards">
+                                    {#each section.monitors as monitor (monitor.id)}<StatusMonitor {monitor} {layout} />{/each}
+                                </div>
+                            {/if}
                         {:else}
                             <p class="rounded-xl border border-dashed border-border px-4 py-6 text-sm text-text-muted">{translateUI('No services in this category')}</p>
                         {/if}
@@ -343,5 +384,27 @@
                 </section>
             {/each}
         </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4 text-[11px] text-text-muted">
+            <span>{translateUI('24 hours ago')} → {translateUI('Now')}</span>
+            <div class="flex flex-wrap gap-3" aria-label={translateUI('History legend')}>
+                {#each [{label: 'Operational', color: 'bg-emerald-500'}, {label: 'Outage', color: 'bg-red-500'}, {label: 'Degraded', color: 'bg-amber-500'}, {label: 'No data', color: 'bg-slate-600 light:bg-slate-300'}] as item}
+                    <span class="inline-flex items-center gap-1.5"><span class={`size-2 rounded-sm ${item.color}`}></span>{translateUI(item.label)}</span>
+                {/each}
+            </div>
+        </div>
     </div>
 {/if}
+
+<style>
+    .status-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+    .status-table th { padding: 12px 16px; font-size: 11px; font-weight: 400; color: var(--color-text-muted); text-align: left; }
+    .status-table th.text-right { text-align: right; }
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .status-table th { padding: 12px 10px; }
+    }
+    @media (max-width: 767px) {
+        .status-table, .status-table tbody { display: block; }
+        /* 只视觉隐藏表头，屏幕阅读器仍能读取列名。 */
+        .status-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    }
+</style>

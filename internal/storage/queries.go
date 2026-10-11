@@ -506,8 +506,9 @@ func (db *DB) PurgeOldChecks(ctx context.Context, olderThan time.Time) (int64, e
 // --- Status Page Queries ---
 
 func (db *DB) CreateStatusPage(ctx context.Context, sp *models.StatusPage) error {
-	if sp.Layout != "cards" {
-		sp.Layout = "list"
+	// 新页面默认轻量卡片；保留旧 list 值，由前端兼容显示。
+	if sp.Layout != "list" && sp.Layout != "table" {
+		sp.Layout = "cards"
 	}
 	groupsJSON, _ := json.Marshal(sp.Groups)
 	if sp.Categories == nil {
@@ -594,8 +595,8 @@ func (db *DB) GetStatusPageByID(ctx context.Context, id string) (*models.StatusP
 }
 
 func (db *DB) UpdateStatusPage(ctx context.Context, sp *models.StatusPage) error {
-	if sp.Layout != "cards" {
-		sp.Layout = "list"
+	if sp.Layout != "list" && sp.Layout != "table" {
+		sp.Layout = "cards"
 	}
 	groupsJSON, _ := json.Marshal(sp.Groups)
 	if sp.Categories == nil {
