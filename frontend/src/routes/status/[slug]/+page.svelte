@@ -308,9 +308,6 @@
                     <p class="text-sm opacity-90">
                         {translateUI("Canary probes report reachability failures across one or more failure domains.")}
                     </p>
-                    <p class="text-xs text-text-muted mt-1">
-                        {translateUI("Status: Unacknowledged by on-call administrator. Automated alerts have been dispatched.")}
-                    </p>
                 </div>
             </div>
         {:else if !isAllUp}

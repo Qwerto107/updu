@@ -910,7 +910,6 @@
     "Scheduled maintenance is currently in progress. Affected services will resume nominal operation upon completion.": "计划维护正在进行，受影响的服务将在维护完成后恢复正常。",
     "Automated Alert: Service Outage Detected": "自动告警：检测到服务故障",
     "Canary probes report reachability failures across one or more failure domains.": "探测发现一个或多个故障域存在可达性问题。",
-    "Status: Unacknowledged by on-call administrator. Automated alerts have been dispatched.": "状态：值班管理员尚未确认，已发送自动告警。",
     "All monitored services are reachable from all server vantage points.": "所有监控服务均可从服务器的全部观测点访问。",
     "If a service is unreachable for you, verify your local network connection, Tailscale overlay daemon, or DNS.": "若你无法访问某项服务，请检查本地网络、Tailscale 服务或 DNS。",
     "% uptime over 24h": "% 可用率（24 小时）",
